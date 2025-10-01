@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from app.schemas import ItemCreate, ItemUpdate, ItemOut
+from app.schemas.items_schema import ItemCreate, ItemUpdate, ItemOut
 
 router = APIRouter(prefix="/items", tags=["items"])
 

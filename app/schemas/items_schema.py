@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -11,7 +10,7 @@ class ItemCreate(ItemBase): ...
 
 
 class ItemUpdate(ItemBase):
-    name: Optional[str] = Field(None, min_length=1, max_length=100)  # type: ignore
+    name: str | None = Field(None, min_length=1, max_length=100)  # type: ignore
     description: str | None = Field(None, max_length=500)
 
 
