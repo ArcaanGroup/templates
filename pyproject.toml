@@ -1,0 +1,16 @@
+[project]
+name = "fastapi-starter"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115", # includes fastapi-cli + uvicorn[standard]
+    "pydantic>=2.7",
+    "pytest>=8.4.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-q"
