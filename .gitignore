@@ -1,0 +1,75 @@
+# ==============================
+# Python
+# ==============================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==============================
+# Virtual Environments
+# ==============================
+
+.venv/
+venv/
+env/
+ENV/
+
+# ==============================
+# Dependency Management (PDM)
+# ==============================
+
+pdm.lock
+.pdm-python
+
+# ==============================
+# Testing (pytest)
+# ==============================
+
+.pytest_cache/
+
+# ==============================
+# Alembic (Database Migrations)
+# ==============================
+
+# Ignore auto-generated migration scripts (you commit them manually)
+alembic/versions/
+
+# ==============================
+# IDEs / Editors
+# ==============================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ==============================
+# OS / Shell
+# ==============================
+
+Thumbs.db
+
+# ==============================
+# Logs and Databases
+# ==============================
+
+*.log
+*.sqlite
+*.db
+
+# ==============================
+# Docker (optional — uncomment if needed)
+# ==============================
+
+# docker-compose.override.yml
+# .env
+
+# ==============================
+# Local Config Files (optional)
+# ==============================
+
+# config.local.py
+# local_settings.py
