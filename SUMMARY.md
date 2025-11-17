@@ -1,299 +1,708 @@
-# FastAPI Enterprise Template - Comprehensive Feature Analysis
+# FastAPI Enterprise Template - Modern Architecture Proposal
 
-## Project Overview
-This is an enterprise-ready FastAPI starter template with an opinionated, production-oriented architecture designed for scalability and maintainability.
+## Executive Summary
 
----
-
-## 1. Architecture & Design Patterns
-
-### Layered Architecture (Controller → Service → Repository)
-- **Controllers** (`app/controller/`): Handle HTTP request/response logic
-  - `item.py`: Item CRUD endpoints
-  - `auth.py`: Authentication endpoints
-- **Services** (`app/service/`): Business logic layer
-  - `ItemsService`: Orchestrates item operations
-- **Repositories** (`app/repo/`): Data access layer
-  - `ItemsRepo`: Database operations using async SQLAlchemy
-- **Entities** (`app/entities/`): SQLAlchemy ORM models
-  - `Item`: Example entity with id, name, price, is_offer fields
-- **Schemas** (`app/schema/`): Pydantic models for validation
-  - Request/Response DTOs (ItemCreate, ItemUpdate, ItemOut)
-  - Standardized response wrapper (`StandardResponse`)
+This document proposes a modern, enterprise-grade architecture for the FastAPI template, evolving from the current **Controller → Service → Repository** pattern to a **Clean Architecture / Domain-Driven Design (DDD)** approach with enhanced separation of concerns, better testability, and production-ready features.
 
 ---
 
-## 2. Technology Stack
+## Current Architecture Analysis
 
-### Core Framework
-- **FastAPI** (≥0.116.1): Modern async web framework
-- **Uvicorn** (≥0.35.0): ASGI server with standard extensions
-- **Python 3.12**: Strict version requirement
+### Existing Pattern: Layered Architecture
+- **Controllers** → **Services** → **Repositories** → **Entities**
+- Simple and straightforward
+- Good for small to medium applications
+- Limited domain modeling
+- Tight coupling between layers
 
-### Database & ORM
-- **SQLAlchemy 2.0+** (≥2.0.43): Modern async ORM
-- **AsyncPG** (≥0.30.0): PostgreSQL async driver
-- **Aiosqlite** (≥0.21.0): SQLite async driver (for local dev)
-- **Alembic** (≥1.16.5): Database migration tool
-- **Psycopg2-binary** (≥2.9.10): Sync PostgreSQL driver (for migrations)
+### Strengths
+✅ Clear separation of HTTP, business logic, and data access  
+✅ Async/await throughout  
+✅ Type safety with Pydantic  
+✅ Dependency injection  
 
-### Authentication & Security
-- **Python-JOSE** (≥3.5.0): JWT token handling
-- **Passlib** (≥1.7.4): Password hashing library
-- **Bcrypt** (4.0.0): Password hashing algorithm
-- **OAuth2**: Password flow implementation
-
-### Validation & Settings
-- **Pydantic** (≥2.11.9): Data validation and serialization
-- **Pydantic-Settings** (≥2.6.0): Environment-based configuration
-- **Python-dotenv** (≥1.1.1): .env file support
-
-### API Features
-- **FastAPI-Pagination** (≥0.14.1): Built-in pagination support
-- **Python-multipart** (≥0.0.20): Form data handling
-
-### Monitoring & Observability (Dependencies included, not yet integrated)
-- **Prometheus-FastAPI-Instrumentator** (≥7.1.0): Metrics collection
-- **Sentry-SDK** (≥1.4): Error tracking
-
-### Development Tools
-- **Pytest** (≥8.4.2): Testing framework
-- **Pytest-asyncio** (≥1.2.0): Async test support
-- **Httpx** (≥0.28.1): Async HTTP client for testing
-- **Black** (≥25.1.0): Code formatter
-- **Ruff** (≥0.13.0): Fast linter
-- **Isort** (≥6.0.1): Import sorter
-- **MyPy** (≥1.18.1): Static type checker
-
-### Package Management
-- **PDM**: Modern Python dependency manager (alternative to pip/poetry)
+### Limitations
+❌ Business logic mixed with application logic  
+❌ No clear domain boundaries  
+❌ Limited extensibility for complex domains  
+❌ Missing cross-cutting concerns (caching, events, background tasks)  
+❌ No clear use case boundaries  
 
 ---
 
-## 3. Project Structure
+## Proposed Modern Architecture
+
+### Architecture Pattern: Clean Architecture + DDD Principles
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Presentation Layer                        │
+│  (FastAPI Routes, Middleware, Request/Response Models)      │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                  Application Layer                           │
+│  (Use Cases, Application Services, DTOs, Command/Query)      │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                    Domain Layer                              │
+│  (Entities, Value Objects, Domain Services, Events)         │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                Infrastructure Layer                          │
+│  (Repositories, External Services, Database, Cache, Queue)   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Proposed Project Structure
 
 ```
 fastapi_template/
-├── alembic/                    # Database migrations
-│   ├── env.py                  # Alembic environment configuration
-│   ├── versions/               # Migration scripts
-│   └── script.py.mako          # Migration template
+├── alembic/                          # Database migrations
+│   ├── env.py
+│   ├── versions/
+│   └── script.py.mako
+│
 ├── app/
-│   ├── api/                    # API layer
-│   │   ├── deps.py             # Dependency injection
-│   │   └── v1/
-│   │       └── api.py          # API router aggregation
-│   ├── constants/              # Application constants
-│   │   └── error.py            # Error message enums
-│   ├── controller/             # HTTP controllers (routers)
-│   │   ├── auth.py             # Auth endpoints
-│   │   └── item.py             # Item CRUD endpoints
-│   ├── core/                   # Core functionality
-│   │   ├── auth.py             # Authentication utilities
-│   │   ├── config.py           # Settings management
-│   │   ├── logging.py          # Logging configuration
-│   │   ├── cache/              # (Empty - placeholder for caching)
-│   │   ├── exceptions/         # (Empty - placeholder for custom exceptions)
-│   │   ├── middlewares/        # (Empty - placeholder for middleware)
-│   │   ├── models/             # (Empty - placeholder for models)
-│   │   ├── schemas/            # (Empty - placeholder for schemas)
-│   │   ├── services/           # (Empty - placeholder for services)
-│   │   ├── utils/              # (Empty - placeholder for utilities)
-│   │   └── security/           # Security utilities
-│   ├── db/                     # Database configuration
-│   │   ├── base.py             # SQLAlchemy Base
-│   │   └── session.py          # Async session management
-│   ├── entities/               # SQLAlchemy ORM models
-│   │   └── item.py             # Item entity
-│   ├── repo/                   # Repository layer
-│   │   └── item.py             # Item repository
-│   ├── schema/                 # Pydantic schemas
-│   │   ├── item.py             # Item DTOs
-│   │   └── response.py         # Standard response wrapper
-│   ├── service/                # Service layer
-│   │   └── item.py             # Item service
-│   ├── tests/                  # Test suite
-│   │   └── item_tests.py       # Example tests
-│   ├── utils/                  # Utility functions
-│   │   └── error.py            # Error handlers
-│   └── main.py                 # Application entry point
-├── create_db.py                # Database creation script
-├── docker-compose.yml          # Docker Compose configuration
-├── docker-compose.dev.yml      # (Empty - development config)
-├── Dockerfile                  # Container image definition
-├── Makefile                    # Build automation commands
-├── pyproject.toml              # Project configuration & dependencies
-└── README.md                   # Project documentation
+│   ├── __init__.py
+│   ├── main.py                       # Application factory
+│   │
+│   ├── api/                          # Presentation Layer
+│   │   ├── __init__.py
+│   │   ├── dependencies.py           # FastAPI dependencies
+│   │   ├── middleware/               # Custom middleware
+│   │   │   ├── __init__.py
+│   │   │   ├── logging.py            # Request logging
+│   │   │   ├── metrics.py            # Prometheus metrics
+│   │   │   ├── rate_limit.py         # Rate limiting
+│   │   │   └── security.py            # Security headers
+│   │   │
+│   │   └── v1/                       # API Version 1
+│   │       ├── __init__.py
+│   │       ├── router.py             # Main router
+│   │       └── endpoints/            # Endpoint modules
+│   │           ├── __init__.py
+│   │           ├── items.py          # Item endpoints
+│   │           ├── auth.py           # Auth endpoints
+│   │           └── health.py         # Health check
+│   │
+│   ├── application/                  # Application Layer
+│   │   ├── __init__.py
+│   │   ├── use_cases/                # Use Cases (CQRS)
+│   │   │   ├── __init__.py
+│   │   │   ├── items/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── create_item.py
+│   │   │   │   ├── get_item.py
+│   │   │   │   ├── list_items.py
+│   │   │   │   ├── update_item.py
+│   │   │   │   └── delete_item.py
+│   │   │   └── auth/
+│   │   │       ├── __init__.py
+│   │   │       ├── login.py
+│   │   │       ├── register.py
+│   │   │       └── refresh_token.py
+│   │   │
+│   │   ├── commands/                 # Command handlers (CQRS)
+│   │   │   ├── __init__.py
+│   │   │   └── item_commands.py
+│   │   │
+│   │   ├── queries/                  # Query handlers (CQRS)
+│   │   │   ├── __init__.py
+│   │   │   └── item_queries.py
+│   │   │
+│   │   ├── dto/                      # Data Transfer Objects
+│   │   │   ├── __init__.py
+│   │   │   ├── item_dto.py
+│   │   │   └── auth_dto.py
+│   │   │
+│   │   ├── events/                   # Application events
+│   │   │   ├── __init__.py
+│   │   │   ├── handlers.py
+│   │   │   └── item_events.py
+│   │   │
+│   │   └── interfaces/               # Application interfaces
+│   │       ├── __init__.py
+│   │       ├── repositories.py      # Repository interfaces
+│   │       ├── cache.py              # Cache interface
+│   │       └── event_bus.py          # Event bus interface
+│   │
+│   ├── domain/                       # Domain Layer
+│   │   ├── __init__.py
+│   │   ├── entities/                 # Domain entities
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py              # Base entity
+│   │   │   ├── item.py
+│   │   │   └── user.py
+│   │   │
+│   │   ├── value_objects/            # Value objects
+│   │   │   ├── __init__.py
+│   │   │   ├── email.py
+│   │   │   ├── money.py
+│   │   │   └── price.py
+│   │   │
+│   │   ├── services/                 # Domain services
+│   │   │   ├── __init__.py
+│   │   │   └── item_service.py
+│   │   │
+│   │   ├── events/                   # Domain events
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   └── item_created.py
+│   │   │
+│   │   └── exceptions/               # Domain exceptions
+│   │       ├── __init__.py
+│   │       ├── base.py
+│   │       └── item_exceptions.py
+│   │
+│   ├── infrastructure/               # Infrastructure Layer
+│   │   ├── __init__.py
+│   │   ├── database/                 # Database setup
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py              # SQLAlchemy Base
+│   │   │   ├── session.py           # Session management
+│   │   │   └── unit_of_work.py      # Unit of Work pattern
+│   │   │
+│   │   ├── repositories/             # Repository implementations
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py              # Base repository
+│   │   │   ├── item_repository.py
+│   │   │   └── user_repository.py
+│   │   │
+│   │   ├── cache/                    # Caching implementation
+│   │   │   ├── __init__.py
+│   │   │   ├── redis_cache.py
+│   │   │   └── memory_cache.py
+│   │   │
+│   │   ├── messaging/                # Message queue
+│   │   │   ├── __init__.py
+│   │   │   ├── event_bus.py
+│   │   │   └── handlers.py
+│   │   │
+│   │   ├── external/                 # External services
+│   │   │   ├── __init__.py
+│   │   │   └── email_service.py
+│   │   │
+│   │   └── observability/            # Observability
+│   │       ├── __init__.py
+│   │       ├── metrics.py           # Prometheus
+│   │       ├── tracing.py            # OpenTelemetry
+│   │       └── logging.py            # Structured logging
+│   │
+│   ├── core/                         # Core/Shared
+│   │   ├── __init__.py
+│   │   ├── config.py                # Settings
+│   │   ├── security.py              # Security utilities
+│   │   ├── exceptions.py            # Global exceptions
+│   │   └── types.py                 # Type definitions
+│   │
+│   └── tests/                        # Test suite
+│       ├── __init__.py
+│       ├── conftest.py              # Pytest fixtures
+│       ├── unit/                    # Unit tests
+│       │   ├── domain/
+│       │   ├── application/
+│       │   └── infrastructure/
+│       ├── integration/              # Integration tests
+│       │   └── api/
+│       └── e2e/                     # End-to-end tests
+│
+├── scripts/                          # Utility scripts
+│   ├── create_db.py
+│   └── seed_data.py
+│
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── Dockerfile
+├── Makefile
+├── pyproject.toml
+├── .env.example
+└── README.md
 ```
 
 ---
 
-## 4. Key Features
+## Key Architectural Improvements
 
-### A. Configuration Management
-- **Pydantic Settings**: Type-safe configuration from environment variables
-- **Environment Variables**: `.env` file support with automatic loading
-- **Settings Include**:
-  - `PROJECT_NAME`, `VERSION`, `ENVIRONMENT`
-  - `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `ALGORITHM`
-  - `CORS_ORIGINS`, `DATABASE_URL`
+### 1. Clean Architecture Principles
 
-### B. Database Management
-- **Async SQLAlchemy**: Full async/await support throughout
-- **Multi-Database Support**: PostgreSQL (production) and SQLite (development)
-- **Alembic Migrations**: Version-controlled schema changes
-- **Database Creation Script**: `create_db.py` for PostgreSQL setup
-- **Session Management**: Async session factory with dependency injection
+#### Dependency Rule
+- **Inner layers don't depend on outer layers**
+- Domain layer has no dependencies
+- Application layer depends only on Domain
+- Infrastructure depends on Application interfaces
+- Presentation depends on Application
 
-### C. Authentication & Authorization
-- **JWT Authentication**: Token-based authentication with configurable expiration
-- **OAuth2 Password Flow**: Standard OAuth2 implementation
-- **Password Hashing**: Bcrypt via Passlib
-- **Protected Routes**: `get_current_user` dependency for route protection
-- **Auth Endpoints**:
-  - `POST /api/v1/auth/login`: Login with username/password
-  - `GET /api/v1/auth/me`: Get current user info
-  - `GET /api/v1/auth/protected`: Example protected route
-
-### D. API Features
-- **RESTful Design**: Standard REST endpoints
-- **Pagination**: Built-in pagination with `fastapi-pagination`
-- **Standardized Responses**: `StandardResponse` wrapper with success/message/payload
-- **Error Handling**: Custom exception handlers for HTTP and validation errors
-- **CORS Middleware**: Configurable CORS support
-- **API Versioning**: `/api/v1` prefix for versioned APIs
-
-### E. Error Handling
-- **Custom Error Handlers**:
-  - HTTPException handler with standardized response format
-  - RequestValidationError handler for Pydantic validation errors
-- **Error Constants**: Enum-based error messages (`ErrorMsg`)
-- **Error Response Format**: Consistent JSON error responses
-
-### F. Logging
-- **Structured Logging**: Basic logging configuration
-- **Log Format**: Timestamp, level, name, message
-- **Log Level**: INFO (configurable)
-
-### G. Testing
-- **Pytest**: Testing framework setup
-- **Async Test Support**: `pytest-asyncio` for async tests
-- **HTTP Client**: `httpx` for API testing
-- **Example Tests**: Basic test structure in `item_tests.py`
-
-### H. Code Quality
-- **Linting**: Ruff for fast linting
-- **Formatting**: Black for code formatting
-- **Import Sorting**: Isort for organized imports
-- **Type Checking**: MyPy for static type analysis
-- **Makefile Commands**: `make lint` for quick checks
+#### Benefits
+✅ Testability: Easy to mock dependencies  
+✅ Flexibility: Swap implementations easily  
+✅ Maintainability: Clear boundaries  
+✅ Domain focus: Business logic isolated  
 
 ---
 
-## 5. Docker & Deployment
+### 2. Domain-Driven Design (DDD)
 
-### Docker Configuration
-- **Multi-Stage Dockerfile**: Optimized Python 3.12-slim image
-- **Docker Compose**: PostgreSQL + Web service orchestration
-- **Volume Persistence**: PostgreSQL data volume
-- **Environment Variables**: Configurable via docker-compose
-- **Development Mode**: Separate dev compose file (placeholder)
+#### Domain Entities
+- Rich domain models with behavior
+- Encapsulation of business rules
+- Self-validating entities
 
-### Database Setup
-- **PostgreSQL 15**: Production database
-- **Default Credentials**: postgres/password/test_db
-- **Port Mapping**: 5432 for database, 8000 for web
-- **Auto-creation**: Database creation script included
+#### Value Objects
+- Immutable objects representing domain concepts
+- Examples: Email, Money, Price, Address
 
----
+#### Domain Events
+- Decoupled event-driven communication
+- Event sourcing ready
 
-## 6. Development Workflow
-
-### Makefile Commands
-- `make run`: Start development server
-- `make up`: Start Docker Compose services
-- `make dev-db`: Start only database service
-- `make dev-web`: Start web service locally
-- `make dev`: Start both database and web
-- `make create_db`: Create database
-- `make migrate`: Run Alembic migrations
-- `make tests`: Run test suite
-- `make lint`: Run code linter
-
-### Quick Start
-1. Copy `.env.example` → `.env` (or use defaults)
-2. Start services: `docker-compose up --build`
-3. Run migrations: `make migrate`
-4. Start server: `uvicorn app.main:app --reload`
-5. Access API docs: `http://localhost:8000/docs`
+#### Domain Services
+- Operations that don't belong to a single entity
 
 ---
 
-## 7. Example Implementation
+### 3. CQRS (Command Query Responsibility Segregation)
 
-### Item CRUD Operations
-- **Create**: `POST /api/v1/items/`
-- **List**: `GET /api/v1/items/` (paginated)
-- **Read**: `GET /api/v1/items/{item_id}`
-- **Update**: `PUT /api/v1/items/{item_id}`
+#### Commands (Write Operations)
+- `CreateItemCommand`
+- `UpdateItemCommand`
+- `DeleteItemCommand`
 
-### Item Entity
-- Fields: `id`, `name`, `price`, `is_offer`
-- Indexes on `id` and `name`
-- Full CRUD repository pattern
+#### Queries (Read Operations)
+- `GetItemQuery`
+- `ListItemsQuery`
+- `SearchItemsQuery`
 
----
-
-## 8. Placeholder/Extension Points
-
-Empty directories ready for extension:
-- `app/core/cache/`: Caching layer
-- `app/core/exceptions/`: Custom exceptions
-- `app/core/middlewares/`: Custom middleware
-- `app/core/models/`: Additional models
-- `app/core/schemas/`: Additional schemas
-- `app/core/services/`: Additional services
-- `app/core/utils/`: Utility functions
-- `app/api/v1/endpoints/`: Additional endpoint modules
+#### Benefits
+✅ Optimize read/write independently  
+✅ Scale reads and writes separately  
+✅ Clear separation of concerns  
 
 ---
 
-## 9. Dependencies Not Yet Integrated
+### 4. Use Cases Pattern
 
-- **Prometheus**: Metrics collection (dependency present, not configured)
-- **Sentry**: Error tracking (dependency present, not configured)
-- **CI/CD**: GitHub Actions mentioned in README but not present
-- **Pre-commit Hooks**: Mentioned in README but not configured
+Each use case is a single, focused class:
+
+```python
+class CreateItemUseCase:
+    def __init__(
+        self,
+        repository: ItemRepositoryInterface,
+        event_bus: EventBusInterface,
+        cache: CacheInterface
+    ):
+        self.repository = repository
+        self.event_bus = event_bus
+        self.cache = cache
+    
+    async def execute(self, command: CreateItemCommand) -> ItemDTO:
+        # Business logic here
+        pass
+```
+
+#### Benefits
+✅ Single Responsibility Principle  
+✅ Easy to test  
+✅ Clear business intent  
+✅ Reusable across different interfaces  
 
 ---
 
-## 10. Best Practices Implemented
+### 5. Repository Pattern with Interfaces
 
-✅ **Separation of Concerns**: Clear layered architecture  
-✅ **Dependency Injection**: FastAPI's dependency system  
-✅ **Async/Await**: Full async support throughout  
-✅ **Type Safety**: Type hints and Pydantic validation  
-✅ **Environment Configuration**: Secure settings management  
-✅ **Database Migrations**: Version-controlled schema changes  
-✅ **Error Handling**: Centralized error handling  
-✅ **Code Quality Tools**: Linting, formatting, type checking  
-✅ **Testing Infrastructure**: Test framework setup  
-✅ **Docker Support**: Containerization ready  
-✅ **API Documentation**: Auto-generated OpenAPI/Swagger docs  
+#### Interface (Application Layer)
+```python
+class ItemRepositoryInterface(ABC):
+    @abstractmethod
+    async def create(self, item: Item) -> Item:
+        pass
+    
+    @abstractmethod
+    async def get_by_id(self, id: int) -> Optional[Item]:
+        pass
+```
+
+#### Implementation (Infrastructure Layer)
+```python
+class SQLAlchemyItemRepository(ItemRepositoryInterface):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+    
+    async def create(self, item: Item) -> Item:
+        # Implementation
+        pass
+```
+
+#### Benefits
+✅ Dependency inversion  
+✅ Easy to swap implementations  
+✅ Testable with mocks  
 
 ---
 
-## Summary
+### 6. Unit of Work Pattern
 
-This template provides:
-- **Production-ready architecture** with clear separation of concerns
-- **Full async/await support** for high performance
-- **Authentication and authorization** with JWT
-- **Database management** with migrations
-- **Standardized API responses** for consistency
-- **Docker deployment** setup
-- **Development tooling** and workflows
-- **Extensible structure** for future growth
+```python
+class UnitOfWork(ABC):
+    items: ItemRepositoryInterface
+    users: UserRepositoryInterface
+    
+    async def __aenter__(self):
+        return self
+    
+    async def __aexit__(self, *args):
+        await self.commit()
+    
+    async def commit(self):
+        pass
+    
+    async def rollback(self):
+        pass
+```
 
-Ready to use as a foundation for FastAPI applications with room to add monitoring, caching, and other enterprise features.
+#### Benefits
+✅ Transaction management  
+✅ Consistency guarantees  
+✅ Cleaner code  
 
+---
+
+### 7. Event-Driven Architecture
+
+#### Domain Events
+```python
+@dataclass
+class ItemCreatedEvent(DomainEvent):
+    item_id: int
+    name: str
+    occurred_at: datetime
+```
+
+#### Event Handlers
+```python
+class ItemCreatedEventHandler:
+    async def handle(self, event: ItemCreatedEvent):
+        # Send notification, update cache, etc.
+        pass
+```
+
+#### Benefits
+✅ Loose coupling  
+✅ Scalability  
+✅ Extensibility  
+
+---
+
+### 8. Enhanced Error Handling
+
+#### Domain Exceptions
+```python
+class DomainException(Exception):
+    pass
+
+class ItemNotFoundException(DomainException):
+    pass
+
+class InvalidItemPriceException(DomainException):
+    pass
+```
+
+#### Global Exception Handlers
+- Map domain exceptions to HTTP responses
+- Consistent error format
+- Proper status codes
+
+---
+
+### 9. Caching Strategy
+
+#### Cache Interface
+```python
+class CacheInterface(ABC):
+    @abstractmethod
+    async def get(self, key: str) -> Optional[Any]:
+        pass
+    
+    @abstractmethod
+    async def set(self, key: str, value: Any, ttl: int):
+        pass
+```
+
+#### Implementations
+- Redis (production)
+- In-memory (development/testing)
+
+#### Cache Decorators
+```python
+@cache_result(ttl=300)
+async def get_item(id: int) -> Item:
+    pass
+```
+
+---
+
+### 10. Observability Integration
+
+#### Metrics (Prometheus)
+- Request count, latency, error rates
+- Business metrics
+- Custom metrics
+
+#### Tracing (OpenTelemetry)
+- Distributed tracing
+- Request flow visualization
+
+#### Structured Logging
+- JSON logs
+- Context propagation
+- Log levels per environment
+
+---
+
+### 11. Background Tasks
+
+#### Task Queue
+- Celery or RQ for async tasks
+- Task definitions in application layer
+- Workers in separate processes
+
+#### Use Cases
+- Email sending
+- Report generation
+- Data processing
+- Event processing
+
+---
+
+### 12. API Design Enhancements
+
+#### Request/Response Models
+- Separate DTOs for each use case
+- Validation at API boundary
+- Versioning support
+
+#### Middleware Stack
+1. Security headers
+2. CORS
+3. Rate limiting
+4. Request logging
+5. Metrics collection
+6. Error handling
+
+#### Health Checks
+- `/health`: Basic health
+- `/health/ready`: Readiness probe
+- `/health/live`: Liveness probe
+
+---
+
+## Technology Stack Enhancements
+
+### Additional Dependencies
+```toml
+# Caching
+redis = ">=5.0.0"
+hiredis = ">=2.0.0"
+
+# Background Tasks
+celery = ">=5.3.0"
+redis = ">=5.0.0"  # For Celery broker
+
+# Observability
+opentelemetry-api = ">=1.20.0"
+opentelemetry-sdk = ">=1.20.0"
+opentelemetry-instrumentation-fastapi = ">=0.42b0"
+structlog = ">=23.2.0"  # Structured logging
+
+# Testing
+faker = ">=20.0.0"  # Test data generation
+factory-boy = ">=3.3.0"  # Test factories
+pytest-cov = ">=4.1.0"  # Coverage
+pytest-mock = ">=3.12.0"  # Mocking
+
+# Development
+pre-commit = ">=3.5.0"
+mypy-extensions = ">=1.0.0"
+```
+
+---
+
+## Migration Strategy
+
+### Phase 1: Foundation
+1. Restructure directories
+2. Implement base classes (Entity, Repository, UseCase)
+3. Move existing code to new structure
+4. Add interfaces
+
+### Phase 2: Domain Layer
+1. Extract domain entities
+2. Create value objects
+3. Add domain events
+4. Implement domain services
+
+### Phase 3: Application Layer
+1. Convert services to use cases
+2. Implement CQRS pattern
+3. Add DTOs
+4. Implement event handlers
+
+### Phase 4: Infrastructure
+1. Implement repository pattern
+2. Add Unit of Work
+3. Implement caching
+4. Add event bus
+
+### Phase 5: Observability
+1. Integrate Prometheus
+2. Add OpenTelemetry
+3. Structured logging
+4. Health checks
+
+### Phase 6: Advanced Features
+1. Background tasks
+2. Rate limiting
+3. API versioning
+4. Documentation enhancements
+
+---
+
+## Benefits of Modern Architecture
+
+### For Developers
+✅ **Clear Structure**: Easy to find and understand code  
+✅ **Testability**: Each layer independently testable  
+✅ **Maintainability**: Changes isolated to specific layers  
+✅ **Scalability**: Easy to add new features  
+
+### For Business
+✅ **Domain Focus**: Business logic clearly expressed  
+✅ **Flexibility**: Easy to adapt to changing requirements  
+✅ **Quality**: Better error handling and validation  
+✅ **Performance**: Optimized with caching and async  
+
+### For Operations
+✅ **Observability**: Full visibility into system behavior  
+✅ **Reliability**: Better error handling and recovery  
+✅ **Monitoring**: Metrics and tracing built-in  
+✅ **Deployment**: Container-ready with health checks  
+
+---
+
+## Example: Item Creation Flow
+
+### Old Architecture
+```
+Controller → Service → Repository → Database
+```
+
+### New Architecture
+```
+API Endpoint
+    ↓
+CreateItemUseCase (Application)
+    ↓
+Item Entity (Domain) - validates business rules
+    ↓
+ItemRepository Interface (Application)
+    ↓
+SQLAlchemyItemRepository (Infrastructure)
+    ↓
+Database
+    ↓
+ItemCreatedEvent (Domain)
+    ↓
+Event Handlers (Application)
+    ↓
+Cache Update, Notifications, etc.
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+- Domain entities and value objects
+- Use cases with mocked dependencies
+- Domain services
+
+### Integration Tests
+- Repository implementations
+- Database operations
+- Cache operations
+
+### E2E Tests
+- Full API flows
+- Authentication flows
+- Error scenarios
+
+### Test Coverage Goals
+- Domain: 100%
+- Application: 90%+
+- Infrastructure: 80%+
+- API: 70%+
+
+---
+
+## Performance Considerations
+
+### Caching Strategy
+- Entity caching (Redis)
+- Query result caching
+- Cache invalidation on updates
+
+### Database Optimization
+- Connection pooling
+- Query optimization
+- Indexes on frequently queried fields
+- Read replicas for scaling
+
+### Async Operations
+- Background tasks for heavy operations
+- Event-driven processing
+- Non-blocking I/O throughout
+
+---
+
+## Security Enhancements
+
+### Authentication
+- JWT with refresh tokens
+- Token rotation
+- Secure token storage
+
+### Authorization
+- Role-based access control (RBAC)
+- Permission-based access
+- Resource-level permissions
+
+### Input Validation
+- Pydantic models at API boundary
+- Domain validation in entities
+
+### Security Headers
+- CORS configuration
+- CSRF protection
+- XSS prevention
+- Rate limiting
+
+---
+
+## Conclusion
+
+This modern architecture proposal transforms the FastAPI template from a simple layered architecture to a **production-ready, enterprise-grade system** that:
+
+1. **Follows Clean Architecture principles** for maintainability
+2. **Implements DDD patterns** for domain clarity
+3. **Uses CQRS** for scalability
+4. **Includes observability** for production monitoring
+5. **Supports event-driven** patterns for extensibility
+6. **Provides comprehensive testing** infrastructure
+7. **Offers clear migration path** from existing code
+
+The architecture is designed to scale from small applications to large enterprise systems while maintaining code quality, testability, and developer productivity.
