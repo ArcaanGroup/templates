@@ -1,3 +1,0 @@
-# entities
-
-from . import item
