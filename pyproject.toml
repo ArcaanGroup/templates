@@ -29,7 +29,7 @@ dependencies = [
     "fastapi-pagination>=0.14.1",
     "python-multipart>=0.0.20",
     "psycopg2-binary>=2.9.10",
-    "bcrypt>=4.3.0",
+    "bcrypt>=4.0.0,<4.1.0",
 ]
 requires-python = "==3.12.*"
 readme = "README.md"
