@@ -1,0 +1,22 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "hello": "Hello",
+    "goodbye": "Goodbye",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "title": "Welcome to Next.js",
+    "description": "Get started by editing the page below.",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
+  }
+}
+

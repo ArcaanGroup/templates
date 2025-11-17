@@ -1,0 +1,22 @@
+{
+  "common": {
+    "welcome": "خوش آمدید",
+    "hello": "سلام",
+    "goodbye": "خداحافظ",
+    "loading": "در حال بارگذاری...",
+    "error": "خطایی رخ داد",
+    "retry": "تلاش مجدد"
+  },
+  "navigation": {
+    "home": "خانه",
+    "about": "درباره",
+    "contact": "تماس"
+  },
+  "home": {
+    "title": "به Next.js خوش آمدید",
+    "description": "با ویرایش صفحه زیر شروع کنید.",
+    "getStarted": "شروع کنید",
+    "learnMore": "بیشتر بدانید"
+  }
+}
+
