@@ -9,11 +9,6 @@ from uuid import UUID, uuid4
 class DomainEvent(ABC):
     """Base class for all domain events"""
     
-    event_id: UUID = field(default_factory=uuid4)
-    occurred_at: datetime = field(default_factory=datetime.utcnow)
-    
-    def __post_init__(self) -> None:
-        """Ensure event is immutable"""
-        object.__setattr__(self, 'event_id', self.event_id)
-        object.__setattr__(self, 'occurred_at', self.occurred_at)
+    event_id: UUID = field(default_factory=uuid4, kw_only=True)
+    occurred_at: datetime = field(default_factory=datetime.utcnow, kw_only=True)
 
