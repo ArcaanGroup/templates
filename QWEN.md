@@ -229,5 +229,5 @@ The application is containerization-ready with Docker support. It follows 12-fac
 2. Add background task processing (Celery)
 3. Add OpenTelemetry tracing
 4. Add more domain entities and use cases
-5. Enhance authentication and authorization features
+5. Implement Authentication layer from scratch in a modern way (as per TODO)
 6. Add comprehensive documentation and API examples

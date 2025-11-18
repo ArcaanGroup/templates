@@ -1,4 +1,5 @@
 """Application entry point"""
+
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException
@@ -18,15 +19,15 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version=settings.VERSION,
-        description="Enterprise FastAPI template with Clean Architecture"
+        description="Enterprise FastAPI template with Clean Architecture",
     )
-    
+
     # Add pagination support
     add_pagination(app)
-    
+
     # Register error handlers
     register_error_handlers(app)
-    
+
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
@@ -35,23 +36,22 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     # Include API routers
     app.include_router(api_v1_router, prefix="/api/v1")
-    
+
     # Health check endpoints
     @app.get("/ping")
     async def ping():
         """Simple ping endpoint"""
         return "pong"
-    
+
     @app.get("/error")
     async def error():
         """Test error endpoint"""
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
-    
+
     return app
 
 
 app = create_app()
-

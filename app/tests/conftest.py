@@ -1,4 +1,5 @@
 """Pytest configuration and fixtures"""
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -18,18 +19,18 @@ async def test_db():
     """Create test database session"""
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+
     # Create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     async with async_session() as session:
         yield session
-    
+
     # Drop tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
@@ -37,15 +38,19 @@ async def test_db():
 async def client(test_db):
     """Create test client"""
     app = create_app()
-    
+
     # Override database dependency
     async def override_get_db():
         yield test_db
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
+
+def pytest_configure(config):
+    """Configure pytest"""
+    config.addinivalue_line("markers", "asyncio: mark test as async")
