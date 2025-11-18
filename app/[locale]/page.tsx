@@ -1,9 +1,6 @@
-import { getTranslations } from "next-intl/server";
-import { setRequestLocale } from "next-intl/server";
-import Image from "next/image";
-import { Link } from "@/i18n/routing";
 import LanguageSelect from "@/components/LanguageSelect";
 import ThemeToggle from "@/components/ThemeToggle";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 /**
  * Home Page
