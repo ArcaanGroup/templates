@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
+import LanguageSelect from '@/components/LanguageSelect';
 
 /**
  * Home Page
@@ -22,7 +23,11 @@ export default async function Home({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+      <main className="relative flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+        {/* Language Selector - Top Right */}
+        <div className="absolute right-4 top-4 sm:right-8 sm:top-8">
+          <LanguageSelect />
+        </div>
         <Image
           className="dark:invert"
           src="/next.svg"
