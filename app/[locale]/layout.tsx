@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { getLocaleConfig } from '@/i18n/config';
 import VazirFont from '@/components/VazirFont';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import '../globals.css';
 
 const geistSans = Geist({
@@ -56,10 +57,12 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          <VazirFont />
-          {children}
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <VazirFont />
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
