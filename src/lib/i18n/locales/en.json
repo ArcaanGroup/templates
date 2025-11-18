@@ -1,0 +1,71 @@
+{
+  "welcome": "Welcome to Tauri + Svelte",
+  "greeting": "Click on the Tauri, Vite, and SvelteKit logos to learn more.",
+  "name_placeholder": "Enter a name...",
+  "greet_button": "Greet",
+  "menu": {
+    "dashboard": "Dashboard",
+    "mission_planning": "Mission Planning",
+    "map_caching": "Map Caching",
+    "data_management": "Data Management",
+    "control_parameters": "Control Parameters",
+    "company_profile": "Company Profile"
+  },
+  "dashboard": {
+    "title": "Submarine Dashboard",
+    "connection_status": "Connection Status",
+    "telemetry": "Telemetry Data",
+    "coordinates": "Coordinates",
+    "depth": "Depth",
+    "temperature": "Temperature",
+    "battery": "Battery Level"
+  },
+  "mission_planning": {
+    "title": "Mission Planning",
+    "add_waypoint": "Add Waypoint",
+    "waypoint_lat": "Latitude",
+    "waypoint_lng": "Longitude",
+    "waypoint_depth": "Depth",
+    "waypoint_duration": "Duration (seconds)",
+    "waypoint_actions": "Actions",
+    "validate_coordinates": "Validate Coordinates",
+    "plan_mission": "Plan Mission"
+  },
+  "map_caching": {
+    "title": "Map Caching",
+    "cache_name": "Cache Name",
+    "zoom_level": "Zoom Level",
+    "center_coords": "Center Coordinates",
+    "cache_area": "Cache Area",
+    "cache_status": "Cache Status",
+    "save_cache": "Save Cache",
+    "select_cache": "Select Cache"
+  },
+  "data_management": {
+    "title": "Data Management",
+    "mission_name": "Mission Name",
+    "creation_date": "Creation Date",
+    "description": "Description",
+    "sampling_rate": "Sampling Rate (seconds)",
+    "export_data": "Export Data",
+    "view_data": "View Data",
+    "import_data": "Import Data"
+  },
+  "control_parameters": {
+    "title": "Control Parameters",
+    "param_1": "Parameter 1",
+    "param_2": "Parameter 2",
+    "param_3": "Parameter 3",
+    "param_4": "Parameter 4",
+    "param_5": "Parameter 5",
+    "param_6": "Parameter 6",
+    "save_params": "Save Parameters",
+    "load_params": "Load Parameters",
+    "validate_params": "Validate Parameters"
+  },
+  "company_profile": {
+    "title": "Company Profile",
+    "about": "About Us",
+    "contact": "Contact Information"
+  }
+}

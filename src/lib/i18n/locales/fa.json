@@ -1,0 +1,71 @@
+{
+  "welcome": "خوش آمدید به تائوری + اسولت",
+  "greeting": "برای کسب اطلاعات بیشتر روی لوگوهای تائوری، وایت و اسولت‌کیت کلیک کنید.",
+  "name_placeholder": "یک نام وارد کنید...",
+  "greet_button": "خوش آمدگویی",
+  "menu": {
+    "dashboard": "داشبورد",
+    "mission_planning": "برنامه‌ریزی مأموریت",
+    "map_caching": "کش کردن نقشه",
+    "data_management": "مدیریت داده‌ها",
+    "control_parameters": "پارامترهای کنترل",
+    "company_profile": "مشخصات شرکت"
+  },
+  "dashboard": {
+    "title": "داشبورد زیردریایی",
+    "connection_status": "وضعیت اتصال",
+    "telemetry": "داده‌های تله‌متری",
+    "coordinates": "مختصات",
+    "depth": "عمق",
+    "temperature": "دما",
+    "battery": "میزان باتری"
+  },
+  "mission_planning": {
+    "title": "برنامه‌ریزی مأموریت",
+    "add_waypoint": "افزودن نقطه مسیر",
+    "waypoint_lat": "عرض جغرافیایی",
+    "waypoint_lng": "طول جغرافیایی",
+    "waypoint_depth": "عمق",
+    "waypoint_duration": "مدت زمان (ثانیه)",
+    "waypoint_actions": "اقدامات",
+    "validate_coordinates": "اعتبارسنجی مختصات",
+    "plan_mission": "برنامه‌ریزی مأموریت"
+  },
+  "map_caching": {
+    "title": "کش کردن نقشه",
+    "cache_name": "نام کش",
+    "zoom_level": "سطح بزرگنمایی",
+    "center_coords": "مختصات مرکز",
+    "cache_area": "منطقه کش",
+    "cache_status": "وضعیت کش",
+    "save_cache": "ذخیره کش",
+    "select_cache": "انتخاب کش"
+  },
+  "data_management": {
+    "title": "مدیریت داده‌ها",
+    "mission_name": "نام مأموریت",
+    "creation_date": "تاریخ ایجاد",
+    "description": "توضیحات",
+    "sampling_rate": "نرخ نمونه‌برداری (ثانیه)",
+    "export_data": "صادرات داده",
+    "view_data": "مشاهده داده",
+    "import_data": "واردات داده"
+  },
+  "control_parameters": {
+    "title": "پارامترهای کنترل",
+    "param_1": "پارامتر 1",
+    "param_2": "پارامتر 2",
+    "param_3": "پارامتر 3",
+    "param_4": "پارامتر 4",
+    "param_5": "پارامتر 5",
+    "param_6": "پارامتر 6",
+    "save_params": "ذخیره پارامترها",
+    "load_params": "بارگذاری پارامترها",
+    "validate_params": "اعتبارسنجی پارامترها"
+  },
+  "company_profile": {
+    "title": "مشخصات شرکت",
+    "about": "درباره ما",
+    "contact": "اطلاعات تماس"
+  }
+}

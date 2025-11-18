@@ -1,0 +1,143 @@
+/* Vazir font for Persian text */
+@import url("https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css");
+
+/* Typography styles */
+:root {
+    --font-primary: Inter, Avenir, Helvetica, Arial, sans-serif;
+    --font-persian: "Vazir", Inter, Avenir, Helvetica, Arial, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 24px;
+    --font-weight-base: 400;
+
+    /* Light theme colors */
+    --color-text: #0f0f0f;
+    --color-background: #f6f6f6;
+    --color-primary: #2c3e50;
+    --color-secondary: #34495e;
+    --color-accent: #24c8db;
+    --color-border: #dcdcdc;
+    --color-card-bg: #ffffff;
+    --color-input-bg: #ffffff;
+    --color-input-text: #0f0f0f;
+    --color-button-bg: #e0e0e0;
+    --color-button-text: #0f0f0f;
+    --color-button-hover: #d0d0d0;
+    --color-nav-bg: #2c3e50;
+    --color-nav-text: #ffffff;
+}
+
+/* Dark theme colors */
+[data-theme="dark"] {
+    --color-text: #f0f0f0;
+    --color-background: #1a1a1a;
+    --color-primary: #2a2a2a;
+    --color-secondary: #3a3a3a;
+    --color-accent: #24c8db;
+    --color-border: #444444;
+    --color-card-bg: #2a2a2a;
+    --color-input-bg: #2a2a2a;
+    --color-input-text: #f0f0f0;
+    --color-button-bg: #444444;
+    --color-button-text: #f0f0f0;
+    --color-button-hover: #555555;
+    --color-nav-bg: #1e1e1e;
+    --color-nav-text: #f0f0f0;
+}
+
+/* Default typography */
+body {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-weight: var(--font-weight-base);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+}
+
+/* Persian typography */
+html[lang="fa"] body,
+html[lang="fa"] {
+    font-family: var(--font-persian);
+}
+
+/* Fallback for Persian text elements */
+html[lang="fa"] h1,
+html[lang="fa"] h2,
+html[lang="fa"] h3,
+html[lang="fa"] h4,
+html[lang="fa"] h5,
+html[lang="fa"] h6,
+html[lang="fa"] p,
+html[lang="fa"] span,
+html[lang="fa"] div,
+html[lang="fa"] a,
+html[lang="fa"] button,
+html[lang="fa"] input,
+html[lang="fa"] textarea,
+html[lang="fa"] label {
+    font-family: var(--font-persian);
+}
+
+/* Common UI elements styling */
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-accent);
+    opacity: 0.8;
+}
+
+input,
+textarea,
+select,
+button {
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--color-input-text);
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem;
+    transition:
+        border-color 0.3s,
+        background-color 0.3s,
+        color 0.3s;
+}
+
+button {
+    background-color: var(--color-button-bg);
+    color: var(--color-button-text);
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--color-button-hover);
+}
+
+button:active {
+    background-color: var(--color-button-hover);
+}
+
+.card {
+    background-color: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation styling */
+nav {
+    background-color: var(--color-nav-bg);
+    color: var(--color-nav-text);
+}
