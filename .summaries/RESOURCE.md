@@ -418,14 +418,20 @@ def get_create_[resource]_use_case(
 1. Add the new endpoint router to the main API router
 2. Usually in `app/api/v1/__init__.py` or similar routing file
 
-## Step 15: Testing Structure
+## Step 15: Testing Structure - Definition of Done
 
-For each resource, create tests for:
+Exhaustive testing coverage is one of the most important Definition of Done (DOD) criteria of a resource implementation. Testing is not optional but a core requirement that must be implemented at every level for each resource. Create tests for:
 
 1. **Unit Tests**: Domain entity business logic
 2. **Integration Tests**: Repository implementations
 3. **Use Case Tests**: Business logic orchestration
 4. **API Tests**: Endpoint functionality
+
+**Testing Requirements (DOD):**
+- Every new resource must include tests at all appropriate layers
+- Code coverage should meet project standards
+- All tests must pass before merging
+- Test-driven development (TDD) is encouraged for complex business logic
 
 ## Step 16: Migration
 

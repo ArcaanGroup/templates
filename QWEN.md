@@ -79,7 +79,7 @@ app/
 - **Event-Driven** architecture with domain events
 - **Async/Await** full async support throughout
 - **Type Safety** with type hints and Pydantic validation
-- **Comprehensive Testing** infrastructure
+- **Comprehensive Testing** as a core architectural principle
 - **Docker Ready** containerization support
 
 ## Dependencies & Tech Stack
@@ -197,12 +197,26 @@ Key settings include:
 - Database URL
 - Redis configuration (optional)
 
-## Testing
+## Testing - Core Architectural Principle
 
-The project includes comprehensive testing infrastructure:
-- Unit tests for domain entities, value objects and use cases
-- Integration tests for repository implementations and API endpoints
-- End-to-end tests for full API flows
+Testing is a fundamental, non-negotiable part of the architecture. Every resource, feature implementation, improvement, or refactor must include exhaustive testing. The testing infrastructure follows a layered approach matching the architectural layers:
+
+- **Unit tests** for domain entities, value objects and use cases (business logic in isolation)
+- **Integration tests** for repository implementations and API endpoints (component collaboration)
+- **End-to-end tests** for full API flows (complete feature verification)
+
+**Testing Requirements:**
+- Every new feature must include tests at appropriate layers
+- Refactoring must not break existing tests
+- Code coverage should be maintained at acceptable levels
+- All tests must pass before merging any changes
+- Test-driven development (TDD) is encouraged for complex business logic
+
+**Testing Best Practices:**
+- The project uses FastAPI's TestClient for API integration tests, which is synchronous
+- Do not use `@pytest.mark.asyncio` decorator when using TestClient
+- Avoid using `async/await` with synchronous TestClient operations
+- For async testing with httpx, use httpx.AsyncClient with ASGI transport
 
 ## Deployment
 

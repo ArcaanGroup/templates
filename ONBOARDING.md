@@ -315,7 +315,9 @@ def get_create_user_use_case() -> CreateUserUseCase:
     return CreateUserUseCase(repository=get_user_repository())
 ```
 
-## Testing Strategy
+## Testing Strategy - Core Development Principle
+
+Testing is a fundamental, non-negotiable part of the architecture. Every resource, feature implementation, improvement, or refactor must include exhaustive testing across all architectural layers. The testing infrastructure follows the same layered approach as the main architecture.
 
 ### Test Organization
 
@@ -336,6 +338,13 @@ tests/
 └── e2e/
     └── test_user_flow.py
 ```
+
+### Testing Requirements
+- Every new feature must include tests at appropriate layers
+- Refactoring must not break existing tests
+- Code coverage should be maintained at acceptable levels
+- All tests must pass before merging any changes
+- Test-driven development (TDD) is encouraged for complex business logic
 
 ### Writing Tests
 
@@ -435,6 +444,10 @@ async def test_create_user_integration(get_db_session):
 - Test business logic thoroughly in unit tests
 - Use integration tests to verify component collaboration
 - Mock external dependencies in unit tests
+- Use FastAPI's TestClient for API integration tests (synchronous)
+- Do not use `@pytest.mark.asyncio` decorator when using TestClient
+- Avoid mixing async/await with synchronous TestClient operations
+- Be aware of the difference between TestClient (sync) and httpx.AsyncClient (async)
 
 ### 8. Code Quality
 - Follow PEP 8 style guidelines

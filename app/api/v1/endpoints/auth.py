@@ -80,3 +80,9 @@ async def change_password(
     """Change user password"""
     result = await use_case.execute(current_user.id, change_dto)
     return success(result, message="Password changed successfully")
+
+
+@router.get("/protected")
+async def protected_route(current_user: UserDTO = Depends(get_current_user_from_token)):
+    """Protected route example that requires authentication"""
+    return success(current_user, message="Access to protected route granted")

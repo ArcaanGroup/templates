@@ -132,11 +132,20 @@ Infrastructure Layer (Repositories, Database)
 5. **Event Bus** publishes domain event
 6. **Event Handlers** process event (cache, notifications, etc.)
 
-## Testing
+## Testing - Core Architectural Principle
+
+Testing is a fundamental, non-negotiable part of the architecture. Every resource, feature implementation, improvement, or refactor must include exhaustive testing across all architectural layers. The testing infrastructure follows the same layered approach as the main architecture:
 
 - **Unit Tests**: Test domain entities, value objects, use cases in isolation
 - **Integration Tests**: Test repository implementations, API endpoints
 - **E2E Tests**: Test full flows through API
+
+**Testing Requirements:**
+- Every new feature must include tests at appropriate layers
+- Refactoring must not break existing tests
+- Code coverage should be maintained at acceptable levels
+- All tests must pass before merging any changes
+- Test-driven development (TDD) is encouraged for complex business logic
 
 ## Next Steps
 

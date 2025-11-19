@@ -44,13 +44,13 @@ class TestTokenService:
 
     def test_decode_expired_token(self):
         """Test decoding an expired token"""
-        from datetime import datetime, timedelta
+        from datetime import datetime, timedelta, timezone
         import time
         from jose import jwt
         from app.core.config import settings
 
         # Create an expired token manually
-        expire = datetime.utcnow() - timedelta(seconds=1)  # Expired 1 second ago
+        expire = datetime.now(timezone.utc) - timedelta(seconds=1)  # Expired 1 second ago
         claims = {"sub": "testuser", "exp": expire}
         expired_token = jwt.encode(claims, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 

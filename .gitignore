@@ -35,6 +35,9 @@ pdm.lock
 htmlcov/
 *.cover
 .hypothesis/
+coverage.xml
+.pytest/
+.testmondata
 
 # ==============================
 # Alembic (Database Migrations)
@@ -96,4 +99,3 @@ Thumbs.db
 dist/
 build/
 *.egg-info/
-

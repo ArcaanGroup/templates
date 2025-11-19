@@ -11,7 +11,7 @@ Enterprise-ready FastAPI starter template with **Clean Architecture** and **Doma
 - ✅ **Event-Driven** - Domain events for decoupling
 - ✅ **Async/Await** - Full async support throughout
 - ✅ **Type Safety** - Type hints and Pydantic validation
-- ✅ **Testing** - Comprehensive test infrastructure
+- ✅ **Testing** - Comprehensive test infrastructure as a core architectural principle
 - ✅ **Docker Ready** - Containerization support
 
 ## Quick Start
@@ -101,6 +101,19 @@ pdm run pytest --cov=app --cov-report=html
 # Run specific test file
 pdm run pytest app/tests/integration/api/test_items.py
 ```
+
+**Important Testing Notes:**
+- The project uses FastAPI's TestClient for API integration tests, which is synchronous
+- Do not use `@pytest.mark.asyncio` decorator when using TestClient
+- Avoid using `async/await` with synchronous TestClient operations
+- For async testing with httpx, use httpx.AsyncClient with ASGI transport
+
+**Testing Requirements:**
+- Testing is a core architectural principle, not optional
+- Every new feature must include tests at appropriate layers
+- Refactoring must not break existing tests
+- All tests must pass before merging any changes
+- Code coverage should be maintained at acceptable levels
 
 ### Code Quality
 

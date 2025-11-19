@@ -1,6 +1,6 @@
 """Authentication domain services"""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from jose import JWTError, jwt
@@ -18,9 +18,14 @@ class PasswordService:
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify a plain password against a hashed password"""
         from passlib.context import CryptContext
+        from passlib.exc import UnknownHashError
 
         pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        return pwd_context.verify(plain_password, hashed_password)
+        try:
+            return pwd_context.verify(plain_password, hashed_password)
+        except UnknownHashError:
+            # Return False if hash is invalid instead of raising an exception
+            return False
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -38,9 +43,11 @@ class TokenService:
     def create_access_token(subject: str, expires_delta: Optional[timedelta] = None) -> str:
         """Create an access token with the specified subject"""
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            expire = datetime.now(timezone.utc) + timedelta(
+                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+            )
 
         claims = {"sub": subject, "exp": expire}
         encoded_jwt = jwt.encode(claims, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
@@ -91,4 +98,7 @@ class UserService:
         if not user.is_active:
             raise AuthenticationFailedException("User account is deactivated")
 
-        return user.verify_password(password)
+        if not user.verify_password(password):
+            raise AuthenticationFailedException("Invalid credentials")
+
+        return True
