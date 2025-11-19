@@ -86,6 +86,29 @@ event = ItemCreatedEvent(item_id=item.id, name=item.name)
 await self.event_bus.publish(event)
 ```
 
+### Exception Handling
+Domain exceptions are raised in domain layer and properly mapped to HTTP responses via global exception handlers:
+
+```python
+# Domain Exception
+class UserAlreadyExistsException(DomainException):
+    def __init__(self, identifier: str):
+        super().__init__(
+            f"User already exists with identifier: {identifier}",
+            {"identifier": identifier}
+        )
+
+# Exception Handler in app/utils/error.py
+@app.exception_handler(UserAlreadyExistsException)
+async def user_already_exists_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=HTTPStatus.CONFLICT,
+        content=StandardResponse(
+            success=False, message=str(exc), payload=exc.details
+        ).model_dump(),
+    )
+```
+
 ## Dependency Flow
 
 ```

@@ -431,6 +431,36 @@ For each resource, create tests for:
 
 If using database migrations, create and run appropriate Alembic migrations for the new resource table.
 
+## Step 17: Implement Exception Handlers
+
+1. Add exception handlers to `app/utils/error.py` for your domain exceptions
+2. Map domain exceptions to appropriate HTTP status codes
+3. Use consistent response format with StandardResponse
+
+**Example structure:**
+```python
+# In app/utils/error.py
+from app.domain.exceptions.[resource]_exceptions import [Resource]NotFoundException, Invalid[Resource]Exception
+
+@app.exception_handler([Resource]NotFoundException)
+async def [resource]_not_found_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=HTTPStatus.NOT_FOUND,
+        content=StandardResponse(
+            success=False, message=str(exc), payload=exc.details
+        ).model_dump(),
+    )
+
+@app.exception_handler(Invalid[Resource]Exception)
+async def invalid_[resource]_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=HTTPStatus.BAD_REQUEST,
+        content=StandardResponse(
+            success=False, message=str(exc), payload=exc.details
+        ).model_dump(),
+    )
+```
+
 ## Architecture Summary
 
 The resource construction algorithm aligns with Clean Architecture and Domain-Driven Design principles:

@@ -216,12 +216,18 @@ The application is containerization-ready with Docker support. It follows 12-fac
 - CORS configuration
 - Dependency security through proper isolation
 
+## Error Handling
+
+- Domain-specific exceptions for business logic errors
+- Global exception handlers in `app/utils/error.py` to map domain exceptions to appropriate HTTP responses
+- Consistent error response format using StandardResponse
+- Proper HTTP status codes based on error types (400 for validation, 404 for not found, 409 for conflicts, etc.)
+
 ## Monitoring & Observability
 
 - Built-in health check endpoints
 - Prometheus metrics support
 - Structured logging
-- Error handling with proper HTTP status codes
 
 ## Next Steps
 

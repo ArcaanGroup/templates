@@ -421,6 +421,9 @@ async def test_create_user_integration(get_db_session):
 - Use domain-specific exceptions for business rule violations
 - Handle infrastructure errors at the infrastructure layer
 - Use HTTP status codes appropriately in API layer
+- Implement global exception handlers for consistent error responses
+- Domain exceptions should extend from `DomainException` base class
+- Exception handlers should be registered in `app/utils/error.py`
 
 ### 6. Async Programming
 - Use async/await throughout the application
@@ -448,6 +451,7 @@ async def test_create_user_integration(get_db_session):
 3. **Port Already in Use**: Change the port in your server configuration
 4. **Type Errors**: Run `pdm run mypy app` to check for type issues
 5. **Test Failures**: Check if database migrations are applied
+6. **Domain Exceptions Not Handled**: If you see 500 errors instead of proper HTTP status codes, ensure your domain exceptions are registered in `app/utils/error.py`
 
 ### Debugging Tips
 
