@@ -14,15 +14,22 @@ from app.application.dto.auth_dto import (
     RegisterDTO,
     TokenDTO,
     UserDTO,
+    RefreshTokenDTO,
 )
 from app.application.use_cases.auth.change_password import ChangePasswordUseCase
 from app.application.use_cases.auth.get_current_user import GetCurrentUserUseCase
 from app.application.use_cases.auth.login import LoginUseCase
 from app.application.use_cases.auth.register import RegisterUseCase
+from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
+from app.application.use_cases.auth.logout import LogoutUseCase
 
 # The get_current_user_from_token dependency is provided by the dependencies module
 # This avoids circular imports while maintaining proper dependency injection
-from app.api.dependencies import get_current_user_from_token
+from app.api.dependencies import (
+    get_current_user_from_token,
+    get_refresh_token_use_case,
+    get_logout_use_case,
+)
 from app.schema.response import StandardResponse, success
 
 router = APIRouter()
@@ -82,7 +89,25 @@ async def change_password(
     return success(result, message="Password changed successfully")
 
 
-@router.get("/protected")
-async def protected_route(current_user: UserDTO = Depends(get_current_user_from_token)):
-    """Protected route example that requires authentication"""
-    return success(current_user, message="Access to protected route granted")
+@router.post("/refresh", response_model=StandardResponse[TokenDTO])
+async def refresh_access_token(
+    refresh_token_dto: RefreshTokenDTO,
+    refresh_use_case: RefreshTokenUseCase = Depends(get_refresh_token_use_case),
+):
+    """Refresh access token using refresh token"""
+    result = await refresh_use_case.execute(refresh_token_dto)
+    return success(result, message="Access token refreshed successfully")
+
+
+@router.post("/logout")
+async def logout(
+    refresh_token_dto: RefreshTokenDTO = None,  # Optional - user can provide refresh token to invalidate
+    logout_use_case: LogoutUseCase = Depends(get_logout_use_case),
+):
+    """Logout endpoint to invalidate refresh tokens"""
+    # Extract refresh token from request body if provided
+    token = None
+    if refresh_token_dto:
+        token = refresh_token_dto.refresh_token
+    await logout_use_case.execute(token)
+    return success({}, message="Successfully logged out")

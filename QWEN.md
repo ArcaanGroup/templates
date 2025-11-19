@@ -124,7 +124,6 @@ app/
 ### Authentication
 - `POST /api/v1/auth/login` - Login
 - `GET /api/v1/auth/me` - Get current user
-- `GET /api/v1/auth/protected` - Protected route example
 
 ### Health
 - `GET /api/v1/health/` - Health check

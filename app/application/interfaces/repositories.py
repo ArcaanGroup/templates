@@ -5,6 +5,7 @@ from typing import Generic, TypeVar
 
 from app.domain.entities.item import Item
 from app.domain.entities.user import User
+from app.domain.entities.refresh_tokens.refresh_token import RefreshToken
 
 T = TypeVar("T")
 
@@ -58,4 +59,28 @@ class UserRepositoryInterface(RepositoryInterface[User], ABC):
     @abstractmethod
     async def get_by_username_or_email(self, identifier: str) -> User | None:
         """Get user by username or email"""
+        pass
+
+
+class RefreshTokenRepositoryInterface(RepositoryInterface[RefreshToken], ABC):
+    """Refresh token repository interface"""
+
+    @abstractmethod
+    async def get_by_token(self, token: str) -> RefreshToken | None:
+        """Get refresh token by its value"""
+        pass
+
+    @abstractmethod
+    async def get_active_by_user_id(self, user_id: int) -> list[RefreshToken]:
+        """Get all active refresh tokens for a user"""
+        pass
+
+    @abstractmethod
+    async def deactivate_by_token(self, token: str) -> None:
+        """Deactivate a refresh token by its value"""
+        pass
+
+    @abstractmethod
+    async def delete_expired_tokens(self) -> int:
+        """Delete expired refresh tokens and return the number of deleted tokens"""
         pass

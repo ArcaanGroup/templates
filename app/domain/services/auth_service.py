@@ -2,11 +2,13 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from uuid import uuid4
 
 from jose import JWTError, jwt
 
 from app.core.config import settings
 from app.domain.entities.user import User
+from app.domain.entities.refresh_tokens.refresh_token import RefreshToken
 from app.domain.exceptions.auth_exceptions import AuthenticationFailedException
 from app.domain.value_objects.email import Email
 
@@ -49,7 +51,35 @@ class TokenService:
                 minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
             )
 
-        claims = {"sub": subject, "exp": expire}
+        import secrets
+
+        jti = secrets.token_urlsafe(16)  # unique identifier for the token
+
+        claims = {"sub": subject, "exp": expire, "type": "access", "jti": jti}
+        encoded_jwt = jwt.encode(claims, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        return encoded_jwt
+
+    @staticmethod
+    def create_refresh_token(user_id: int, expires_delta: Optional[timedelta] = None) -> str:
+        """Create a refresh token as a signed JWT"""
+        import secrets
+
+        jti = secrets.token_urlsafe(32)  # unique identifier for the token
+        return TokenService.create_refresh_token_with_jti(user_id, jti, expires_delta)
+
+    @staticmethod
+    def create_refresh_token_with_jti(
+        user_id: int, jti: str, expires_delta: Optional[timedelta] = None
+    ) -> str:
+        """Create a refresh token as a signed JWT with a specific jti"""
+        if expires_delta:
+            expire = datetime.now(timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(timezone.utc) + timedelta(
+                minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
+            )
+
+        claims = {"sub": str(user_id), "exp": expire, "type": "refresh", "jti": jti}
         encoded_jwt = jwt.encode(claims, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
 
@@ -59,11 +89,45 @@ class TokenService:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             subject: str = payload.get("sub")
-            if subject is None:
+            token_type: str = payload.get("type")
+
+            if subject is None or token_type != "access":
                 return None
             return subject
         except JWTError:
             return None
+
+    @staticmethod
+    def decode_refresh_token(token: str) -> Optional[str]:
+        """Decode a refresh token and return the user_id (subject)"""
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            subject: str = payload.get("sub")
+            token_type: str = payload.get("type")
+
+            if subject is None or token_type != "refresh":
+                return None
+            return subject
+        except JWTError:
+            return None
+
+    @staticmethod
+    def create_refresh_token_entity(
+        user_id: int, expires_delta: Optional[timedelta] = None
+    ) -> RefreshToken:
+        """Create a refresh token entity with proper expiration time"""
+        if expires_delta:
+            expires_at = datetime.now(timezone.utc) + expires_delta
+        else:
+            expires_at = datetime.now(timezone.utc) + timedelta(
+                minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
+            )
+
+        import secrets
+
+        token = secrets.token_urlsafe(32)
+
+        return RefreshToken(token=token, user_id=user_id, expires_at=expires_at)
 
 
 class UserService:

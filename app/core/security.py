@@ -56,6 +56,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     return {"username": username}
 
 
+def verify_refresh_token(token: str) -> bool:
+    """Verify if a refresh token is valid without decoding user info"""
+    from app.domain.services.auth_service import TokenService
+
+    try:
+        user_id = TokenService.decode_refresh_token(token)
+        return user_id is not None
+    except:
+        return False
+
+
 async def get_current_user_from_token(token: str = Depends(oauth2_scheme)):
     """Get current user from JWT token - this is now a placeholder for dependency injection"""
     # This function is overridden in dependencies.py with proper DI implementation

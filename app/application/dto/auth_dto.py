@@ -24,6 +24,7 @@ class TokenDTO(BaseModel):
     """DTO for token response"""
 
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
 
 
@@ -69,3 +70,9 @@ class PasswordChangeDTO(BaseModel):
 
     current_password: str
     new_password: str = Field(..., min_length=8)
+
+
+class RefreshTokenDTO(BaseModel):
+    """DTO for refresh token request"""
+
+    refresh_token: str

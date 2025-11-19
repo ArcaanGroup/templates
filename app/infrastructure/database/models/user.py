@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.base import Base
 
@@ -19,3 +20,6 @@ class UserModel(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relationship to refresh tokens
+    refresh_tokens = relationship("RefreshTokenModel", back_populates="user", lazy="select")

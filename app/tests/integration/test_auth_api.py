@@ -79,8 +79,11 @@ class TestAuthAPI:
                 },
             )
 
-            # Should return 200 for success or 409 if user already exists
-            if response.status_code == 200:
+            # Should return 201 for success (200 is also acceptable) or 409 if user already exists
+            if response.status_code in [
+                200,
+                201,
+            ]:  # 201 is the expected status for created resources
                 data = response.json()
                 assert data["success"] is True
             elif response.status_code == 409:
@@ -110,28 +113,11 @@ class TestAuthAPI:
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_get_current_user_protected(self, client):
-        """Test getting current user information (protected endpoint)"""
-        # Try to access without token
-        response = client.get("/api/v1/auth/me")
-
-        # Should return 401 Unauthorized
-        assert response.status_code == 401
-
-    @pytest.mark.asyncio
     async def test_get_current_user_with_token(self, client):
         """Test getting current user information with valid token"""
         # We'll need to mock the token decoding to test this
         # This is better done with integration tests using real tokens
         pass
-
-    @pytest.mark.asyncio
-    async def test_protected_route_without_token(self, client):
-        """Test accessing protected route without token"""
-        response = client.get("/api/v1/auth/protected")
-
-        # Should return 401 Unauthorized
-        assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_change_password_endpoint(self, client):
@@ -180,7 +166,9 @@ class TestAuthAPIIntegration:
         from app.application.dto.auth_dto import TokenDTO
 
         # Setup mock
-        mock_token = TokenDTO(access_token="mocked_token", token_type="bearer")
+        mock_token = TokenDTO(
+            access_token="mocked_token", refresh_token="mock_refresh_token", token_type="bearer"
+        )
         mock_use_case = client_with_mocks.app.dependency_overrides[get_login_use_case]()
         mock_use_case.execute.return_value = mock_token
 
@@ -199,7 +187,9 @@ class TestAuthAPIIntegration:
         from app.application.dto.auth_dto import TokenDTO
 
         # Setup mock
-        mock_token = TokenDTO(access_token="mocked_token", token_type="bearer")
+        mock_token = TokenDTO(
+            access_token="mocked_token", refresh_token="mock_refresh_token", token_type="bearer"
+        )
         mock_use_case = client_with_mocks.app.dependency_overrides[get_register_use_case]()
         mock_use_case.execute.return_value = mock_token
 

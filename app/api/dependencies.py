@@ -12,6 +12,8 @@ from app.application.use_cases.auth.change_password import ChangePasswordUseCase
 from app.application.use_cases.auth.get_current_user import GetCurrentUserUseCase
 from app.application.use_cases.auth.login import LoginUseCase
 from app.application.use_cases.auth.register import RegisterUseCase
+from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
+from app.application.use_cases.auth.logout import LogoutUseCase
 from app.application.use_cases.items.create_item import CreateItemUseCase
 from app.application.use_cases.items.delete_item import DeleteItemUseCase
 from app.application.use_cases.items.get_item import GetItemUseCase
@@ -24,6 +26,10 @@ from app.infrastructure.database.session import get_db
 from app.infrastructure.messaging.event_bus import InMemoryEventBus
 from app.infrastructure.repositories.item_repository import SQLAlchemyItemRepository
 from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+from app.infrastructure.repositories.refresh_token_repository import (
+    SQLAlchemyRefreshTokenRepository,
+)
+from app.application.interfaces.repositories import RefreshTokenRepositoryInterface
 
 
 # Cache singleton
@@ -62,6 +68,13 @@ def get_item_repository(db: AsyncSession = Depends(get_db)) -> ItemRepositoryInt
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepositoryInterface:
     """Get user repository"""
     return SQLAlchemyUserRepository(db)
+
+
+def get_refresh_token_repository(
+    db: AsyncSession = Depends(get_db),
+) -> RefreshTokenRepositoryInterface:
+    """Get refresh token repository"""
+    return SQLAlchemyRefreshTokenRepository(db)
 
 
 def get_create_item_use_case(
@@ -105,16 +118,26 @@ def get_delete_item_use_case(
 
 def get_login_use_case(
     user_repository: UserRepositoryInterface = Depends(get_user_repository),
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
 ) -> LoginUseCase:
     """Get login use case"""
-    return LoginUseCase(user_repository)
+    return LoginUseCase(
+        user_repository=user_repository, refresh_token_repository=refresh_token_repository
+    )
 
 
 def get_register_use_case(
     user_repository: UserRepositoryInterface = Depends(get_user_repository),
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
 ) -> RegisterUseCase:
     """Get register use case"""
-    return RegisterUseCase(user_repository)
+    return RegisterUseCase(
+        user_repository=user_repository, refresh_token_repository=refresh_token_repository
+    )
 
 
 def get_current_user_use_case(
@@ -129,6 +152,31 @@ def get_change_password_use_case(
 ) -> ChangePasswordUseCase:
     """Get change password use case"""
     return ChangePasswordUseCase(user_repository)
+
+
+def get_refresh_token_use_case(
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> RefreshTokenUseCase:
+    """Get refresh token use case"""
+    from app.core.config import settings
+
+    return RefreshTokenUseCase(
+        refresh_token_repository=refresh_token_repository,
+        user_repository=user_repository,
+        access_token_expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
+    )
+
+
+def get_logout_use_case(
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
+) -> LogoutUseCase:
+    """Get logout use case"""
+    return LogoutUseCase(refresh_token_repository=refresh_token_repository)
 
 
 async def get_current_user_from_token(
