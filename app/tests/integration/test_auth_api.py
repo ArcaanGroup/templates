@@ -26,18 +26,7 @@ from app.api.dependencies import (
 class TestAuthAPI:
     """API tests for authentication endpoints"""
 
-    @pytest.fixture
-    def app(self):
-        """Create test app"""
-        return create_app()
-
-    @pytest.fixture
-    def client(self, app):
-        """Create test client"""
-        return TestClient(app)
-
-    @pytest.mark.asyncio
-    async def test_login_success(self, client):
+    def test_login_success(self, client):
         """Test successful login"""
         # Since we don't have a user in the database yet, we'll test by mocking
         # In a real scenario, we would first register a user
@@ -53,8 +42,7 @@ class TestAuthAPI:
         # For now, we'll just check that the endpoint returns expected error codes
         assert response.status_code in [401, 404]  # Expected responses for invalid credentials
 
-    @pytest.mark.asyncio
-    async def test_register_success(self, client):
+    def test_register_success(self, client):
         """Test successful user registration"""
         # Mock the register use case
         original_get_register_use_case = get_register_use_case
@@ -97,8 +85,7 @@ class TestAuthAPI:
             # Restore original function
             dependencies_module.get_register_use_case = original_get_register_use_case
 
-    @pytest.mark.asyncio
-    async def test_register_invalid_data(self, client):
+    def test_register_invalid_data(self, client):
         """Test registration with invalid data"""
         response = client.post(
             "/api/v1/auth/register",
@@ -112,15 +99,13 @@ class TestAuthAPI:
         # Should return 422 for validation errors
         assert response.status_code == 422
 
-    @pytest.mark.asyncio
-    async def test_get_current_user_with_token(self, client):
+    def test_get_current_user_with_token(self, client):
         """Test getting current user information with valid token"""
         # We'll need to mock the token decoding to test this
         # This is better done with integration tests using real tokens
         pass
 
-    @pytest.mark.asyncio
-    async def test_change_password_endpoint(self, client):
+    def test_change_password_endpoint(self, client):
         """Test changing password endpoint"""
         # Try to change password without token
         response = client.post(
