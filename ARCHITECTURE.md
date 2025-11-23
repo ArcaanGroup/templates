@@ -48,7 +48,7 @@ class CreateItemUseCase:
     def __init__(self, repository, event_bus):
         self.repository = repository
         self.event_bus = event_bus
-    
+
     async def execute(self, dto: ItemCreateDTO) -> ItemDTO:
         # Business logic here
         pass
@@ -141,11 +141,11 @@ Testing is a fundamental, non-negotiable part of the architecture. Every resourc
 - **E2E Tests**: Test full flows through API
 
 **Testing Requirements:**
+- Test-driven development (TDD) steps must be taken for any effort
 - Every new feature must include tests at appropriate layers
 - Refactoring must not break existing tests
 - Code coverage should be maintained at acceptable levels
 - All tests must pass before merging any changes
-- Test-driven development (TDD) is encouraged for complex business logic
 
 ## Next Steps
 
@@ -155,4 +155,3 @@ Testing is a fundamental, non-negotiable part of the architecture. Every resourc
 4. Add Prometheus metrics
 5. Add OpenTelemetry tracing
 6. Add more domain entities and use cases
-

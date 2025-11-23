@@ -55,6 +55,12 @@ class SQLAlchemyItemRepository(ItemRepositoryInterface):
         models = result.scalars().all()
         return [self._to_domain(model) for model in models]
 
+    async def count_all(self) -> int:
+        """Count all items"""
+        from sqlalchemy import func
+        result = await self.session.execute(select(func.count()).select_from(ItemModel))
+        return result.scalar_one()
+
     async def update(self, entity: Item) -> Item:
         """Update an item"""
         result = await self.session.execute(select(ItemModel).where(ItemModel.id == entity.id))

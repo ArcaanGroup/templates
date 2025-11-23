@@ -42,6 +42,11 @@ class ItemRepositoryInterface(RepositoryInterface[Item], ABC):
         """List all items with pagination"""
         pass
 
+    @abstractmethod
+    async def count_all(self) -> int:
+        """Count all items"""
+        pass
+
 
 class UserRepositoryInterface(RepositoryInterface[User], ABC):
     """User repository interface"""
