@@ -107,3 +107,17 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
 
         await self.session.delete(model)
         await self.session.commit()
+
+    async def list_all(self, skip: int = 0, limit: int = 100) -> list[User]:
+        """List all users with pagination"""
+        result = await self.session.execute(
+            select(UserModel).offset(skip).limit(limit)
+        )
+        models = result.scalars().all()
+        return [self._to_domain(model) for model in models]
+
+    async def count_all(self) -> int:
+        """Count all users"""
+        from sqlalchemy import func
+        result = await self.session.execute(select(func.count(UserModel.id)))
+        return result.scalar_one()

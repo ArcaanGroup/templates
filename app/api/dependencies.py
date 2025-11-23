@@ -19,6 +19,11 @@ from app.application.use_cases.items.delete_item import DeleteItemUseCase
 from app.application.use_cases.items.get_item import GetItemUseCase
 from app.application.use_cases.items.list_items import ListItemsUseCase
 from app.application.use_cases.items.update_item import UpdateItemUseCase
+from app.application.use_cases.users.create_user import CreateUserUseCase
+from app.application.use_cases.users.delete_user import DeleteUserUseCase
+from app.application.use_cases.users.get_user import GetUserUseCase
+from app.application.use_cases.users.list_users import ListUsersUseCase
+from app.application.use_cases.users.update_user import UpdateUserUseCase
 from app.application.dto.auth_dto import UserDTO
 from app.core.security import oauth2_scheme, get_current_user
 from app.infrastructure.cache.memory_cache import MemoryCache
@@ -114,6 +119,45 @@ def get_delete_item_use_case(
 ) -> DeleteItemUseCase:
     """Get delete item use case"""
     return DeleteItemUseCase(repository, cache)
+
+
+def get_create_user_use_case(
+    repository: UserRepositoryInterface = Depends(get_user_repository),
+    event_bus: EventBusInterface = Depends(get_event_bus),
+) -> CreateUserUseCase:
+    """Get create user use case"""
+    return CreateUserUseCase(repository, event_bus)
+
+
+def get_get_user_use_case(
+    repository: UserRepositoryInterface = Depends(get_user_repository),
+    cache: CacheInterface = Depends(get_cache),
+) -> GetUserUseCase:
+    """Get get user use case"""
+    return GetUserUseCase(repository, cache)
+
+
+def get_list_users_use_case(
+    repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> ListUsersUseCase:
+    """Get list users use case"""
+    return ListUsersUseCase(repository)
+
+
+def get_update_user_use_case(
+    repository: UserRepositoryInterface = Depends(get_user_repository),
+    cache: CacheInterface = Depends(get_cache),
+) -> UpdateUserUseCase:
+    """Get update user use case"""
+    return UpdateUserUseCase(repository, cache)
+
+
+def get_delete_user_use_case(
+    repository: UserRepositoryInterface = Depends(get_user_repository),
+    cache: CacheInterface = Depends(get_cache),
+) -> DeleteUserUseCase:
+    """Get delete user use case"""
+    return DeleteUserUseCase(repository, cache)
 
 
 def get_login_use_case(

@@ -66,6 +66,16 @@ class UserRepositoryInterface(RepositoryInterface[User], ABC):
         """Get user by username or email"""
         pass
 
+    @abstractmethod
+    async def list_all(self, skip: int = 0, limit: int = 100) -> list[User]:
+        """List all users with pagination"""
+        pass
+
+    @abstractmethod
+    async def count_all(self) -> int:
+        """Count all users"""
+        pass
+
 
 class RefreshTokenRepositoryInterface(RepositoryInterface[RefreshToken], ABC):
     """Refresh token repository interface"""
