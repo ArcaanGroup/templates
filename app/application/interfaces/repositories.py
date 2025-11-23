@@ -3,7 +3,6 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from app.domain.entities.item import Item
 from app.domain.entities.user import User
 from app.domain.entities.refresh_tokens.refresh_token import RefreshToken
 
@@ -31,20 +30,6 @@ class RepositoryInterface(ABC, Generic[T]):
     @abstractmethod
     async def delete(self, entity: T) -> None:
         """Delete an entity"""
-        pass
-
-
-class ItemRepositoryInterface(RepositoryInterface[Item], ABC):
-    """Item repository interface"""
-
-    @abstractmethod
-    async def list_all(self, skip: int = 0, limit: int = 100) -> list[Item]:
-        """List all items with pagination"""
-        pass
-
-    @abstractmethod
-    async def count_all(self) -> int:
-        """Count all items"""
         pass
 
 
