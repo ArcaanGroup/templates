@@ -9,6 +9,7 @@ from .auth_exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
 )
+from .general_exceptions import EntityNotFoundException
 
 __all__ = [
     "AuthenticationFailedException",
@@ -18,6 +19,7 @@ __all__ = [
     "InvalidUsernameException",
     "UserAlreadyExistsException",
     "UserNotFoundException",
+    "EntityNotFoundException",
     "ItemNotFoundException",
     "InvalidItemPriceException",
     "ItemNameRequiredException",

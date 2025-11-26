@@ -23,3 +23,6 @@ class UserModel(Base):
 
     # Relationship to refresh tokens
     refresh_tokens = relationship("RefreshTokenModel", back_populates="user", lazy="select")
+
+    # Many-to-many relationship with roles
+    roles = relationship("RoleModel", secondary="user_roles", back_populates="users", lazy="noload")

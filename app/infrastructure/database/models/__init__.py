@@ -2,5 +2,6 @@
 
 from .user import UserModel
 from .refresh_token import RefreshTokenModel
+from .role import RoleModel, UserRoleModel
 
-__all__ = ["UserModel", "RefreshTokenModel"]
+__all__ = ["UserModel", "RefreshTokenModel", "RoleModel", "UserRoleModel"]
