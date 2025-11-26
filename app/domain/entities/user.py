@@ -1,8 +1,9 @@
 """User domain entity"""
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from app.domain.entities.base import BaseEntity
+from app.domain.entities.role import Role
 from app.domain.exceptions.auth_exceptions import (
     InvalidEmailException,
     InvalidPasswordException,
@@ -21,6 +22,7 @@ class User(BaseEntity):
         username: Username,
         email: Email,
         password: Password,
+        roles: Optional[List[Role]] = None,
         is_active: bool = True,
         id: Optional[int] = None,
         created_at: Optional[datetime] = None,
@@ -31,6 +33,7 @@ class User(BaseEntity):
         self._email = email
         self._password = password
         self._is_active = is_active
+        self._roles = roles or []
 
     @property
     def username(self) -> Username:
@@ -52,6 +55,37 @@ class User(BaseEntity):
         """Whether user account is active"""
         return self._is_active
 
+    @property
+    def roles(self) -> List[Role]:
+        """User's roles"""
+        return self._roles
+
+    def add_role(self, role: Role) -> None:
+        """Add a role to the user"""
+        if role not in self._roles:
+            self._roles.append(role)
+            self.mark_as_updated()
+
+    def remove_role(self, role: Role) -> None:
+        """Remove a role from the user"""
+        if role in self._roles:
+            self._roles.remove(role)
+            self.mark_as_updated()
+
+    def has_role(self, role_title: str) -> bool:
+        """Check if user has a specific role by title"""
+        return any(role.title.value == role_title for role in self._roles)
+
+    def has_any_role(self, role_titles: List[str]) -> bool:
+        """Check if user has any of the specified roles"""
+        user_role_titles = [role.title.value for role in self._roles]
+        return bool(set(role_titles) & set(user_role_titles))
+
+    def has_all_roles(self, role_titles: List[str]) -> bool:
+        """Check if user has all of the specified roles"""
+        user_role_titles = [role.title.value for role in self._roles]
+        return all(title in user_role_titles for title in role_titles)
+
     def update_username(self, new_username: Username) -> None:
         """Update user's username"""
         self._username = new_username
@@ -65,6 +99,11 @@ class User(BaseEntity):
     def update_password(self, new_password: Password) -> None:
         """Update user's password"""
         self._password = new_password
+        self.mark_as_updated()
+
+    def update_roles(self, roles: List[Role]) -> None:
+        """Update user's roles"""
+        self._roles = roles
         self.mark_as_updated()
 
     def deactivate(self) -> None:

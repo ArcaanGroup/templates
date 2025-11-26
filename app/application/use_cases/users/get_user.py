@@ -29,12 +29,16 @@ class GetUserUseCase:
         if not user:
             raise UserNotFoundException(f"User with ID {user_id} not found")
 
+        # Convert to DTO - get role titles for the response
+        role_titles = [role.title.value for role in user.roles]
+
         # Convert to DTO
         user_dto = UserDTO(
             id=user.id,
             username=user.username.value,
             email=user.email.value,
             is_active=user.is_active,
+            roles=role_titles,
             created_at=user.created_at,
             updated_at=user.updated_at
         )

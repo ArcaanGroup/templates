@@ -1,8 +1,9 @@
 """Update user use case"""
 from app.application.dto.auth_dto import UserDTO, UserUpdateDTO
 from app.application.interfaces.cache import CacheInterface
-from app.application.interfaces.repositories import UserRepositoryInterface
+from app.application.interfaces.repositories import UserRepositoryInterface, RoleRepositoryInterface
 from app.domain.exceptions.auth_exceptions import UserNotFoundException
+from app.domain.entities.role import Role
 from app.domain.value_objects.email import Email
 from app.domain.value_objects.username import Username
 
@@ -13,9 +14,11 @@ class UpdateUserUseCase:
     def __init__(
         self,
         repository: UserRepositoryInterface,
+        role_repository: RoleRepositoryInterface,
         cache: CacheInterface
     ):
         self.repository = repository
+        self.role_repository = role_repository
         self.cache = cache
 
     async def execute(self, user_id: int, dto: UserUpdateDTO) -> UserDTO:
@@ -38,6 +41,15 @@ class UpdateUserUseCase:
             else:
                 user.deactivate()
 
+        # Update roles if provided
+        if dto.role_ids is not None:
+            roles = []
+            for role_id in dto.role_ids:
+                role = await self.role_repository.get_by_id(role_id)
+                if role:
+                    roles.append(role)
+            user.update_roles(roles)
+
         # Save updated user
         updated_user = await self.repository.update(user)
 
@@ -45,12 +57,16 @@ class UpdateUserUseCase:
         cache_key = f"user:{user_id}"
         await self.cache.delete(cache_key)
 
+        # Convert to DTO - get role titles for the response
+        role_titles = [role.title.value for role in updated_user.roles]
+
         # Convert to DTO
         return UserDTO(
             id=updated_user.id,
             username=updated_user.username.value,
             email=updated_user.email.value,
             is_active=updated_user.is_active,
+            roles=role_titles,
             created_at=updated_user.created_at,
             updated_at=updated_user.updated_at
         )

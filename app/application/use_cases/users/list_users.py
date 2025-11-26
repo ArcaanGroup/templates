@@ -22,13 +22,14 @@ class ListUsersUseCase:
         # Count total users for proper pagination
         total = await self.repository.count_all()
 
-        # Convert to DTOs
+        # Convert to DTOs - get role titles for each user
         dtos = [
             UserDTO(
                 id=user.id,
                 username=user.username.value,
                 email=user.email.value,
                 is_active=user.is_active,
+                roles=[role.title.value for role in user.roles],
                 created_at=user.created_at,
                 updated_at=user.updated_at
             )

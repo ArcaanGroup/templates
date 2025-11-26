@@ -1,7 +1,8 @@
 """Authentication DTOs"""
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -35,6 +36,7 @@ class UserDTO(BaseModel):
     username: str
     email: str
     is_active: bool
+    roles: List[str] = Field(default_factory=list, description="List of role titles")
     created_at: datetime
     updated_at: datetime
 
@@ -48,6 +50,7 @@ class UserCreateDTO(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
     is_active: bool = True
+    role_ids: Optional[List[UUID]] = Field(default_factory=list, description="List of role IDs to assign to the user")
 
 
 class UserUpdateDTO(BaseModel):
@@ -56,6 +59,7 @@ class UserUpdateDTO(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=20)
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = None
+    role_ids: Optional[List[UUID]] = Field(None, description="List of role IDs to assign to the user")
 
 
 class PasswordResetDTO(BaseModel):

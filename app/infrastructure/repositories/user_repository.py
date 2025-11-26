@@ -1,16 +1,21 @@
 """User repository implementation"""
 
-from typing import Optional
+from typing import Optional, List
+import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.application.interfaces.repositories import UserRepositoryInterface
 from app.domain.entities.user import User
+from app.domain.entities.role import Role
 from app.domain.value_objects.email import Email
 from app.domain.value_objects.password import Password
 from app.domain.value_objects.username import Username
+from app.domain.value_objects.title import Title
 from app.infrastructure.database.models.user import UserModel
+from app.infrastructure.database.models.role import RoleModel
 
 
 class SQLAlchemyUserRepository(UserRepositoryInterface):
@@ -19,12 +24,28 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    def _to_domain(self, model: UserModel) -> User:
+    async def _to_domain(self, model: UserModel) -> User:
         """Convert ORM model to domain entity"""
         from app.domain.entities.user import User
         from app.domain.value_objects.email import Email
         from app.domain.value_objects.password import Password
         from app.domain.value_objects.username import Username
+
+        # Convert role models to role entities
+        roles = []
+        if model.roles:
+            for role_model in model.roles:
+                import json
+                permissions = [uuid.UUID(p) for p in json.loads(role_model.permissions)] if role_model.permissions else []
+                from app.domain.value_objects.title import Title
+                from app.domain.value_objects.description import Description
+                role_entity = Role(
+                    id=uuid.UUID(role_model.id),
+                    title=Title(role_model.title),
+                    description=Description(role_model.description) if role_model.description else None,
+                    permissions=permissions
+                )
+                roles.append(role_entity)
 
         return User(
             id=model.id,
@@ -32,6 +53,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             email=Email(model.email),
             password=Password(model.hashed_password, hashed=model.hashed_password),
             is_active=model.is_active,
+            roles=roles,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
@@ -52,39 +74,73 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         self.session.add(model)
         await self.session.commit()
         await self.session.refresh(model)
-        return self._to_domain(model)
+
+        # Assign roles if any
+        if entity.roles:
+            # Convert domain role entities to model role objects
+            role_models = []
+            for role in entity.roles:
+                # Get the role model from the database based on the role ID
+                role_model = await self.session.get(RoleModel, str(role.id))
+                if role_model:
+                    role_models.append(role_model)
+
+            # Associate the roles with the user
+            model.roles = role_models
+            await self.session.commit()
+            await self.session.refresh(model)
+
+        return await self._to_domain(model)
 
     async def get_by_id(self, id: int) -> Optional[User]:
         """Get user by ID"""
-        result = await self.session.execute(select(UserModel).where(UserModel.id == id))
+        result = await self.session.execute(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(UserModel.id == id)
+        )
         model = result.scalars().first()
-        return self._to_domain(model) if model else None
+        return await self._to_domain(model) if model else None
 
     async def get_by_username(self, username: str) -> Optional[User]:
         """Get user by username"""
-        result = await self.session.execute(select(UserModel).where(UserModel.username == username))
+        result = await self.session.execute(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(UserModel.username == username)
+        )
         model = result.scalars().first()
-        return self._to_domain(model) if model else None
+        return await self._to_domain(model) if model else None
 
     async def get_by_email(self, email: str) -> Optional[User]:
         """Get user by email"""
-        result = await self.session.execute(select(UserModel).where(UserModel.email == email))
+        result = await self.session.execute(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(UserModel.email == email)
+        )
         model = result.scalars().first()
-        return self._to_domain(model) if model else None
+        return await self._to_domain(model) if model else None
 
     async def get_by_username_or_email(self, identifier: str) -> Optional[User]:
         """Get user by username or email"""
         result = await self.session.execute(
-            select(UserModel).where(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(
                 (UserModel.username == identifier) | (UserModel.email == identifier)
             )
         )
         model = result.scalars().first()
-        return self._to_domain(model) if model else None
+        return await self._to_domain(model) if model else None
 
     async def update(self, entity: User) -> User:
         """Update a user"""
-        result = await self.session.execute(select(UserModel).where(UserModel.id == entity.id))
+        result = await self.session.execute(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(UserModel.id == entity.id)
+        )
         model = result.scalars().first()
         if not model:
             raise ValueError(f"User with id {entity.id} not found")
@@ -94,9 +150,22 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         model.hashed_password = entity.password.hashed
         model.is_active = entity.is_active
 
+        # Update roles if provided
+        if hasattr(entity, '_roles') and entity._roles is not None:
+            # Convert domain role entities to model role objects
+            role_models = []
+            for role in entity._roles:
+                # Get the role model from the database based on the role ID
+                role_model = await self.session.get(RoleModel, str(role.id))
+                if role_model:
+                    role_models.append(role_model)
+
+            # Update the user's roles
+            model.roles = role_models
+
         await self.session.commit()
         await self.session.refresh(model)
-        return self._to_domain(model)
+        return await self._to_domain(model)
 
     async def delete(self, entity: User) -> None:
         """Delete a user"""
@@ -111,10 +180,13 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
     async def list_all(self, skip: int = 0, limit: int = 100) -> list[User]:
         """List all users with pagination"""
         result = await self.session.execute(
-            select(UserModel).offset(skip).limit(limit)
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .offset(skip)
+            .limit(limit)
         )
         models = result.scalars().all()
-        return [self._to_domain(model) for model in models]
+        return [await self._to_domain(model) for model in models]
 
     async def count_all(self) -> int:
         """Count all users"""

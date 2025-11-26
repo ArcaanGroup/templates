@@ -24,6 +24,8 @@ from app.application.use_cases.roles.delete_role import DeleteRoleUseCase
 from app.application.use_cases.roles.get_role import GetRoleUseCase
 from app.application.use_cases.roles.list_roles import ListRolesUseCase
 from app.application.use_cases.roles.update_role import UpdateRoleUseCase
+from app.application.use_cases.user_roles.assign_role_to_user import AssignRoleToUserUseCase
+from app.application.use_cases.user_roles.get_user_roles import GetUserRolesUseCase
 from app.application.dto.auth_dto import UserDTO
 from app.core.security import oauth2_scheme, get_current_user
 from app.infrastructure.cache.memory_cache import MemoryCache
@@ -84,10 +86,11 @@ def get_role_repository(db: AsyncSession = Depends(get_db)) -> RoleRepositoryInt
 
 def get_create_user_use_case(
     repository: UserRepositoryInterface = Depends(get_user_repository),
+    role_repository: RoleRepositoryInterface = Depends(get_role_repository),
     event_bus: EventBusInterface = Depends(get_event_bus),
 ) -> CreateUserUseCase:
     """Get create user use case"""
-    return CreateUserUseCase(repository, event_bus)
+    return CreateUserUseCase(repository, role_repository, event_bus)
 
 
 def get_get_user_use_case(
@@ -107,10 +110,11 @@ def get_list_users_use_case(
 
 def get_update_user_use_case(
     repository: UserRepositoryInterface = Depends(get_user_repository),
+    role_repository: RoleRepositoryInterface = Depends(get_role_repository),
     cache: CacheInterface = Depends(get_cache),
 ) -> UpdateUserUseCase:
     """Get update user use case"""
-    return UpdateUserUseCase(repository, cache)
+    return UpdateUserUseCase(repository, role_repository, cache)
 
 
 def get_delete_user_use_case(
@@ -277,3 +281,19 @@ async def authorize_user(
         return current_user
 
     return authorization_dependency
+
+
+# User Role dependencies
+def get_assign_role_to_user_use_case(
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+    role_repository: RoleRepositoryInterface = Depends(get_role_repository),
+) -> AssignRoleToUserUseCase:
+    """Get assign role to user use case"""
+    return AssignRoleToUserUseCase(user_repository, role_repository)
+
+
+def get_get_user_roles_use_case(
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> GetUserRolesUseCase:
+    """Get get user roles use case"""
+    return GetUserRolesUseCase(user_repository)
