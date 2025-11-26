@@ -19,8 +19,5 @@ __all__ = [
     "InvalidUsernameException",
     "UserAlreadyExistsException",
     "UserNotFoundException",
-    "EntityNotFoundException",
-    "ItemNotFoundException",
-    "InvalidItemPriceException",
-    "ItemNameRequiredException",
+    "EntityNotFoundException"
 ]

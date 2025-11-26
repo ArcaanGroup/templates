@@ -1,7 +1,7 @@
 """Delete user use case"""
 from app.application.interfaces.cache import CacheInterface
 from app.application.interfaces.repositories import UserRepositoryInterface
-from app.domain.exceptions.auth_exceptions import UserNotFoundException
+from app.domain.exceptions.user_exceptions import UserNotFoundException
 
 
 class DeleteUserUseCase:

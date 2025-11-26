@@ -2,7 +2,7 @@
 from app.application.dto.auth_dto import UserDTO
 from app.application.interfaces.cache import CacheInterface
 from app.application.interfaces.repositories import UserRepositoryInterface
-from app.domain.exceptions.auth_exceptions import UserNotFoundException
+from app.domain.exceptions.user_exceptions import UserNotFoundException
 
 
 class GetUserUseCase:

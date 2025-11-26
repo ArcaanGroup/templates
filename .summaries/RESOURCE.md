@@ -98,7 +98,6 @@ class Money:
 **Example structure:**
 ```python
 from app.domain.entities.user import User
-from app.domain.entities.item import Item
 
 class [Resource]DomainService:
     """Domain service for [resource]-related business logic"""

@@ -14,9 +14,8 @@ from app.application.use_cases.users.get_user import GetUserUseCase
 from app.application.use_cases.users.list_users import ListUsersUseCase
 from app.application.use_cases.users.update_user import UpdateUserUseCase
 from app.application.use_cases.users.delete_user import DeleteUserUseCase
-from app.application.use_cases.user_roles.assign_role_to_user import AssignRoleToUserUseCase
-from app.application.use_cases.user_roles.get_user_roles import GetUserRolesUseCase
-from app.domain.exceptions.auth_exceptions import UserNotFoundException, UserAlreadyExistsException
+from app.domain.exceptions.auth_exceptions import UserAlreadyExistsException
+from app.domain.exceptions.user_exceptions import UserNotFoundException
 from app.domain.exceptions.role_exceptions import RoleNotFoundException
 from app.domain.entities.user import User
 from app.domain.entities.role import Role
@@ -73,14 +72,6 @@ def delete_user_use_case(mock_user_repository, mock_cache):
     return DeleteUserUseCase(mock_user_repository, mock_cache)
 
 
-@pytest.fixture
-def assign_role_to_user_use_case(mock_user_repository, mock_role_repository):
-    return AssignRoleToUserUseCase(mock_user_repository, mock_role_repository)
-
-
-@pytest.fixture
-def get_user_roles_use_case(mock_user_repository):
-    return GetUserRolesUseCase(mock_user_repository)
 
 
 @pytest.fixture
@@ -173,7 +164,7 @@ class TestGetUserUseCase:
 
         # Act & Assert
         with pytest.raises(UserNotFoundException):
-            await get_user_use_case.execute(999)
+            await get_user_use_case.execute(1)
 
 
 class TestListUsersUseCase:
@@ -224,7 +215,7 @@ class TestUpdateUserUseCase:
 
         # Act & Assert
         with pytest.raises(UserNotFoundException):
-            await update_user_use_case.execute(999, dto)
+            await update_user_use_case.execute(1, dto)
 
 
 class TestDeleteUserUseCase:
@@ -249,104 +240,4 @@ class TestDeleteUserUseCase:
 
         # Act & Assert
         with pytest.raises(UserNotFoundException):
-            await delete_user_use_case.execute(999)
-
-
-class TestAssignRoleToUserUseCase:
-    """Test cases for AssignRoleToUserUseCase"""
-
-    async def test_execute_success(self, assign_role_to_user_use_case, mock_user_repository, mock_role_repository, sample_user, sample_role):
-        """Test successful assignment of role to user"""
-        # Arrange
-        role_id = sample_role.id
-        dto = UserRoleAssignmentDTO(
-            user_id=sample_user.id,
-            role_ids=[role_id]
-        )
-        mock_user_repository.get_by_id.return_value = sample_user
-        mock_role_repository.get_by_id.return_value = sample_role
-        mock_user_repository.update.return_value = sample_user
-
-        # Act
-        result = await assign_role_to_user_use_case.execute(dto)
-
-        # Assert
-        assert result.id == sample_user.id
-        # Verify the user was updated with the role
-        mock_user_repository.update.assert_called_once()
-        mock_user_repository.update.assert_called_with(sample_user)
-
-
-    async def test_execute_user_not_found(self, assign_role_to_user_use_case, mock_user_repository, mock_role_repository):
-        """Test assignment when user doesn't exist"""
-        # Arrange
-        role_id = uuid.uuid4()
-        dto = UserRoleAssignmentDTO(
-            user_id=999,
-            role_ids=[role_id]
-        )
-        mock_user_repository.get_by_id.return_value = None
-
-        # Act & Assert
-        with pytest.raises(UserNotFoundException):
-            await assign_role_to_user_use_case.execute(dto)
-
-    async def test_execute_role_not_found(self, assign_role_to_user_use_case, mock_user_repository, mock_role_repository, sample_user):
-        """Test assignment when role doesn't exist"""
-        # Arrange
-        role_id = uuid.uuid4()
-        dto = UserRoleAssignmentDTO(
-            user_id=sample_user.id,
-            role_ids=[role_id]
-        )
-        mock_user_repository.get_by_id.return_value = sample_user
-        mock_role_repository.get_by_id.return_value = None
-
-        # Act & Assert
-        with pytest.raises(RoleNotFoundException):
-            await assign_role_to_user_use_case.execute(dto)
-
-    async def test_execute_role_not_found(self, assign_role_to_user_use_case, mock_user_repository, mock_role_repository, sample_user):
-        """Test assignment when role doesn't exist"""
-        # Arrange
-        role_id = uuid.uuid4()
-        dto = UserRoleAssignmentDTO(
-            user_id=sample_user.id,
-            role_ids=[role_id]
-        )
-        mock_user_repository.get_by_id.return_value = sample_user
-        mock_role_repository.get_by_id.return_value = None
-
-        # Act & Assert
-        with pytest.raises(RoleNotFoundException):
-            await assign_role_to_user_use_case.execute(dto)
-
-
-class TestGetUserRolesUseCase:
-    """Test cases for GetUserRolesUseCase"""
-
-    async def test_execute_success(self, get_user_roles_use_case, mock_user_repository, sample_user, sample_role):
-        """Test successful retrieval of user roles"""
-        # Arrange
-        sample_user._roles = [sample_role]  # Set roles directly on the user
-        mock_user_repository.get_by_id.return_value = sample_user
-
-        # Act
-        result = await get_user_roles_use_case.execute(1)
-
-        # Assert
-        assert isinstance(result, UserWithRolesDTO)
-        assert result.id == 1
-        assert result.username == "testuser"
-        assert len(result.roles) == 1
-        assert result.roles[0] == sample_role.title.value
-        mock_user_repository.get_by_id.assert_called_once_with(1)
-
-    async def test_execute_user_not_found(self, get_user_roles_use_case, mock_user_repository):
-        """Test retrieval when user doesn't exist"""
-        # Arrange
-        mock_user_repository.get_by_id.return_value = None
-
-        # Act & Assert
-        with pytest.raises(UserNotFoundException):
-            await get_user_roles_use_case.execute(999)
+            await delete_user_use_case.execute(1)

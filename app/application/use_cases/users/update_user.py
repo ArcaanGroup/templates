@@ -2,7 +2,7 @@
 from app.application.dto.auth_dto import UserDTO, UserUpdateDTO
 from app.application.interfaces.cache import CacheInterface
 from app.application.interfaces.repositories import UserRepositoryInterface, RoleRepositoryInterface
-from app.domain.exceptions.auth_exceptions import UserNotFoundException
+from app.domain.exceptions.user_exceptions import UserNotFoundException
 from app.domain.entities.role import Role
 from app.domain.value_objects.email import Email
 from app.domain.value_objects.username import Username

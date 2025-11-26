@@ -24,8 +24,6 @@ from app.application.use_cases.roles.delete_role import DeleteRoleUseCase
 from app.application.use_cases.roles.get_role import GetRoleUseCase
 from app.application.use_cases.roles.list_roles import ListRolesUseCase
 from app.application.use_cases.roles.update_role import UpdateRoleUseCase
-from app.application.use_cases.user_roles.assign_role_to_user import AssignRoleToUserUseCase
-from app.application.use_cases.user_roles.get_user_roles import GetUserRolesUseCase
 from app.application.dto.auth_dto import UserDTO
 from app.core.security import oauth2_scheme, get_current_user
 from app.infrastructure.cache.memory_cache import MemoryCache
@@ -281,19 +279,3 @@ async def authorize_user(
         return current_user
 
     return authorization_dependency
-
-
-# User Role dependencies
-def get_assign_role_to_user_use_case(
-    user_repository: UserRepositoryInterface = Depends(get_user_repository),
-    role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-) -> AssignRoleToUserUseCase:
-    """Get assign role to user use case"""
-    return AssignRoleToUserUseCase(user_repository, role_repository)
-
-
-def get_get_user_roles_use_case(
-    user_repository: UserRepositoryInterface = Depends(get_user_repository),
-) -> GetUserRolesUseCase:
-    """Get get user roles use case"""
-    return GetUserRolesUseCase(user_repository)

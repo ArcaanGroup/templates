@@ -34,23 +34,5 @@
     "title": "role:delete",
     "description": "Permission to delete role information",
     "policies": []
-  },
-  {
-    "id": "00000000-0000-0000-0000-000000000007",
-    "title": "item:read",
-    "description": "Permission to read item information",
-    "policies": []
-  },
-  {
-    "id": "00000000-0000-0000-0000-000000000008",
-    "title": "item:write",
-    "description": "Permission to create/update item information",
-    "policies": []
-  },
-  {
-    "id": "00000000-0000-0000-0000-000000000009",
-    "title": "item:delete",
-    "description": "Permission to delete item information",
-    "policies": []
   }
 ]

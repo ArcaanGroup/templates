@@ -13,7 +13,11 @@ from app.domain.exceptions.auth_exceptions import (
     InvalidPasswordException,
     InvalidUsernameException,
     UserAlreadyExistsException,
-    UserNotFoundException,
+    UserNotFoundException as AuthUserNotFoundException,
+)
+from app.domain.exceptions.user_exceptions import (
+    UserNotFoundException as UserUserNotFoundException,
+    UserAlreadyExistsException as UserUserAlreadyExistsException,
 )
 from app.schema.response import StandardResponse
 
@@ -40,8 +44,26 @@ def register_error_handlers(app) -> None:
         )
 
     # Domain exception handlers for auth
+    @app.exception_handler(AuthUserNotFoundException)
+    async def auth_user_not_found_exception_handler(request, exc):
+        return JSONResponse(
+            status_code=HTTPStatus.NOT_FOUND,
+            content=StandardResponse(
+                success=False, message=str(exc), payload=exc.details
+            ).model_dump(),
+        )
+
+    @app.exception_handler(UserUserNotFoundException)
+    async def user_user_not_found_exception_handler(request, exc):
+        return JSONResponse(
+            status_code=HTTPStatus.NOT_FOUND,
+            content=StandardResponse(
+                success=False, message=str(exc), payload=None  # user_exceptions version doesn't have details
+            ).model_dump(),
+        )
+
     @app.exception_handler(UserAlreadyExistsException)
-    async def user_already_exists_exception_handler(request, exc):
+    async def auth_user_already_exists_exception_handler(request, exc):
         return JSONResponse(
             status_code=HTTPStatus.CONFLICT,
             content=StandardResponse(
@@ -49,12 +71,12 @@ def register_error_handlers(app) -> None:
             ).model_dump(),
         )
 
-    @app.exception_handler(UserNotFoundException)
-    async def user_not_found_exception_handler(request, exc):
+    @app.exception_handler(UserUserAlreadyExistsException)
+    async def user_user_already_exists_exception_handler(request, exc):
         return JSONResponse(
-            status_code=HTTPStatus.NOT_FOUND,
+            status_code=HTTPStatus.CONFLICT,
             content=StandardResponse(
-                success=False, message=str(exc), payload=exc.details
+                success=False, message=str(exc), payload=None  # user_exceptions version doesn't have details
             ).model_dump(),
         )
 
