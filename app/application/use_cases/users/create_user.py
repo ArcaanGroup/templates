@@ -44,6 +44,18 @@ class CreateUserUseCase:
                 if role:
                     roles.append(role)
 
+        # Assign default role if no roles were specified
+        if not roles:
+            # Try to find a 'user' role as the default
+            default_role = await self.role_repository.get_by_title("user")
+            if default_role:
+                roles.append(default_role)
+            else:
+                # If no 'user' role exists, try 'basic' role
+                basic_role = await self.role_repository.get_by_title("basic")
+                if basic_role:
+                    roles.append(basic_role)
+
         user = User(
             username=Username(dto.username),
             email=Email(dto.email),

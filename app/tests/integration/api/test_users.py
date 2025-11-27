@@ -61,7 +61,7 @@ class TestUserEndpoints:
         """Test getting a user by ID"""
         import uuid
         unique_id = str(uuid.uuid4())[:8]  # Short unique identifier
-        # First, create a user
+        # First, create a user (public endpoint)
         payload = {
             "username": f"getusertest{unique_id}",
             "email": f"getuser{unique_id}@example.com",
@@ -70,20 +70,57 @@ class TestUserEndpoints:
         }
         create_response = client.post("/api/v1/users/", json=payload)
         assert create_response.status_code == 201
-        user_id = create_response.json()["payload"]["id"]
+        created_user_id = create_response.json()["payload"]["id"]
 
-        response = client.get(f"/api/v1/users/{user_id}")
+        # Login to get a token
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"getusertest{unique_id}", "password": "SecurePass123"}
+        )
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Make authenticated request to get the user
+        response = client.get(
+            f"/api/v1/users/{created_user_id}",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 200
 
         data = response.json()
         assert data["success"] is True
-        assert data["payload"]["id"] == user_id
+        assert data["payload"]["id"] == created_user_id
         assert data["payload"]["username"] == f"getusertest{unique_id}"
         assert data["payload"]["email"] == f"getuser{unique_id}@example.com"
 
     def test_get_user_not_found(self, client: TestClient):
         """Test getting a non-existent user"""
-        response = client.get("/api/v1/users/999999")
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+        # Create a user to login with
+        register_payload = {
+            "username": f"testuser{unique_id}",
+            "email": f"test{unique_id}@example.com",
+            "password": "SecurePass123",
+            "is_active": True
+        }
+        register_response = client.post("/api/v1/users/", json=register_payload)
+        assert register_response.status_code == 201
+
+        # Login with the created user
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"testuser{unique_id}", "password": "SecurePass123"}
+        )
+
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Make authenticated request to get a non-existent user
+        response = client.get(
+            "/api/v1/users/999999",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 404
 
     def test_update_user(self, client: TestClient):
@@ -101,13 +138,25 @@ class TestUserEndpoints:
         assert create_response.status_code == 201
         user_id = create_response.json()["payload"]["id"]
 
-        # Update the user
+        # Login to get a token
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"updateuser{unique_id}", "password": "SecurePass123"}
+        )
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Update the user with authentication
         update_payload = {
             "username": f"updateduser{unique_id}",
             "email": f"updated{unique_id}@example.com",
             "is_active": False
         }
-        response = client.put(f"/api/v1/users/{user_id}", json=update_payload)
+        response = client.put(
+            f"/api/v1/users/{user_id}",
+            json=update_payload,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 200
 
         data = response.json()
@@ -118,10 +167,35 @@ class TestUserEndpoints:
 
     def test_update_user_not_found(self, client: TestClient):
         """Test updating a non-existent user"""
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+        # Create a user to login with
+        payload = {
+            "username": f"testuser{unique_id}",
+            "email": f"test{unique_id}@example.com",
+            "password": "SecurePass123",
+            "is_active": True
+        }
+        create_response = client.post("/api/v1/users/", json=payload)
+        assert create_response.status_code == 201
+
+        # Login to get a token
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"testuser{unique_id}", "password": "SecurePass123"}
+        )
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Try to update a non-existent user with authentication
         update_payload = {
             "username": "updateduser",
         }
-        response = client.put("/api/v1/users/999999", json=update_payload)
+        response = client.put(
+            "/api/v1/users/999999",
+            json=update_payload,
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 404
 
     def test_delete_user(self, client: TestClient):
@@ -139,17 +213,56 @@ class TestUserEndpoints:
         assert create_response.status_code == 201
         user_id = create_response.json()["payload"]["id"]
 
-        # Delete the user
-        response = client.delete(f"/api/v1/users/{user_id}")
+        # Login to get a token
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"deleteuser{unique_id}", "password": "SecurePass123"}
+        )
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Delete the user with authentication
+        response = client.delete(
+            f"/api/v1/users/{user_id}",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 204
 
         # Verify the user is gone
-        get_response = client.get(f"/api/v1/users/{user_id}")
-        assert get_response.status_code == 404
+        # Login again to get a token for this request
+        get_login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"deleteuser{unique_id}", "password": "SecurePass123"}
+        )
+        assert get_login_response.status_code == 404
 
     def test_delete_user_not_found(self, client: TestClient):
         """Test deleting a non-existent user"""
-        response = client.delete("/api/v1/users/999999")
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+        # Create a user to login with
+        payload = {
+            "username": f"testuser{unique_id}",
+            "email": f"test{unique_id}@example.com",
+            "password": "SecurePass123",
+            "is_active": True
+        }
+        create_response = client.post("/api/v1/users/", json=payload)
+        assert create_response.status_code == 201
+
+        # Login to get a token
+        login_response = client.post(
+            "/api/v1/auth/login",
+            data={"username": f"testuser{unique_id}", "password": "SecurePass123"}
+        )
+        assert login_response.status_code == 200
+        token = login_response.json()["payload"]["access_token"]
+
+        # Try to delete a non-existent user with authentication
+        response = client.delete(
+            "/api/v1/users/999999",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 404
 
     def test_list_users(self, client: TestClient):

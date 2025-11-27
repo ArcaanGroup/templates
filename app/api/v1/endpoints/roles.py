@@ -11,6 +11,7 @@ from app.api.dependencies import (
     get_get_role_use_case,
     get_list_roles_use_case,
     get_update_role_use_case,
+    authorization_dependency,
 )
 from app.application.dto.role_dto import RoleCreateDTO, RoleDTO, RoleUpdateDTO
 from app.application.use_cases.roles.create_role import CreateRoleUseCase
@@ -27,6 +28,7 @@ router = APIRouter()
 @router.post("/", response_model=StandardResponse[RoleDTO])
 async def create_role(
     dto: RoleCreateDTO,
+    _: dict = Depends(authorization_dependency(required=["role:write"])),
     use_case: CreateRoleUseCase = Depends(get_create_role_use_case),
 ) -> StandardResponse[RoleDTO]:
     """Create a new role"""
@@ -81,6 +83,7 @@ async def list_roles(
 async def update_role(
     role_id: uuid.UUID,
     dto: RoleUpdateDTO,
+    _: dict = Depends(authorization_dependency(required=["role:write"])),
     use_case: UpdateRoleUseCase = Depends(get_update_role_use_case),
 ) -> StandardResponse[RoleDTO]:
     """Update an existing role"""
@@ -101,6 +104,7 @@ async def update_role(
 @router.delete("/{role_id}", response_model=StandardResponse[bool])
 async def delete_role(
     role_id: uuid.UUID,
+    _: dict = Depends(authorization_dependency(required=["role:delete"])),
     use_case: DeleteRoleUseCase = Depends(get_delete_role_use_case),
 ) -> StandardResponse[bool]:
     """Delete a role by ID"""

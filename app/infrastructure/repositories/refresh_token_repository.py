@@ -116,6 +116,14 @@ class SQLAlchemyRefreshTokenRepository(RefreshTokenRepositoryInterface):
         await self.session.refresh(model)
         return self._to_domain(model)
 
+    async def delete_by_user_id(self, user_id: int) -> int:
+        """Delete all refresh tokens for a specific user and return count of deleted tokens"""
+        result = await self.session.execute(
+            delete(RefreshTokenModel).where(RefreshTokenModel.user_id == user_id)
+        )
+        await self.session.commit()
+        return result.rowcount
+
     async def delete(self, entity: RefreshToken) -> None:
         """Delete a refresh token"""
         result = await self.session.execute(

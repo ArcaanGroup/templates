@@ -24,8 +24,11 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def _to_domain(self, model: UserModel) -> User:
+    async def _to_domain(self, model: UserModel) -> Optional[User]:
         """Convert ORM model to domain entity"""
+        if model is None:
+            return None
+
         from app.domain.entities.user import User
         from app.domain.value_objects.email import Email
         from app.domain.value_objects.password import Password
@@ -169,6 +172,12 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
 
     async def delete(self, entity: User) -> None:
         """Delete a user"""
+        # First, delete any related refresh tokens to avoid foreign key constraint issues
+        from app.infrastructure.database.models.refresh_token import RefreshTokenModel
+        from sqlalchemy import delete
+        await self.session.execute(delete(RefreshTokenModel).where(RefreshTokenModel.user_id == entity.id))
+
+        # Now delete the user
         result = await self.session.execute(select(UserModel).where(UserModel.id == entity.id))
         model = result.scalars().first()
         if not model:

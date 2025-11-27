@@ -230,52 +230,64 @@ async def get_current_user_from_token(
     return await use_case.execute(token)
 
 
-# Authorization dependencies
-from typing import List
-import uuid
+from typing import List, Optional
 
 from fastapi import Depends, HTTPException, status
 
 from app.application.interfaces.repositories import UserRepositoryInterface, RoleRepositoryInterface
 from app.application.dto.auth_dto import UserDTO
-from app.domain.services.permission_service import PermissionService
 
 
-async def authorize_user(
-    required_permissions: List[uuid.UUID] = None,
-    user_repository: UserRepositoryInterface = Depends(get_user_repository),
-    role_repository: RoleRepositoryInterface = Depends(get_role_repository)
-):
+from typing import Callable
+
+def authorization_dependency(required: Optional[List[str]] = None):
     """
-    Authorization dependency that extends the current authentication
-    Checks if the authenticated user has the required permissions
+    Factory function that creates an authorization dependency.
+    Accepts a list of required permission strings and returns a dependency
+    that checks if the user has the required permissions.
     """
-    if required_permissions is None:
-        required_permissions = []
-
-    async def authorization_dependency(
-        current_user: UserDTO = Depends(get_current_user_from_token)
+    async def dependency(
+        current_user: UserDTO = Depends(get_current_user_from_token),
+        user_resource_id: Optional[int] = None,  # The ID of the resource being accessed, if applicable
+        user_repository: UserRepositoryInterface = Depends(get_user_repository),
+        role_repository: RoleRepositoryInterface = Depends(get_role_repository)
     ) -> UserDTO:
-        # If no permissions are required, just return the authenticated user
-        if not required_permissions:
+        if required is None or len(required) == 0:
+            return current_user
+
+        # Check if user is accessing their own resource (self-service)
+        if user_resource_id is not None and current_user.id == user_resource_id:
+            # User is accessing their own resource, allow basic operations
+            # We could implement specific logic here, but for now return the user
+            # The original implementation would still apply to non-self resources
             return current_user
 
         # Get user's roles and their permissions
         user_roles = await role_repository.get_user_roles(current_user.id)
         user_permissions = set()
 
+        # Get all permissions once using PermissionService and create a lookup map
+        from app.domain.services.permission_service import PermissionService
+        all_permissions = PermissionService.get_permissions()
+        permission_map = {perm.id: perm.title for perm in all_permissions}
+
         # Collect all permissions from user's roles
         for role in user_roles:
-            user_permissions.update(role.permissions)
+            # Get all permission IDs from the role
+            for permission_id in role.permissions:
+                # Get the permission title from the map and add to user permissions
+                permission_title = permission_map.get(permission_id)
+                if permission_title:
+                    user_permissions.add(permission_title)
 
         # Check if user has all required permissions
-        for required_permission in required_permissions:
+        for required_permission in required:
             if required_permission not in user_permissions:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="User does not have required permissions"
+                    detail=f"User does not have required permission: {required_permission}"
                 )
 
         return current_user
 
-    return authorization_dependency
+    return dependency
