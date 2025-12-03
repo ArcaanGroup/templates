@@ -124,6 +124,32 @@ class SQLAlchemyRefreshTokenRepository(RefreshTokenRepositoryInterface):
         await self.session.commit()
         return result.rowcount
 
+    # Method to delete all refresh tokens for a user (returning boolean to match service expectation)
+    async def delete_by_user_id_bool(self, user_id: int) -> bool:
+        """Delete all refresh tokens for a specific user and return success boolean"""
+        result = await self.session.execute(
+            delete(RefreshTokenModel).where(RefreshTokenModel.user_id == user_id)
+        )
+        await self.session.commit()
+        return result.rowcount > 0
+
+    # Method to create refresh token directly from model
+    async def create_with_model(self, model: RefreshTokenModel) -> RefreshTokenModel:
+        """Create a refresh token from a database model"""
+        self.session.add(model)
+        await self.session.commit()
+        await self.session.refresh(model)
+        return model
+
+    # Method to delete refresh token by token string
+    async def delete_by_token(self, token: str) -> bool:
+        """Delete refresh token by token string and return success boolean"""
+        result = await self.session.execute(
+            delete(RefreshTokenModel).where(RefreshTokenModel.token == token)
+        )
+        await self.session.commit()
+        return result.rowcount > 0
+
     async def delete(self, entity: RefreshToken) -> None:
         """Delete a refresh token"""
         result = await self.session.execute(

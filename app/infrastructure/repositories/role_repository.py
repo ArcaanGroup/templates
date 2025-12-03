@@ -169,3 +169,22 @@ class SQLAlchemyRoleRepository(RoleRepositoryInterface):
             )
             for role_model in role_models
         ]
+
+    # Method to get user roles directly as RoleModel
+    async def get_user_roles_model(self, user_id: int) -> List[RoleModel]:
+        """Get all roles for a specific user as RoleModel instances"""
+        # Query to get roles for a specific user via the user_roles association table
+        stmt = (
+            select(RoleModel)
+            .join(RoleModel.users)
+            .where(RoleModel.users.any(id=user_id))
+        )
+        result = await self._db_session.execute(stmt)
+        return result.scalars().all()
+
+    # Method to get role by title as RoleModel
+    async def get_role_model_by_title(self, title: str) -> Optional[RoleModel]:
+        """Get role by title as RoleModel"""
+        stmt = select(RoleModel).where(RoleModel.title == title)
+        result = await self._db_session.execute(stmt)
+        return result.scalar_one_or_none()

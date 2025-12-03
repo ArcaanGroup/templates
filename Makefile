@@ -67,4 +67,3 @@ clean:
 	find . -type d -name ".mypy_cache" -exec rm -r {} +
 	rm -rf htmlcov/
 	rm -rf .coverage
-

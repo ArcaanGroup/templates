@@ -4,7 +4,7 @@ from typing import Optional, List
 import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 
 from app.application.interfaces.repositories import UserRepositoryInterface
@@ -16,6 +16,8 @@ from app.domain.value_objects.username import Username
 from app.domain.value_objects.title import Title
 from app.infrastructure.database.models.user import UserModel
 from app.infrastructure.database.models.role import RoleModel
+from fastapi_pagination import Params
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 class SQLAlchemyUserRepository(UserRepositoryInterface):
@@ -95,6 +97,14 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
 
         return await self._to_domain(model)
 
+    # Method to create user directly from model
+    async def create_with_model(self, model: UserModel) -> UserModel:
+        """Create a new user from a database model"""
+        self.session.add(model)
+        await self.session.commit()
+        await self.session.refresh(model)
+        return model
+
     async def get_by_id(self, id: int) -> Optional[User]:
         """Get user by ID"""
         result = await self.session.execute(
@@ -104,6 +114,16 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         )
         model = result.scalars().first()
         return await self._to_domain(model) if model else None
+
+    # Method to get user model directly without converting to domain entity
+    async def get_user_model_by_id(self, id: int) -> Optional[UserModel]:
+        """Get user model by ID without converting to domain entity"""
+        result = await self.session.execute(
+            select(UserModel)
+            .options(selectinload(UserModel.roles))
+            .where(UserModel.id == id)
+        )
+        return result.scalars().first()
 
     async def get_by_username(self, username: str) -> Optional[User]:
         """Get user by username"""
@@ -174,7 +194,6 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         """Delete a user"""
         # First, delete any related refresh tokens to avoid foreign key constraint issues
         from app.infrastructure.database.models.refresh_token import RefreshTokenModel
-        from sqlalchemy import delete
         await self.session.execute(delete(RefreshTokenModel).where(RefreshTokenModel.user_id == entity.id))
 
         # Now delete the user
@@ -186,6 +205,18 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         await self.session.delete(model)
         await self.session.commit()
 
+    async def delete_by_id(self, user_id: int) -> bool:
+        """Delete a user by ID"""
+        from app.infrastructure.database.models.refresh_token import RefreshTokenModel
+        await self.session.execute(delete(RefreshTokenModel).where(RefreshTokenModel.user_id == user_id))
+
+        result = await self.session.execute(
+            delete(UserModel).where(UserModel.id == user_id)
+        )
+        await self.session.commit()
+
+        return result.rowcount > 0
+
     async def list_all(self, skip: int = 0, limit: int = 100) -> list[User]:
         """List all users with pagination"""
         result = await self.session.execute(
@@ -196,6 +227,12 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         )
         models = result.scalars().all()
         return [await self._to_domain(model) for model in models]
+
+    # Method to list users with pagination using fastapi-pagination
+    async def list_all_with_pagination(self, params: Params) -> List[UserModel]:
+        """List all users with pagination using fastapi-pagination"""
+        query = select(UserModel).options(selectinload(UserModel.roles))
+        return await paginate(self.session, query, params)
 
     async def count_all(self) -> int:
         """Count all users"""

@@ -8,8 +8,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.core.config import settings
 from app.application.dto.auth_dto import UserDTO
+from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=True)
@@ -35,6 +35,35 @@ def create_access_token(claims: dict, expires_delta: Optional[timedelta] = None)
     claims_to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(claims_to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
+
+
+def create_refresh_token(claims: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """Create a JWT refresh token"""
+    claims_to_encode = claims.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        # Refresh tokens expire in 30 days by default
+        expire = datetime.utcnow() + timedelta(days=30)
+    claims_to_encode.update({"exp": expire, "type": "refresh"})
+    encoded_jwt = jwt.encode(claims_to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt
+
+
+def decode_refresh_token(token: str) -> dict:
+    """Decode a refresh token and return its payload"""
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        token_type = payload.get("type")
+        if token_type != "refresh":
+            raise JWTError("Invalid token type")
+        return payload
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:

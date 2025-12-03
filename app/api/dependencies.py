@@ -2,40 +2,29 @@
 
 from typing import AsyncGenerator
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.application.dto.auth_dto import UserDTO
 from app.application.interfaces.cache import CacheInterface
 from app.application.interfaces.event_bus import EventBusInterface
-from app.application.interfaces.repositories import UserRepositoryInterface, RoleRepositoryInterface
-from app.application.use_cases.auth.change_password import ChangePasswordUseCase
-from app.application.use_cases.auth.get_current_user import GetCurrentUserUseCase
-from app.application.use_cases.auth.login import LoginUseCase
-from app.application.use_cases.auth.register import RegisterUseCase
-from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
-from app.application.use_cases.auth.logout import LogoutUseCase
-from app.application.use_cases.users.create_user import CreateUserUseCase
-from app.application.use_cases.users.delete_user import DeleteUserUseCase
-from app.application.use_cases.users.get_user import GetUserUseCase
-from app.application.use_cases.users.list_users import ListUsersUseCase
-from app.application.use_cases.users.update_user import UpdateUserUseCase
-from app.application.use_cases.roles.create_role import CreateRoleUseCase
-from app.application.use_cases.roles.delete_role import DeleteRoleUseCase
-from app.application.use_cases.roles.get_role import GetRoleUseCase
-from app.application.use_cases.roles.list_roles import ListRolesUseCase
-from app.application.use_cases.roles.update_role import UpdateRoleUseCase
-from app.application.dto.auth_dto import UserDTO
-from app.core.security import oauth2_scheme, get_current_user
+from app.application.interfaces.repositories import (
+    RefreshTokenRepositoryInterface,
+    RoleRepositoryInterface,
+    UserRepositoryInterface,
+)
+from app.core.security import get_current_user, oauth2_scheme
 from app.infrastructure.cache.memory_cache import MemoryCache
 from app.infrastructure.database.session import get_db
 from app.infrastructure.messaging.event_bus import InMemoryEventBus
-from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
-from app.infrastructure.repositories.role_repository import SQLAlchemyRoleRepository
 from app.infrastructure.repositories.refresh_token_repository import (
     SQLAlchemyRefreshTokenRepository,
 )
-from app.application.interfaces.repositories import RefreshTokenRepositoryInterface
-
+from app.infrastructure.repositories.role_repository import SQLAlchemyRoleRepository
+from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+from app.services.auth_service import AuthService
+from app.services.role_service import RoleService
+from app.services.user_service import UserService
 
 # Cache singleton
 _cache: CacheInterface | None = None
@@ -80,47 +69,32 @@ def get_role_repository(db: AsyncSession = Depends(get_db)) -> RoleRepositoryInt
     return SQLAlchemyRoleRepository(db)
 
 
-
-
-def get_create_user_use_case(
-    repository: UserRepositoryInterface = Depends(get_user_repository),
+def get_user_service(
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-    event_bus: EventBusInterface = Depends(get_event_bus),
-) -> CreateUserUseCase:
-    """Get create user use case"""
-    return CreateUserUseCase(repository, role_repository, event_bus)
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
+) -> UserService:
+    """Get user service"""
+    return UserService(user_repository, role_repository, refresh_token_repository)
 
 
-def get_get_user_use_case(
-    repository: UserRepositoryInterface = Depends(get_user_repository),
-    cache: CacheInterface = Depends(get_cache),
-) -> GetUserUseCase:
-    """Get get user use case"""
-    return GetUserUseCase(repository, cache)
-
-
-def get_list_users_use_case(
-    repository: UserRepositoryInterface = Depends(get_user_repository),
-) -> ListUsersUseCase:
-    """Get list users use case"""
-    return ListUsersUseCase(repository)
-
-
-def get_update_user_use_case(
-    repository: UserRepositoryInterface = Depends(get_user_repository),
+def get_role_service(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-    cache: CacheInterface = Depends(get_cache),
-) -> UpdateUserUseCase:
-    """Get update user use case"""
-    return UpdateUserUseCase(repository, role_repository, cache)
+) -> RoleService:
+    """Get role service"""
+    return RoleService(role_repository)
 
 
-def get_delete_user_use_case(
-    repository: UserRepositoryInterface = Depends(get_user_repository),
-    cache: CacheInterface = Depends(get_cache),
-) -> DeleteUserUseCase:
-    """Get delete user use case"""
-    return DeleteUserUseCase(repository, cache)
+def get_auth_service(
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+    refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
+        get_refresh_token_repository
+    ),
+) -> AuthService:
+    """Get auth service"""
+    return AuthService(user_repository, refresh_token_repository)
 
 
 def get_login_use_case(
@@ -128,11 +102,11 @@ def get_login_use_case(
     refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
         get_refresh_token_repository
     ),
-) -> LoginUseCase:
+) -> "LoginUseCase":
     """Get login use case"""
-    return LoginUseCase(
-        user_repository=user_repository, refresh_token_repository=refresh_token_repository
-    )
+    from app.application.use_cases.auth.login import LoginUseCase
+
+    return LoginUseCase(user_repository, refresh_token_repository)
 
 
 def get_register_use_case(
@@ -140,25 +114,29 @@ def get_register_use_case(
     refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
         get_refresh_token_repository
     ),
-) -> RegisterUseCase:
+) -> "RegisterUseCase":
     """Get register use case"""
-    return RegisterUseCase(
-        user_repository=user_repository, refresh_token_repository=refresh_token_repository
-    )
+    from app.application.use_cases.auth.register import RegisterUseCase
 
-
-def get_current_user_use_case(
-    user_repository: UserRepositoryInterface = Depends(get_user_repository),
-) -> GetCurrentUserUseCase:
-    """Get get current user use case"""
-    return GetCurrentUserUseCase(user_repository)
+    return RegisterUseCase(user_repository, refresh_token_repository)
 
 
 def get_change_password_use_case(
     user_repository: UserRepositoryInterface = Depends(get_user_repository),
-) -> ChangePasswordUseCase:
+) -> "ChangePasswordUseCase":
     """Get change password use case"""
+    from app.application.use_cases.auth.change_password import ChangePasswordUseCase
+
     return ChangePasswordUseCase(user_repository)
+
+
+def get_current_user_use_case(
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> "GetCurrentUserUseCase":
+    """Get current user use case"""
+    from app.application.use_cases.auth.get_current_user import GetCurrentUserUseCase
+
+    return GetCurrentUserUseCase(user_repository)
 
 
 def get_refresh_token_use_case(
@@ -166,79 +144,108 @@ def get_refresh_token_use_case(
         get_refresh_token_repository
     ),
     user_repository: UserRepositoryInterface = Depends(get_user_repository),
-) -> RefreshTokenUseCase:
+) -> "RefreshTokenUseCase":
     """Get refresh token use case"""
-    from app.core.config import settings
+    from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
 
-    return RefreshTokenUseCase(
-        refresh_token_repository=refresh_token_repository,
-        user_repository=user_repository,
-        access_token_expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-    )
+    return RefreshTokenUseCase(refresh_token_repository, user_repository)
 
 
 def get_logout_use_case(
     refresh_token_repository: RefreshTokenRepositoryInterface = Depends(
         get_refresh_token_repository
     ),
-) -> LogoutUseCase:
+) -> "LogoutUseCase":
     """Get logout use case"""
-    return LogoutUseCase(refresh_token_repository=refresh_token_repository)
+    from app.application.use_cases.auth.logout import LogoutUseCase
+
+    return LogoutUseCase(refresh_token_repository)
 
 
 def get_create_role_use_case(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-    event_bus: EventBusInterface = Depends(get_event_bus),
-) -> CreateRoleUseCase:
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> "CreateRoleUseCase":
     """Get create role use case"""
-    return CreateRoleUseCase(role_repository, event_bus)
+    from app.application.use_cases.roles.create_role import CreateRoleUseCase
+
+    return CreateRoleUseCase(role_repository, user_repository)
 
 
 def get_get_role_use_case(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-) -> GetRoleUseCase:
+) -> "GetRoleUseCase":
     """Get get role use case"""
+    from app.application.use_cases.roles.get_role import GetRoleUseCase
+
     return GetRoleUseCase(role_repository)
 
 
 def get_list_roles_use_case(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-) -> ListRolesUseCase:
+) -> "ListRolesUseCase":
     """Get list roles use case"""
+    from app.application.use_cases.roles.list_roles import ListRolesUseCase
+
     return ListRolesUseCase(role_repository)
 
 
 def get_update_role_use_case(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-) -> UpdateRoleUseCase:
+    user_repository: UserRepositoryInterface = Depends(get_user_repository),
+) -> "UpdateRoleUseCase":
     """Get update role use case"""
-    return UpdateRoleUseCase(role_repository)
+    from app.application.use_cases.roles.update_role import UpdateRoleUseCase
+
+    return UpdateRoleUseCase(role_repository, user_repository)
 
 
 def get_delete_role_use_case(
     role_repository: RoleRepositoryInterface = Depends(get_role_repository),
-) -> DeleteRoleUseCase:
+) -> "DeleteRoleUseCase":
     """Get delete role use case"""
+    from app.application.use_cases.roles.delete_role import DeleteRoleUseCase
+
     return DeleteRoleUseCase(role_repository)
 
 
 async def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),
-    use_case: GetCurrentUserUseCase = Depends(get_current_user_use_case),
+    user_service: UserService = Depends(get_user_service),
 ) -> UserDTO:
     """Get current user DTO from token"""
-    return await use_case.execute(token)
+    from app.core.security import get_current_user as get_user_from_token
+
+    # Get user data from the token
+    user_data = await get_user_from_token(token)
+
+    # Get user by username or email from the repository
+    user_model = await user_service.user_repository.get_by_username_or_email(user_data["username"])
+    if not user_model:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Extract role titles for the response
+    role_titles = [role.title for role in user_model.roles] if user_model.roles else []
+
+    # Return UserDTO
+    return UserDTO(
+        id=user_model.id,
+        username=user_model.username.value,
+        email=user_model.email.value,
+        is_active=user_model.is_active,
+        roles=role_titles,
+        created_at=user_model.created_at,
+        updated_at=user_model.updated_at,
+    )
 
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from fastapi import Depends, HTTPException, status
 
-from app.application.interfaces.repositories import UserRepositoryInterface, RoleRepositoryInterface
 from app.application.dto.auth_dto import UserDTO
+from app.application.interfaces.repositories import RoleRepositoryInterface, UserRepositoryInterface
 
-
-from typing import Callable
 
 def authorization_dependency(required: Optional[List[str]] = None):
     """
@@ -246,11 +253,14 @@ def authorization_dependency(required: Optional[List[str]] = None):
     Accepts a list of required permission strings and returns a dependency
     that checks if the user has the required permissions.
     """
+
     async def dependency(
         current_user: UserDTO = Depends(get_current_user_from_token),
-        user_resource_id: Optional[int] = None,  # The ID of the resource being accessed, if applicable
+        user_resource_id: Optional[
+            int
+        ] = None,  # The ID of the resource being accessed, if applicable
         user_repository: UserRepositoryInterface = Depends(get_user_repository),
-        role_repository: RoleRepositoryInterface = Depends(get_role_repository)
+        role_repository: RoleRepositoryInterface = Depends(get_role_repository),
     ) -> UserDTO:
         if required is None or len(required) == 0:
             return current_user
@@ -267,7 +277,10 @@ def authorization_dependency(required: Optional[List[str]] = None):
         user_permissions = set()
 
         # Get all permissions once using PermissionService and create a lookup map
+        # In the simplified architecture, we might handle permissions differently
+        # For now, using the existing permission service approach
         from app.domain.services.permission_service import PermissionService
+
         all_permissions = PermissionService.get_permissions()
         permission_map = {perm.id: perm.title for perm in all_permissions}
 
@@ -285,7 +298,7 @@ def authorization_dependency(required: Optional[List[str]] = None):
             if required_permission not in user_permissions:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"User does not have required permission: {required_permission}"
+                    detail=f"User does not have required permission: {required_permission}",
                 )
 
         return current_user
