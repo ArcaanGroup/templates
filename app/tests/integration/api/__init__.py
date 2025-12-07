@@ -1,2 +1,0 @@
-"""API integration tests"""
-
