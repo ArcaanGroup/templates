@@ -17,6 +17,25 @@
     "description": "Get started by editing the page below.",
     "getStarted": "Get Started",
     "learnMore": "Learn More"
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password",
+      "submitButton": "Sign In",
+      "loading": "Logging in...",
+      "failed": "Login failed. Please check your credentials."
+    },
+    "validation": {
+      "username": {
+        "required": "Username is required",
+        "minLength": "Username must be at least 3 characters"
+      },
+      "password": {
+        "required": "Password is required",
+        "minLength": "Password must be at least 6 characters"
+      }
+    }
   }
 }
-

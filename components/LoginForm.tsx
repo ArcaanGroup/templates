@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
@@ -9,6 +10,7 @@ type FormData = {
 };
 
 export default function LoginForm() {
+  const t = useTranslations("auth");
   const form = useForm<FormData>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,7 @@ export default function LoginForm() {
       // Handle successful login here (e.g., redirect, store token, etc.)
     } catch (err) {
       console.error("Login error:", err);
-      setError("ورود ناموفق بود. لطفاً اطلاعات خود را بررسی کنید.");
+      setError(t("login.failed"));
     } finally {
       setIsLoading(false);
     }
@@ -31,7 +33,7 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
       <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
-        ورود به حساب کاربری
+        {t("login.title")}
       </h2>
 
       <form
@@ -49,7 +51,7 @@ export default function LoginForm() {
             htmlFor="username"
             className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            نام کاربری:
+            {t("login.usernameLabel")}:
           </label>
           <input
             type="text"
@@ -61,10 +63,10 @@ export default function LoginForm() {
                 : "border-gray-300 focus:border-blue-500 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-600"
             } bg-white dark:bg-gray-700 dark:text-white`}
             {...form.register("username", {
-              required: "نام کاربری الزامی است",
+              required: t("validation.username.required"),
               minLength: {
                 value: 3,
-                message: "نام کاربری باید حداقل 3 کاراکتر باشد",
+                message: t("validation.username.minLength"),
               },
             })}
           />
@@ -80,7 +82,7 @@ export default function LoginForm() {
             htmlFor="password"
             className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            رمز عبور:
+            {t("login.passwordLabel")}:
           </label>
           <input
             type="password"
@@ -91,10 +93,10 @@ export default function LoginForm() {
                 : "border-gray-300 focus:border-blue-500 focus:ring-blue-200 dark:focus:ring-blue-800 dark:border-gray-600"
             } bg-white dark:bg-gray-700 dark:text-white`}
             {...form.register("password", {
-              required: "رمز عبور الزامی است",
+              required: t("validation.password.required"),
               minLength: {
                 value: 6,
-                message: "رمز عبور باید حداقل 6 کاراکتر باشد",
+                message: t("validation.password.minLength"),
               },
             })}
           />
@@ -132,10 +134,10 @@ export default function LoginForm() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              در حال ورود...
+              {t("login.loading")}
             </>
           ) : (
-            "ورود"
+            t("login.submitButton")
           )}
         </button>
       </form>
