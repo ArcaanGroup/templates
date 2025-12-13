@@ -19,6 +19,10 @@ export default function LoginForm() {
     setIsLoading(true);
     setError(null);
 
+    await fetch("http://localhost:8000/api", {
+      method: "GET",
+    });
+
     try {
       console.log(data);
       // Handle successful login here (e.g., redirect, store token, etc.)

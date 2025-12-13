@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 /**
  * Theme Toggle Component
- * 
+ *
  * A button component that allows users to toggle between light, dark, and system themes.
  * Features:
  * - Shows current theme with icon
@@ -38,20 +38,18 @@ export default function ThemeToggle() {
   }
 
   const cycleTheme = () => {
-    if (theme === 'system') {
-      setTheme('light');
-    } else if (theme === 'light') {
-      setTheme('dark');
-    } else {
-      setTheme('system');
-    }
+    // Define the theme cycling sequence
+    const themeOrder = ["system", "light", "dark"];
+    const currentIndex = themeOrder.indexOf(theme || "system");
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    setTheme(themeOrder[nextIndex]);
   };
 
   // Determine which icon to show based on resolved theme (actual theme being used)
   const getIcon = () => {
     const currentTheme = resolvedTheme || theme;
-    
-    if (currentTheme === 'dark') {
+
+    if (currentTheme === "dark") {
       // Moon icon for dark mode
       return (
         <svg
@@ -69,7 +67,7 @@ export default function ThemeToggle() {
           />
         </svg>
       );
-    } else if (currentTheme === 'light') {
+    } else if (currentTheme === "light") {
       // Sun icon for light mode
       return (
         <svg
@@ -110,12 +108,12 @@ export default function ThemeToggle() {
 
   const getAriaLabel = () => {
     const currentTheme = resolvedTheme || theme;
-    if (theme === 'system') {
+    if (theme === "system") {
       return `System theme (${currentTheme}) - Click to switch to light`;
-    } else if (theme === 'light') {
-      return 'Light theme - Click to switch to dark';
+    } else if (theme === "light") {
+      return "Light theme - Click to switch to dark";
     } else {
-      return 'Dark theme - Click to switch to system';
+      return "Dark theme - Click to switch to system";
     }
   };
 
@@ -131,4 +129,3 @@ export default function ThemeToggle() {
     </button>
   );
 }
-
