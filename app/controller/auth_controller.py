@@ -10,7 +10,10 @@ from app.dependencies.auth_dependencies import (
     get_authorized_user,
 )
 from app.dependencies.permission_dependencies import get_permission_service
-from app.error.exceptions import DomainException, UnauthorizedException
+from app.error.exceptions import (
+    CredentialsValidationException,
+    DomainException,
+)
 from app.models.auth.dto import UserLogin
 from app.models.permission.mapper import PermissionMapper
 from app.models.responses import StandardResponse, failure, success
@@ -75,13 +78,13 @@ async def refresh_tokens(
     refresh_token: Optional[str] = request.cookies.get("refresh_token")
 
     if not refresh_token:
-        raise UnauthorizedException(message="No refresh token provided")
+        raise CredentialsValidationException(message="No refresh token provided")
 
     # Use the auth service to refresh the access token
     new_token = await auth_service.refresh_access_token(refresh_token)
 
     if not new_token or not new_token.refresh_token:
-        raise UnauthorizedException(detail="Invalid or expired refresh token")
+        raise CredentialsValidationException(detail="Invalid or expired refresh token")
 
     # Update the refresh token cookie if needed (in case it's rotated)
     response.set_cookie(

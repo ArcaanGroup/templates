@@ -6,13 +6,15 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.core.config import config
-from app.error.exceptions import UnauthorizedException
+from app.error.exceptions import CredentialsValidationException, InactiveUserException
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import Token, UserLogin
+from app.models.refresh_token.dto import RefreshTokenCreate
 from app.models.user.dto import User
+from app.models.user.mapper import UserMapper
 from app.utils import verify_password
 from app.utils.auth import create_access_token, generate_refresh_token
 
@@ -47,13 +49,12 @@ class AuthService:
         if not domain_user or not verify_password(
             password, domain_user.hashed_password
         ):
-            raise UnauthorizedException("Incorrect username or password")
+            raise CredentialsValidationException("Incorrect username or password")
 
         if not domain_user.is_active:
-            raise UnauthorizedException("Inactive user")
+            raise InactiveUserException()
 
         # Convert domain entity to DTO for return to maintain the expected interface
-        from app.models.user.mapper import UserMapper
 
         return UserMapper.to_dto(domain_user)
 
@@ -77,8 +78,6 @@ class AuthService:
 
         # Generate refresh token
         refresh_token_domain = generate_refresh_token(user.id)
-
-        from app.models.refresh_token.dto import RefreshTokenCreate
 
         # Create refresh token in the database
         refresh_token_dto = await self.refresh_token_repo.create_refresh_token(
