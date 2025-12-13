@@ -41,7 +41,7 @@ async def login(
         value=token.access_token,
         httponly=True,
         secure=False,  # Set to True in production with HTTPS
-        samesite="lax",  # Adjust as needed
+        samesite="strict",  # Adjust as needed
         max_age=int(
             timedelta(minutes=15).total_seconds()
         ),  # Same as refresh token expiration
@@ -54,7 +54,7 @@ async def login(
         value=token.refresh_token,
         httponly=True,
         secure=False,  # Set to True in production with HTTPS
-        samesite="lax",  # Adjust as needed
+        samesite="strict",  # Adjust as needed
         max_age=int(
             timedelta(days=7).total_seconds()
         ),  # Same as refresh token expiration
