@@ -37,6 +37,19 @@ async def login(
 
     # Set the refresh token in an HTTP-only cookie
     response.set_cookie(
+        key="access_token",
+        value=token.access_token,
+        httponly=True,
+        secure=False,  # Set to True in production with HTTPS
+        samesite="lax",  # Adjust as needed
+        max_age=int(
+            timedelta(minutes=15).total_seconds()
+        ),  # Same as refresh token expiration
+        path="/",
+    )
+
+    # Set the refresh token in an HTTP-only cookie
+    response.set_cookie(
         key="refresh_token",
         value=token.refresh_token,
         httponly=True,
@@ -48,11 +61,7 @@ async def login(
         path="/api/auth/refresh",  # Limit the cookie to the refresh endpoint path
     )
 
-    # Remove refresh token from the response payload for security
-    token_payload = token.model_dump()
-    del token_payload["refresh_token"]
-
-    return success(message="Login successful", payload=token_payload)
+    return success(message="Login successful")
 
 
 @auth_router.post("/refresh", response_model=StandardResponse)
@@ -109,6 +118,7 @@ async def logout(
         await auth_service.logout(refresh_token)
 
     # Clear the refresh token cookie
+    response.delete_cookie(key="access_token", path="/")
     response.delete_cookie(key="refresh_token", path="/auth/refresh")
 
     return success(message="Logged out successfully", payload=None)

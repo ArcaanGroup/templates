@@ -4,13 +4,13 @@ Authentication-related dependencies and dependency injection logic.
 
 from typing import List, Optional
 
-from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Cookie, Depends
+from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 
+from app.core import logger
 from app.core.config import config
 from app.dependencies.permission_dependencies import get_permission_repository
-from app.dependencies.policy_dependencies import get_policy_repository
 from app.dependencies.refresh_token_dependencies import (
     get_refresh_token_repository,
 )
@@ -23,7 +23,6 @@ from app.error.exceptions import (
 from app.interface.repositories.permission_repository_interface import (
     IPermissionRepository,
 )
-from app.interface.repositories.policy_repository_interface import IPolicyRepository
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import TokenData
@@ -42,6 +41,14 @@ ALGORITHM = config.algorithm
 security = HTTPBearer(auto_error=False)
 
 
+def get_access_token_from_cookie(
+    access_token: str = Cookie(None, alias="access_token"),
+):
+    if not access_token:
+        raise CredentialsValidationException("No access token provided")
+    return access_token
+
+
 def verify_token(token: str) -> Optional[TokenData]:
     """
     Verify and decode a JWT token.
@@ -53,6 +60,7 @@ def verify_token(token: str) -> Optional[TokenData]:
         TokenData if valid, None if invalid
     """
     try:
+        logger.debug(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
         # Validate that required fields exist
@@ -74,11 +82,10 @@ def verify_token(token: str) -> Optional[TokenData]:
 
 async def authorize(
     required_permissions: List[Permission] = [],
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    access_token: str = Depends(get_access_token_from_cookie),
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
     permission_repository: IPermissionRepository = Depends(get_permission_repository),
-    policy_repository: IPolicyRepository = Depends(get_policy_repository),
 ) -> Optional[User]:
     """
     Get the current user from the token in the request and check required permissions.
@@ -92,11 +99,7 @@ async def authorize(
     Returns:
         UserDomain object if token is valid and user has required permissions, raises HTTPException otherwise
     """
-    if not credentials:
-        raise CredentialsValidationException()
-
-    token = credentials.credentials
-    token_data = verify_token(token)
+    token_data = verify_token(access_token)
 
     if token_data is None or token_data.username is None:
         raise CredentialsValidationException()
@@ -179,15 +182,19 @@ def get_authorized_user(required_permissions: List[Permission]):
     """
 
     async def get_authorized_user(
-        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+        access_token: str = Depends(get_access_token_from_cookie),
         user_repository: IUserRepository = Depends(get_user_repository),
         role_repository: IRoleRepository = Depends(get_role_repository),
+        permission_repository: IPermissionRepository = Depends(
+            get_permission_repository
+        ),
     ) -> Optional[User]:
         return await authorize(
             required_permissions=required_permissions,
-            credentials=credentials,
+            access_token=access_token,
             user_repository=user_repository,
             role_repository=role_repository,
+            permission_repository=permission_repository,
         )
 
     return get_authorized_user
