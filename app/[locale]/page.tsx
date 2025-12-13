@@ -1,4 +1,5 @@
 import LanguageSelect from "@/components/LanguageSelect";
+import LoginForm from "@/components/LoginForm";
 import ThemeToggle from "@/components/ThemeToggle";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -26,6 +27,7 @@ export default async function Home({
         <LanguageSelect />
         <ThemeToggle />
       </div>
+      <LoginForm />
     </div>
   );
 }
