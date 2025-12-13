@@ -145,7 +145,7 @@ class AxiosClient {
 
       // Call refresh endpoint
       // const { data } = await axios.post(`${baseURL}/auth/refresh`, { refreshToken });
-      await axios.post(`${baseURL}/auth/refresh`);
+      await axios.post(`${baseURL}/api/auth/refresh`);
 
       // Store new tokens
       // localStorage.setItem("accessToken", data.accessToken);
