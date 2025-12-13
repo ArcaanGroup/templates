@@ -99,6 +99,7 @@ async def authorize(
     Returns:
         UserDomain object if token is valid and user has required permissions, raises HTTPException otherwise
     """
+    # Authentication --------------------
     token_data = verify_token(access_token)
 
     if token_data is None or token_data.username is None:
@@ -115,6 +116,9 @@ async def authorize(
 
     # Convert entity to DTO
     user_dto = UserMapper.to_dto(user_domain)
+    # -------------------- Authentication
+
+    # Authorization --------------------
 
     # If required permissions are specified, check if the user has them
     if required_permissions:
@@ -150,6 +154,7 @@ async def authorize(
                     all_policies.update(policy_id)
 
         await evaluate_policies(list(all_policies))
+    # -------------------- Authorization
 
     return user_dto
 
@@ -181,23 +186,12 @@ def get_authorized_user(required_permissions: List[Permission]):
         A function that can be used with FastAPI's Depends
     """
 
-    async def get_authorized_user(
-        access_token: str = Depends(get_access_token_from_cookie),
-        user_repository: IUserRepository = Depends(get_user_repository),
-        role_repository: IRoleRepository = Depends(get_role_repository),
-        permission_repository: IPermissionRepository = Depends(
-            get_permission_repository
-        ),
-    ) -> Optional[User]:
+    async def authorize_dependency() -> Optional[User]:
         return await authorize(
             required_permissions=required_permissions,
-            access_token=access_token,
-            user_repository=user_repository,
-            role_repository=role_repository,
-            permission_repository=permission_repository,
         )
 
-    return get_authorized_user
+    return authorize_dependency
 
 
 async def get_auth_service(

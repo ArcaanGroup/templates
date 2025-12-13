@@ -24,3 +24,5 @@ class Permission(Enum):
     Users_AssignRole = "88cd4ed4-97d8-4265-88b2-bacaa44e16a9"
     Users_UnassignRole = "3920e61d-1d5f-4cae-ac5e-391a455e8e15"
     Test_CreateDefault = "cd3ecf7c-0dab-4ed8-ae53-e59e6e579d65"
+    Item_Read = "21d84b48-8e60-4e0b-89d9-17ecdf5aacc8"
+    Item_Create = "64c43027-6309-41e9-8ddb-f425a94f66bd"
