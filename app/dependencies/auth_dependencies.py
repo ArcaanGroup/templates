@@ -186,9 +186,20 @@ def get_authorized_user(required_permissions: List[Permission]):
         A function that can be used with FastAPI's Depends
     """
 
-    async def authorize_dependency() -> Optional[User]:
+    async def authorize_dependency(
+        access_token: str = Depends(get_access_token_from_cookie),
+        user_repository: IUserRepository = Depends(get_user_repository),
+        role_repository: IRoleRepository = Depends(get_role_repository),
+        permission_repository: IPermissionRepository = Depends(
+            get_permission_repository
+        ),
+    ) -> Optional[User]:
         return await authorize(
+            access_token=access_token,
             required_permissions=required_permissions,
+            user_repository=user_repository,
+            role_repository=role_repository,
+            permission_repository=permission_repository,
         )
 
     return authorize_dependency
