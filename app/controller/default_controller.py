@@ -6,12 +6,12 @@ from app.models.responses import StandardResponse, success
 default_router = APIRouter(tags=["default"])
 
 
-@default_router.get("/", response_model=StandardResponse[None])
-async def root():
+@default_router.get("/ping", response_model=StandardResponse[str])
+async def ping():
     """
     Root endpoint to provide basic information about the API.
     """
 
     return success(
-        "Welcome to FastAPI server!",
+        "pong",
     )
