@@ -6,8 +6,8 @@ import type { AxiosRequestConfig, AxiosResponse } from "axios";
 export type OrvalFetcherConfig = {
   url: string;
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-  params?: string | number | boolean | Record<string, string>;
-  data?: string | number | boolean | Record<string, string>;
+  params?: unknown;
+  data?: unknown;
   headers?: Record<string, string>;
   responseType?: "json" | "blob" | "arraybuffer" | "text" | "stream";
   baseURL?: string;
