@@ -1,6 +1,6 @@
 # FastAPI Server
 
-A modern, scalable FastAPI server with clean architecture.
+An e-commerce for Datasets.
 
 ## Features
 
