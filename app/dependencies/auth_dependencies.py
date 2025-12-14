@@ -8,7 +8,6 @@ from fastapi import Cookie, Depends
 from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 
-from app.core import logger
 from app.core.config import config
 from app.dependencies.permission_dependencies import get_permission_repository
 from app.dependencies.refresh_token_dependencies import (
@@ -60,7 +59,6 @@ def verify_token(token: str) -> Optional[TokenData]:
         TokenData if valid, None if invalid
     """
     try:
-        logger.debug(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
         # Validate that required fields exist
