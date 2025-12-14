@@ -26,7 +26,7 @@ from app.utils.auth.permission import Permission
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@auth_router.post("/login", response_model=StandardResponse)
+@auth_router.post("/login", response_model=StandardResponse[None])
 async def login(
     response: Response,
     user_login: UserLogin,
@@ -67,7 +67,7 @@ async def login(
     return success(message="Login successful")
 
 
-@auth_router.post("/refresh", response_model=StandardResponse)
+@auth_router.post("/refresh", response_model=StandardResponse[None])
 async def refresh_tokens(
     request: Request,
     response: Response,
@@ -106,7 +106,7 @@ async def refresh_tokens(
     return success(message="Token refreshed successfully", payload=token_payload)
 
 
-@auth_router.post("/logout", response_model=StandardResponse)
+@auth_router.post("/logout", response_model=StandardResponse[None])
 async def logout(
     request: Request,
     response: Response,
@@ -127,7 +127,7 @@ async def logout(
     return success(message="Logged out successfully", payload=None)
 
 
-@auth_router.get("/permissions", response_model=StandardResponse)
+@auth_router.get("/permissions", response_model=StandardResponse[list[Permission]])
 async def get_permissions(
     permission_service: PermissionService = Depends(get_permission_service),
     _=Depends(get_authorized_user([Permission.Permissions_Read])),
