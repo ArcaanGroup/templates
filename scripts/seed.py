@@ -2,9 +2,8 @@
 Seed script for populating the database with initial data.
 
 This script creates:
-- Initial roles (Admin, User, Moderator)
-- Sample users with different roles
-- Assigns roles to users as needed
+- One role 'Admin' with permission 'super:user'
+- One user 'admin' with password 'Secret123' assigned to the Admin role
 """
 
 import asyncio
@@ -22,15 +21,18 @@ from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.role.domain import RoleDomain
 from app.models.user.domain import UserDomain
+from app.repository.permission_repository import JSONPermissionRepository
 from app.repository.role_repository import RoleRepository
 from app.repository.user_repository import UserRepository
+from app.service.permission_service import PermissionService
+from app.service.role_service import RoleService
 
 
 async def create_roles(role_repository: IRoleRepository):
     """Create initial roles in the database."""
     print("Creating roles...")
 
-    roles_data = [{"name": "Admin"}, {"name": "User"}, {"name": "Moderator"}]
+    roles_data = [{"name": "Admin"}]
 
     roles: List[RoleDomain] = []
     for role_data in roles_data:
@@ -45,6 +47,23 @@ async def create_roles(role_repository: IRoleRepository):
                 role_domain = RoleDomain.create(name=role_data["name"])
                 role = await role_repository.create(role_domain)
                 print(f"Created role: {role.name}")
+
+                # Create permission repository and service to get the 'super:user' permission
+                permission_repo = JSONPermissionRepository()
+                permission_service = PermissionService(permission_repo)
+
+                # Get the 'super:user' permission
+                super_user_permission = await permission_repo.get_by_title("super:user")
+                if super_user_permission:
+                    # Create role service to assign permission
+                    role_service = RoleService(role_repository, permission_service)
+                    await role_service.assign_permission_to_role(
+                        role.id, super_user_permission.id
+                    )
+                    print(f"Assigned permission 'super:user' to role: {role.name}")
+                else:
+                    print("Warning: 'super:user' permission not found")
+
                 roles.append(role)
             else:
                 print(f"Role '{role_data['name']}' already exists")
@@ -62,32 +81,11 @@ async def create_users(
 
     users_data = [
         {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@example.com",
-            "username": "johndoe",
-            "password": "Password123",
-        },
-        {
-            "first_name": "Jane",
-            "last_name": "Smith",
-            "email": "jane.smith@example.com",
-            "username": "janesmith",
-            "password": "Password123",
-        },
-        {
-            "first_name": "Bob",
-            "last_name": "Johnson",
-            "email": "bob.johnson@example.com",
-            "username": "bobjohnson",
-            "password": "Password123",
-        },
-        {
-            "first_name": "Alice",
-            "last_name": "Williams",
-            "email": "alice.williams@example.com",
-            "username": "alicewilliams",
-            "password": "Password123",
+            "first_name": "Admin",
+            "last_name": "User",
+            "email": "admin@example.com",
+            "username": "admin",
+            "password": "Secret123",
         },
     ]
 
@@ -107,6 +105,27 @@ async def create_users(
                 )
                 user = await user_repository.create(user_domain)
                 print(f"Created user: {user.username}")
+
+                # Find the Admin role and assign it to the user
+                params = Params(page=1, size=100)  # Assuming we won't exceed 100 roles
+                roles_page = await role_repository.get_all(params)
+                admin_role = next(
+                    (r for r in roles_page.items if r.name == "Admin"), None
+                )
+
+                if admin_role:
+                    # Assign admin role to the user
+                    updated_user = await user_repository.assign_role(
+                        user_id=user.id, role_id=admin_role.id
+                    )
+                    print(f"Assigned admin role to user: {updated_user.username}")
+
+                # Activate the user
+                user.activate()  # Set is_active to True and update timestamp
+                activated_user = await user_repository.update(user)
+                if activated_user is not None:
+                    print(f"Activated user: {activated_user.username}")
+
                 users.append(user)
             else:
                 print(f"User with email '{user_data['email']}' already exists")
@@ -114,81 +133,6 @@ async def create_users(
             print(f"Error creating user '{user_data['username']}': {e}")
 
     return users
-
-
-async def assign_roles_to_users(
-    user_repository: IUserRepository, role_repository: IRoleRepository
-):
-    """Assign roles to users."""
-    print("Assigning roles to users...")
-
-    # Get all roles and users
-    params = Params(page=1, size=100)  # Assuming we won't exceed 100 roles/users
-    roles_page = await role_repository.get_all(params)
-    users_page = await user_repository.get_all(params)
-
-    roles = roles_page.items
-    users = users_page.items
-
-    # Find specific roles by name
-    admin_role = next((r for r in roles if r.name == "Admin"), None)
-    user_role = next((r for r in roles if r.name == "User"), None)
-    mod_role = next((r for r in roles if r.name == "Moderator"), None)
-
-    # Assign roles to specific users
-    if admin_role and users:
-        try:
-            # Assign admin role to the first user
-            updated_user = await user_repository.assign_role(
-                user_id=users[0].id, role_id=admin_role.id
-            )
-            print(f"Assigned admin role to user: {updated_user.username}")
-        except Exception as e:
-            print(f"Error assigning admin role to user: {e}")
-
-    if user_role and len(users) > 1:
-        try:
-            # Assign user role to the second user
-            updated_user = await user_repository.assign_role(
-                user_id=users[1].id, role_id=user_role.id
-            )
-            print(f"Assigned user role to user: {updated_user.username}")
-        except Exception as e:
-            print(f"Error assigning user role to user: {e}")
-
-    if mod_role and len(users) > 2:
-        try:
-            # Assign moderator role to the third user
-            updated_user = await user_repository.assign_role(
-                user_id=users[2].id, role_id=mod_role.id
-            )
-            print(f"Assigned moderator role to user: {updated_user.username}")
-        except Exception as e:
-            print(f"Error assigning moderator role to user: {e}")
-
-    # Assign user role to the last user as well
-    if user_role and len(users) > 3:
-        try:
-            updated_user = await user_repository.assign_role(
-                user_id=users[3].id, role_id=user_role.id
-            )
-            print(f"Assigned user role to user: {updated_user.username}")
-        except Exception as e:
-            print(f"Error assigning user role to user: {e}")
-
-    # Make the first user (johndoe) active
-    if users:
-        try:
-            # Get the first user (johndoe) and update their is_active status to True
-            first_user = users[0]
-            first_user.activate()  # Set is_active to True and update timestamp
-            activated_user = await user_repository.update(first_user)
-            if activated_user is not None:
-                print(f"Activated user: {activated_user.username}")
-            else:
-                raise Exception()
-        except Exception as e:
-            print(f"Error activating user: {e}")
 
 
 async def main():
@@ -207,9 +151,6 @@ async def main():
 
             # Create users
             await create_users(user_repo, role_repo)
-
-            # Assign roles to users
-            await assign_roles_to_users(user_repo, role_repo)
 
             print("Database seeding completed successfully!")
             break
