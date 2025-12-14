@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import useLoginForm from "./useLoginForm";
 
 type FormData = {
   username: string;
@@ -12,27 +12,8 @@ type FormData = {
 export default function LoginForm() {
   const t = useTranslations("auth");
   const form = useForm<FormData>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(data: FormData) {
-    setIsLoading(true);
-    setError(null);
-
-    await fetch("http://localhost:8000/api", {
-      method: "GET",
-    });
-
-    try {
-      console.log(data);
-      // Handle successful login here (e.g., redirect, store token, etc.)
-    } catch (err) {
-      console.error("Login error:", err);
-      setError(t("login.failed"));
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const { onSubmit, isPending, isError } = useLoginForm();
 
   return (
     <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
@@ -41,12 +22,12 @@ export default function LoginForm() {
       </h2>
 
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col space-y-4"
       >
-        {error && (
+        {isError && (
           <div className="p-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-200">
-            {error}
+            {isError}
           </div>
         )}
 
@@ -113,10 +94,10 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 text-white font-medium rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900 flex items-center justify-center"
         >
-          {isLoading ? (
+          {isPending ? (
             <>
               <svg
                 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
