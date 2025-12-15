@@ -7,8 +7,8 @@ export default defineConfig({
   api: {
     output: {
       mode: "single",
-      target: "./gen/api/index.ts",
-      schemas: "./gen/schema",
+      target: "./lib/gen/api/index.ts",
+      schemas: "./lib/gen/schema",
       client: "axios",
       mock: false,
       clean: true,
@@ -37,8 +37,8 @@ export default defineConfig({
   "api-react-query": {
     output: {
       mode: "single",
-      target: "./gen/hook/index.ts",
-      schemas: "./gen/schema",
+      target: "./lib/gen/hook/index.ts",
+      schemas: "./lib/gen/schema",
       client: "react-query",
       mock: false,
       clean: true,

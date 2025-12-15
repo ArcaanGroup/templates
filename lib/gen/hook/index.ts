@@ -40,7 +40,7 @@ import type {
   UserUpdate,
 } from "../schema";
 
-import { orvalFetcher } from "../../lib/axios/fetcher";
+import { orvalFetcher } from "../../../lib/axios/fetcher";
 /**
  * Root endpoint to provide basic information about the API.
  * @summary Ping

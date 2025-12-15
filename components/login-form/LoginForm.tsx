@@ -13,7 +13,7 @@ export default function LoginForm() {
   const t = useTranslations("auth");
   const form = useForm<FormData>();
 
-  const { onSubmit, isPending, isError } = useLoginForm();
+  const { onSubmit, isPending, error } = useLoginForm();
 
   return (
     <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
@@ -25,9 +25,9 @@ export default function LoginForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col space-y-4"
       >
-        {isError && (
+        {error && (
           <div className="p-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-200">
-            {isError}
+            {error}
           </div>
         )}
 
@@ -95,7 +95,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 text-white font-medium rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900 flex items-center justify-center"
+          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 text-white font-medium rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900 flex items-center justify-center gap-3"
         >
           {isPending ? (
             <>

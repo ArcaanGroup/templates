@@ -1,4 +1,7 @@
 {
+  "error": {
+    "message": "Something went wrong"
+  },
   "common": {
     "welcome": "Welcome",
     "hello": "Hello",

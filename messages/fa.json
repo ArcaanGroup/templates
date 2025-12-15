@@ -1,4 +1,7 @@
 {
+  "error": {
+    "message": "خطایی رخ داده"
+  },
   "common": {
     "welcome": "خوش آمدید",
     "hello": "سلام",
