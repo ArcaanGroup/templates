@@ -5,10 +5,11 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useTranslations } from "next-intl";
 import LoginForm from "../login-form/LoginForm";
 import { useAuth } from "@/lib/contexts/auth-context";
+import UserProfile from "../UserProfile";
 
 export default function HomePage() {
   const t = useTranslations("home");
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-3">
@@ -17,7 +18,7 @@ export default function HomePage() {
         <LanguageSelect />
         <ThemeToggle />
       </div>
-      {Boolean(user) ? <button onClick={logout}>Logout</button> : <LoginForm />}
+      {Boolean(user) ? <UserProfile user={user!} /> : <LoginForm />}
     </div>
   );
 }

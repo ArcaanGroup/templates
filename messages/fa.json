@@ -46,5 +46,17 @@
         "minLength": "رمز عبور باید حداقل 6 کاراکتر باشد"
       }
     }
+  },
+  "UserProfile": {
+    "email": "ایمیل",
+    "userId": "شناسه کاربر",
+    "status": "وضعیت",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+    "roles": "نقش‌ها",
+    "noRolesAssigned": "هیچ نقشی اختصاص داده نشده است",
+    "created": "ایجاد شده",
+    "updated": "به روزرسانی شده",
+    "logoutButton": "خروج"
   }
 }

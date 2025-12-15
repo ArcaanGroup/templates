@@ -83,6 +83,36 @@ class AxiosClient {
         return response;
       },
       async (error: AxiosError) => {
+        if (error.response) {
+          // Server responded with error
+          const duration =
+            Date.now() - (error.config?.metadata?.startTime || Date.now());
+
+          console.group("❌ Server Error Response");
+          console.log("URL:", error.config?.url);
+          console.log(
+            "Status:",
+            error.response.status,
+            error.response.statusText,
+          );
+          console.log("Duration:", `${duration}ms`);
+          console.log("Headers:", error.response.headers);
+          console.log("Data:", error.response.data);
+          console.log("Request Headers:", error.config?.headers);
+          console.log("Request Data:", error.config?.data);
+          console.groupEnd();
+        } else if (error.request) {
+          // Request made but no response
+          console.group("🌐 Network Error (No Response)");
+          console.log("URL:", error.config?.url);
+          console.log("Error:", error.message);
+          console.log("Request:", error.request);
+          console.groupEnd();
+        } else {
+          // Something else
+          console.error("🚨 Setup Error:", error.message);
+        }
+
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
         };

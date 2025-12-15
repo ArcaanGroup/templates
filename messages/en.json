@@ -46,5 +46,17 @@
         "minLength": "Password must be at least 6 characters"
       }
     }
+  },
+  "UserProfile": {
+    "email": "Email",
+    "userId": "User ID",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "roles": "Roles",
+    "noRolesAssigned": "No roles assigned",
+    "created": "Created",
+    "updated": "Updated",
+    "logoutButton": "Logout"
   }
 }
