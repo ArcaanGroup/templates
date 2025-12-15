@@ -1,5 +1,6 @@
-import { useLoginApiAuthLoginPost } from "@/lib/gen/hook";
 import { UserLogin } from "@/lib/gen/schema";
+import { useAuthStore } from "@/lib/stores/auth";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 interface LoginFormInterface {
@@ -9,16 +10,18 @@ interface LoginFormInterface {
 }
 
 export default function useLoginForm(): LoginFormInterface {
+  const t = useTranslations();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const authMutation = useLoginApiAuthLoginPost();
+  const { login } = useAuthStore();
 
   async function onSubmit(input: UserLogin) {
     try {
       setIsPending(true);
-      await authMutation.mutateAsync({ data: input });
+      await login(input);
+      setError(null);
     } catch (err) {
-      setError("Login Failed");
+      setError(t("features.auth.login.messages.failed"));
       throw err;
     } finally {
       setIsPending(false);

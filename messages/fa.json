@@ -1,6 +1,12 @@
 {
-  "error": {
-    "message": "خطایی رخ داده"
+  "features": {
+    "auth": {
+      "login": {
+        "messages": {
+          "failed": "ورود ناموفق بود."
+        }
+      }
+    }
   },
   "common": {
     "welcome": "خوش آمدید",

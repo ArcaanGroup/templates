@@ -4,9 +4,11 @@ import LanguageSelect from "@/components/LanguageSelect";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTranslations } from "next-intl";
 import LoginForm from "../login-form/LoginForm";
+import { useAuthStore } from "@/lib/stores/auth";
 
 export default function HomePage() {
   const t = useTranslations("home");
+  const { user, logout } = useAuthStore();
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-3">
@@ -15,7 +17,7 @@ export default function HomePage() {
         <LanguageSelect />
         <ThemeToggle />
       </div>
-      <LoginForm />
+      {Boolean(user) ? <button onClick={logout}>Logout</button> : <LoginForm />}
     </div>
   );
 }

@@ -1,6 +1,12 @@
 {
-  "error": {
-    "message": "Something went wrong"
+  "features": {
+    "auth": {
+      "login": {
+        "messages": {
+          "failed": "Login failed"
+        }
+      }
+    }
   },
   "common": {
     "welcome": "Welcome",
