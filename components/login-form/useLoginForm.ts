@@ -11,20 +11,16 @@ interface LoginFormInterface {
 
 export default function useLoginForm(): LoginFormInterface {
   const t = useTranslations();
-  const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuthStore();
+  const { login, isPending } = useAuthStore();
 
   async function onSubmit(input: UserLogin) {
     try {
-      setIsPending(true);
       await login(input);
       setError(null);
     } catch (err) {
       setError(t("features.auth.login.messages.failed"));
       throw err;
-    } finally {
-      setIsPending(false);
     }
   }
 

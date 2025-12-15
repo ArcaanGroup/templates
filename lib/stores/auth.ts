@@ -10,22 +10,30 @@ import { immer } from "zustand/middleware/immer";
 
 interface AuthStore {
   user: User | null;
-  login: (credentials: UserLogin) => Promise<User>;
+  isPending: boolean; // Indicates that the login/logout operation is in progress
+  login: (credentials: UserLogin) => Promise<void>;
   logout: () => Promise<void>;
-  _getMe: () => Promise<User>;
+  _getMe: () => Promise<void>;
   _setUser: (user: User) => void;
   _removeUser: () => void;
+  _setIsPending: (to: boolean) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
   devtools(
     immer((set, get) => ({
       user: null,
+      isPending: false,
       async login(credentials: UserLogin) {
-        await loginApiAuthLoginPost(credentials);
-        const me = await get()._getMe();
-        get()._setUser(me);
-        return get().user as User;
+        get()._setIsPending(true);
+        try {
+          await get()._getMe();
+        } catch {
+          await loginApiAuthLoginPost(credentials);
+          await get()._getMe();
+        } finally {
+          get()._setIsPending(false);
+        }
       },
       async logout() {
         await logoutApiAuthLogoutPost();
@@ -33,10 +41,7 @@ export const useAuthStore = create<AuthStore>()(
       },
       async _getMe() {
         const me = await getMeApiAuthMeGet();
-        set((state) => {
-          state.user = me.payload as User;
-        });
-        return me.payload as User;
+        get()._setUser(me.payload as User);
       },
       _setUser: (user) =>
         set((state) => {
@@ -46,6 +51,11 @@ export const useAuthStore = create<AuthStore>()(
         set((state) => {
           state.user = null;
         }),
+      _setIsPending(to: boolean) {
+        set((state) => {
+          state.isPending = to;
+        });
+      },
     })),
     { name: "zustand-store" },
   ),
