@@ -34,9 +34,9 @@ export async function serverAction<T = unknown>(
     });
 
     // Revalidate cache if needed
-    if (options?.tags?.length) {
-      options.tags.forEach((tag) => revalidateTag(tag));
-    }
+    // if (options?.tags?.length) {
+    //   options.tags.forEach((tag) => revalidateTag(tag));
+    // }
 
     if (options?.paths?.length) {
       options.paths.forEach((path) => revalidatePath(path));
