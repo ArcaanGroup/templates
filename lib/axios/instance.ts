@@ -137,22 +137,14 @@ class AxiosClient {
     this.isRefreshing = true;
 
     try {
-      // const refreshToken = localStorage.getItem("refreshToken");
-
-      // if (!refreshToken) {
-      //   throw new Error("No refresh token available");
-      // }
-
       // Call refresh endpoint
-      // const { data } = await axios.post(`${baseURL}/auth/refresh`, { refreshToken });
-      await axios.post(`${baseURL}/api/auth/refresh`);
-
-      // Store new tokens
-      // localStorage.setItem("accessToken", data.accessToken);
-      // localStorage.setItem("refreshToken", data.refreshToken);
-
-      // Update auth header
-      // originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+      // Since tokens are stored in HTTP-only cookies, no need to manually handle them
+      // Just call the refresh endpoint and let the backend handle the refresh
+      await axios.post(
+        `${baseURL}/api/auth/refresh`,
+        {},
+        { withCredentials: true },
+      );
 
       // Retry original request
       const response = await this.instance(originalRequest);
@@ -163,10 +155,7 @@ class AxiosClient {
 
       return response;
     } catch (refreshError) {
-      // Clear tokens and redirect to login
-      // localStorage.removeItem("accessToken");
-      // localStorage.removeItem("refreshToken");
-
+      // On refresh failure, remove user and redirect to login
       if (!isServer) {
         redirect("/");
       }
