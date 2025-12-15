@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{
   children: React.ReactNode;
   initialUser?: User;
 }> = ({ children, initialUser }) => {
-  const [user, setUser] = useState<User | null | undefined>(initialUser);
+  const [user, setUser] = useState<User | null>(initialUser ?? null);
   const [isPending, setIsPending] = useState<boolean>(false);
 
   const _setUser = useCallback((user: User) => {
