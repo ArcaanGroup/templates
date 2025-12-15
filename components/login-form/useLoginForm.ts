@@ -1,5 +1,5 @@
 import { UserLogin } from "@/lib/gen/schema";
-import { useAuthStore } from "@/lib/stores/auth";
+import { useAuth } from "@/lib/contexts/auth-context";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ interface LoginFormInterface {
 export default function useLoginForm(): LoginFormInterface {
   const t = useTranslations();
   const [error, setError] = useState<string | null>(null);
-  const { login, isPending } = useAuthStore();
+  const { login, isPending } = useAuth();
 
   async function onSubmit(input: UserLogin) {
     try {

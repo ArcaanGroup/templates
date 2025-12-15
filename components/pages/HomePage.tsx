@@ -4,11 +4,11 @@ import LanguageSelect from "@/components/LanguageSelect";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTranslations } from "next-intl";
 import LoginForm from "../login-form/LoginForm";
-import { useAuthStore } from "@/lib/stores/auth";
+import { useAuth } from "@/lib/contexts/auth-context";
 
 export default function HomePage() {
   const t = useTranslations("home");
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-3">

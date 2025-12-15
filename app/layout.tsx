@@ -1,3 +1,5 @@
+import AuthProviderWrapper from "@/components/providers/AuthProviderWrapper";
+
 /**
  * Root Layout
  * This is the top-level layout that wraps all pages
@@ -8,5 +10,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <AuthProviderWrapper>{children}</AuthProviderWrapper>;
 }
