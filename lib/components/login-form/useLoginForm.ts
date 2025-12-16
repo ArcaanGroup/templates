@@ -18,8 +18,15 @@ export default function useLoginForm(): LoginFormInterface {
     try {
       await login(input);
       setError(null);
-    } catch (err) {
-      setError(t("features.auth.login.messages.failed"));
+    } catch (err: any) {
+      // Handle different types of errors appropriately
+      if (err?.code === "FORBIDDEN_ERROR") {
+        setError(err.message || t("features.auth.login.messages.failed"));
+      } else if (err?.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError(t("features.auth.login.messages.failed"));
+      }
       throw err;
     }
   }

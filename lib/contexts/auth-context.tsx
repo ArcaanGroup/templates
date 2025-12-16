@@ -51,30 +51,33 @@ export const AuthProvider: React.FC<{
     setIsPending(to);
   }, []);
 
-  const login = useCallback(async (credentials: UserLogin) => {
-    _setIsPending(true);
-    try {
-      // Check if user is already logged in by getting user info
-      await _getMe();
-    } catch {
-      // If not logged in, perform login with credentials
-      await loginApiAuthLoginPost(credentials);
-      // Then get user info
-      await _getMe();
-    } finally {
-      _setIsPending(false);
-    }
-  }, []);
+  const _getMe = useCallback(async () => {
+    const me = await getMeApiAuthMeGet();
+    _setUser(me.payload as User);
+  }, [_setUser]);
+
+  const login = useCallback(
+    async (credentials: UserLogin) => {
+      _setIsPending(true);
+      try {
+        // Check if user is already logged in by getting user info
+        await _getMe();
+      } catch {
+        // If not logged in, perform login with credentials
+        await loginApiAuthLoginPost(credentials);
+        // Then get user info
+        await _getMe();
+      } finally {
+        _setIsPending(false);
+      }
+    },
+    [_getMe],
+  );
 
   const logout = useCallback(async () => {
     await logoutApiAuthLogoutPost();
     _removeUser();
   }, [_removeUser]);
-
-  const _getMe = useCallback(async () => {
-    const me = await getMeApiAuthMeGet();
-    _setUser(me.payload as User);
-  }, [_setUser]);
 
   const _refreshTokens = useCallback(async () => {
     try {
@@ -85,6 +88,7 @@ export const AuthProvider: React.FC<{
     } catch (error) {
       // If refresh fails, remove user from store
       _removeUser();
+      // Only throw the error, don't handle redirects here
       throw error;
     }
   }, [_getMe, _removeUser]);

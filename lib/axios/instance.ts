@@ -62,8 +62,12 @@ class AxiosClient {
           config.headers["x-request-from"] = "nextjs-server";
         }
 
-        // Add request ID for tracing
-        config.headers["X-Request-ID"] = crypto.randomUUID();
+        // Add request ID for tracing (using crypto.randomUUID with fallback)
+        config.headers["X-Request-ID"] =
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 15) +
+              Math.random().toString(36).substring(2, 15);
 
         return config;
       },
@@ -96,10 +100,11 @@ class AxiosClient {
 
         // Handle 403 - Forbidden
         if (error.response?.status === 403) {
-          if (!isServer) {
-            // Redirect to home or show access denied
-            redirect("/");
-          }
+          const apiError = this.transformError(error);
+          apiError.code = "FORBIDDEN_ERROR";
+          apiError.message =
+            "Access denied. You don't have permission to access this resource.";
+          return Promise.reject(apiError);
         }
 
         // Handle 429 - Rate limiting
@@ -155,12 +160,8 @@ class AxiosClient {
 
       return response;
     } catch (refreshError) {
-      // On refresh failure, remove user and redirect to login
-      if (!isServer) {
-        redirect("/");
-      }
-
-      throw refreshError;
+      // On refresh failure, throw specific error for auth handling
+      throw new Error("Token refresh failed. Please log in again.");
     } finally {
       this.isRefreshing = false;
     }

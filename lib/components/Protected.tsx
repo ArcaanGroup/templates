@@ -1,12 +1,13 @@
 import { useAuth } from "@/contexts/auth-context";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, memo } from "react";
+import ErrorBoundary from "./ErrorBoundary";
 
 type Props = {
   reverse?: boolean;
   requiredPermissions?: string[];
 } & PropsWithChildren;
 
-export default function Protected({
+const Protected = memo(function ProtectedComponent({
   children,
   reverse,
   requiredPermissions,
@@ -27,5 +28,7 @@ export default function Protected({
     }
   }
 
-  return children;
-}
+  return <ErrorBoundary>{children}</ErrorBoundary>;
+});
+
+export default Protected;

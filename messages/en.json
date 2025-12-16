@@ -14,7 +14,10 @@
     "goodbye": "Goodbye",
     "loading": "Loading...",
     "error": "An error occurred",
-    "retry": "Retry"
+    "retry": "Retry",
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedErrorOccurred": "An unexpected error occurred",
+    "reloadPage": "Reload Page"
   },
   "navigation": {
     "home": "Home",

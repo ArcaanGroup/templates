@@ -16,7 +16,15 @@ export type ProxyHandler = (
  * authentication, authorization and internationalization.
  */
 export default async function proxy(request: NextRequest) {
-  const user = await authenticationMiddleware();
+  let user;
+
+  try {
+    user = await authenticationMiddleware();
+  } catch (error) {
+    // If authentication fails due to an error, treat as unauthenticated
+    console.error("Authentication middleware error:", error);
+    user = null;
+  }
 
   // Pass user data via request headers for the layout to use
   const requestHeaders = new Headers(request.headers);

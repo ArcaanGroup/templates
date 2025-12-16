@@ -14,7 +14,10 @@
     "goodbye": "خداحافظ",
     "loading": "در حال بارگذاری...",
     "error": "خطایی رخ داد",
-    "retry": "تلاش مجدد"
+    "retry": "تلاش مجدد",
+    "somethingWentWrong": "مشکلی پیش آمد",
+    "unexpectedErrorOccurred": "خطای غیرمنتظره‌ای رخ داد",
+    "reloadPage": "بارگذاری مجدد صفحه"
   },
   "navigation": {
     "home": "خانه",

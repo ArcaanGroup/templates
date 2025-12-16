@@ -7,12 +7,12 @@ export async function authenticationMiddleware(): Promise<User | null> {
   try {
     const res = await serverAction<StandardResponseUser>("GET", "/api/auth/me");
     if (!res.data?.success) {
-      throw new Error("Not authenticated");
+      return null; // Not authenticated
     }
     return res.data.payload as User;
-  } catch {
-    // Not authenticated users for a protected route
-    // get redirected to home
+  } catch (error) {
+    // Log the error but don't throw - just return null for unauthenticated
+    console.error("Authentication check failed:", error);
     return null;
   }
 }
@@ -29,6 +29,7 @@ export async function authorizationMiddleware(
   const isRouteProtected = Boolean(requiredPermissions);
   if (isRouteProtected) {
     if (user === null) {
+      // Redirect to home if user is not authenticated
       return NextResponse.redirect(new URL("/", request.url));
     }
     if (requiredPermissions) {
@@ -44,11 +45,14 @@ export async function authorizationMiddleware(
             userPermissions?.includes(requiredPerm),
           )
         ) {
+          // Redirect to home if user doesn't have required permissions
           return NextResponse.redirect(new URL("/", request.url));
         }
       } else {
+        // Redirect to home if user has no permissions
         return NextResponse.redirect(new URL("/", request.url));
       }
     }
   }
+  return undefined; // Return undefined if no redirect is needed
 }

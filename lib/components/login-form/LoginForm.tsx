@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { memo } from "react";
 import useLoginForm from "./useLoginForm";
 
 type FormData = {
@@ -9,7 +10,7 @@ type FormData = {
   password: string;
 };
 
-export default function LoginForm() {
+const LoginForm = memo(function LoginFormComponent() {
   const t = useTranslations("auth");
   const form = useForm<FormData>();
 
@@ -128,4 +129,6 @@ export default function LoginForm() {
       </form>
     </div>
   );
-}
+});
+
+export default LoginForm;
