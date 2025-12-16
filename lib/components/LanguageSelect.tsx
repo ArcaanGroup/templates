@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/routing';
-import { getAvailableLocales, isRTL } from '@/lib/i18n';
-import { getLocaleConfig } from '@/i18n/config';
+import { useState, useRef, useEffect } from "react";
+import { useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/lib/i18n/routing";
+import { getAvailableLocales, isRTL } from "@/lib/i18n";
+import { getLocaleConfig } from "@/lib/i18n/config";
 
 /**
  * Language Select Dropdown Component
- * 
+ *
  * A dropdown component for switching between available locales.
  * Features:
  * - Shows current locale with flag and name
@@ -44,28 +44,28 @@ export default function LanguageSelect() {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
   // Close dropdown on Escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
 
@@ -85,7 +85,7 @@ export default function LanguageSelect() {
         <span className="sm:hidden">{currentLocale.code.toUpperCase()}</span>
         <svg
           className={`h-4 w-4 transition-transform ${
-            isOpen ? 'rotate-180' : ''
+            isOpen ? "rotate-180" : ""
           }`}
           fill="none"
           stroke="currentColor"
@@ -105,9 +105,7 @@ export default function LanguageSelect() {
       {isOpen && (
         <div
           className={`absolute z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:border-gray-700 dark:bg-gray-800 ${
-            isRTLMode
-              ? 'left-0 origin-top-left'
-              : 'right-0 origin-top-right'
+            isRTLMode ? "left-0 origin-top-left" : "right-0 origin-top-right"
           }`}
         >
           <div className="py-1" role="menu" aria-orientation="vertical">
@@ -120,16 +118,16 @@ export default function LanguageSelect() {
                   onClick={() => switchLocale(loc.code)}
                   className={`flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700'
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700"
                   }`}
                   role="menuitem"
-                  aria-current={isActive ? 'true' : undefined}
+                  aria-current={isActive ? "true" : undefined}
                 >
                   <span className="text-lg">{loc.flag}</span>
                   <span
                     className={`flex-1 ${
-                      isRTLMode ? 'text-left' : 'text-right'
+                      isRTLMode ? "text-left" : "text-right"
                     }`}
                   >
                     {loc.name}
@@ -157,4 +155,3 @@ export default function LanguageSelect() {
     </div>
   );
 }
-

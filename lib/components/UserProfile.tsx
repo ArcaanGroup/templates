@@ -2,7 +2,7 @@ import { User } from "@/lib/gen/schema";
 import React, { useCallback } from "react";
 import { useAuth } from "@/lib/contexts/auth-context";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/lib/i18n/routing";
 import Protected from "./Protected";
 import { PERMISSIONS } from "@/lib/auth";
 

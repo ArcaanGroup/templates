@@ -1,17 +1,17 @@
 /**
  * i18n Utility Functions
- * 
+ *
  * Helper functions for working with locales and translations
  */
 
-import { getLocaleConfig, isValidLocale, type Locale } from '@/i18n/config';
-import { routing } from '@/i18n/routing';
+import { getLocaleConfig, isValidLocale, type Locale } from "@/lib/i18n/config";
+import { routing } from "@/lib/i18n/routing";
 
 /**
  * Get the current locale from the URL or default locale
  */
 export function getCurrentLocale(pathname: string): string {
-  const segments = pathname.split('/').filter(Boolean);
+  const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0];
 
   if (firstSegment && isValidLocale(firstSegment)) {
@@ -32,7 +32,7 @@ export function getLocale(locale: string): Locale {
  * Check if locale is RTL
  */
 export function isRTL(locale: string): boolean {
-  return getLocaleConfig(locale).dir === 'rtl';
+  return getLocaleConfig(locale).dir === "rtl";
 }
 
 /**
@@ -48,4 +48,3 @@ export function getAvailableLocales(): Locale[] {
 export function getLocaleName(locale: string): string {
   return getLocaleConfig(locale).name;
 }
-
