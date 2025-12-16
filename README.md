@@ -1,39 +1,47 @@
-# templates_1
+# Nextjs template
 
-This is a comprehensive [Next.js](https://nextjs.org) application bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). This project showcases modern web development practices with TypeScript, internationalization, and API client generation.
+This is a comprehensive [Next.js](https://nextjs.org) application bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). This project showcases modern web development practices with TypeScript, internationalization, authentication, and API client generation.
 
 ## Features
 
-- **Next.js 14+** with App Router
+- **Next.js 16** with App Router
 - **TypeScript** for type safety
 - **Tailwind CSS** for styling
-- **Internationalization (i18n)** support
+- **Internationalization (i18n)** support with RTL/LTR capabilities
+- **Authentication & Authorization** with middleware protection
 - **Orval** for API client generation from OpenAPI specs
+- **Redux Toolkit** for client state management
+- **TanStack Query** for server state management and caching
 - **ESLint** for code quality
 - **Geist Font** optimization with `next/font`
 - **Modern Package Management** with pnpm
 - **Proxy Configuration** for API requests
+- **Theme Switching** with dark/light mode support
 
 ## Project Structure
 
 ```
-next-template/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable React components
-├── lib/                # Shared utilities and helpers
-├── i18n/               # Internationalization configuration
-├── docs/               # Project documentation
-├── messages/           # Localization message files
+nextjs-template/
+├── app/                    # Next.js App Router pages and layouts
+├── lib/                    # Shared utilities, components, and helpers
+│   ├── auth/               # Authentication and authorization logic
+│   ├── axios/              # Axios configuration and interceptors
+│   ├── components/         # Reusable React components
+│   ├── contexts/           # React context providers
+│   ├── gen/                # Generated API clients and schemas (by Orval)
+│   └── i18n/               # Internationalization configuration
+├── messages/               # Localization message files
+├── public/                 # Static assets
+├── .docs/                  # Project documentation
 ├── .git/
-├── .next/              # Next.js build directory
-├── .summaries/         # Generated summaries
-├── next.config.ts      # Next.js configuration
-├── tsconfig.json       # TypeScript configuration
-├── eslint.config.mjs   # ESLint rules
-├── orval.config.js     # API client generation config
-├── proxy.ts            # Proxy configuration
-├── package.json        # Dependencies and scripts
-└── pnpm-lock.yaml      # Lock file
+├── .next/                  # Next.js build directory
+├── next.config.ts          # Next.js configuration
+├── tsconfig.json           # TypeScript configuration
+├── eslint.config.mjs       # ESLint rules
+├── orval.config.js         # API client generation config
+├── proxy.ts                # Internationalized authentication middleware
+├── package.json            # Dependencies and scripts
+└── pnpm-lock.yaml          # Lock file
 ```
 
 ## Getting Started
@@ -106,7 +114,16 @@ yarn start
 
 ## Internationalization (i18n)
 
-This project includes internationalization support located in the `i18n/` directory. You can configure multiple languages and manage translations in the `messages/` folder.
+This project includes internationalization support with both English (en) and Persian (fa) locales. RTL (right-to-left) support is included for Persian. Configuration is located in the `lib/i18n/` directory, and translation files are stored in the `messages/` folder. The application uses `next-intl` for locale detection via URL routing.
+
+## Authentication & Authorization
+
+The application includes a comprehensive authentication system with:
+- Custom middleware for authentication and authorization (`proxy.ts`)
+- Context-based authentication management (`lib/contexts/auth-context`)
+- Protected route components (`lib/components/Protected.tsx`)
+- Login form with form validation (`lib/components/login-form/`)
+- User profile display component (`lib/components/UserProfile.tsx`)
 
 ## Project Conventions
 
@@ -115,12 +132,16 @@ This project includes internationalization support located in the `i18n/` direct
 - Tailwind CSS classes are used for styling
 - Component composition is favored over inheritance
 - Hooks are placed in the `lib/` directory or co-located with components
+- Authentication state is managed through React Context
+- API clients are auto-generated from OpenAPI specs using Orval
 
 ## Code Quality
 
 - ESLint enforces code style and catches potential issues
 - TypeScript provides static type checking
 - Orval ensures API contracts are type-safe
+- TanStack Query provides type-safe data fetching and caching
+- Prettier ensures consistent code formatting
 
 ## Learn More
 
