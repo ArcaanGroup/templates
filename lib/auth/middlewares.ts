@@ -22,9 +22,9 @@ export async function authorizationMiddleware(
   user: User | null,
 ) {
   const requestPathname = request.nextUrl.pathname;
-  const [_route, requiredPermissions] =
+  const [, requiredPermissions] =
     Object.entries(ROUTE_PERMISSIONS).find(
-      ([route, _routePermissions]) => route === requestPathname,
+      ([route]) => route === requestPathname,
     ) ?? [];
   const isRouteProtected = Boolean(requiredPermissions);
   if (isRouteProtected) {

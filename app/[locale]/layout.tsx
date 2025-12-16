@@ -1,9 +1,9 @@
-import AuthProviderWrapper from "@/components/providers/AuthProviderWrapper";
 import QueryProvider from "@/components/QueryProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import VazirFont from "@/components/VazirFont";
 import { getLocaleConfig } from "@/i18n/config";
 import { routing } from "@/i18n/routing";
+import { AuthProvider } from "@/lib/contexts/auth-context";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -55,7 +55,7 @@ export default async function LocaleLayout({
   const localeConfig = getLocaleConfig(locale);
   const messages = await getMessages();
 
-  // Get user data from middleware headers
+  // Get user data from proxy headers
   const headersList = await headers();
   const userHeader = headersList.get("x-user-data");
   const user = userHeader ? JSON.parse(userHeader) : null;
@@ -65,7 +65,7 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProviderWrapper user={user}>
+        <AuthProvider initialUser={user}>
           <QueryProvider>
             <ThemeProvider>
               <NextIntlClientProvider messages={messages}>
@@ -74,7 +74,7 @@ export default async function LocaleLayout({
               </NextIntlClientProvider>
             </ThemeProvider>
           </QueryProvider>
-        </AuthProviderWrapper>
+        </AuthProvider>
       </body>
     </html>
   );
