@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ROUTE_PERMISSIONS } from "./route-protection-table";
 import { serverAction } from "../axios";
 import { StandardResponseUser, User } from "../gen/schema";
+import { ROUTE_PERMISSIONS } from "./route-protection-table";
 
-export async function authProxyHandler(request: NextRequest) {
+export async function authenticationMiddleware(): Promise<User | null> {
+  try {
+    const res = await serverAction<StandardResponseUser>("GET", "/api/auth/me");
+    if (!res.data?.success) {
+      throw new Error("Not authenticated");
+    }
+    return res.data.payload as User;
+  } catch {
+    // Not authenticated users for a protected route
+    // get redirected to home
+    return null;
+  }
+}
+
+export async function authorizationMiddleware(
+  request: NextRequest,
+  user: User | null,
+) {
   const requestPathname = request.nextUrl.pathname;
   const [_route, requiredPermissions] =
     Object.entries(ROUTE_PERMISSIONS).find(
@@ -11,19 +28,7 @@ export async function authProxyHandler(request: NextRequest) {
     ) ?? [];
   const isRouteProtected = Boolean(requiredPermissions);
   if (isRouteProtected) {
-    let user;
-    try {
-      const res = await serverAction<StandardResponseUser>(
-        "GET",
-        "/api/auth/me",
-      );
-      if (!res.data?.success) {
-        throw new Error("Not authenticated");
-      }
-      user = res.data.payload as User;
-    } catch {
-      // Not authenticated users for a protected route
-      // get redirected to home
+    if (user === null) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     if (requiredPermissions) {

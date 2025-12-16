@@ -1,7 +1,10 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
-import { authProxyHandler } from "./lib/auth/auth-proxy-helper";
+import {
+  authenticationMiddleware,
+  authorizationMiddleware,
+} from "./lib/auth/middlewares";
 
 // Define types for extensible middleware functionality
 export type ProxyHandler = (
@@ -9,13 +12,18 @@ export type ProxyHandler = (
 ) => Promise<NextResponse | undefined>;
 
 /**
- * Main middleware function that combines internationalization with extensible handlers
+ * Main middleware function that combines
+ * authentication, authorization and internationalization.
  */
 export default async function proxy(request: NextRequest) {
-  const redirectTo = await authProxyHandler(request);
+  const user = await authenticationMiddleware();
+  const redirectTo = await authorizationMiddleware(request, user);
   if (redirectTo) return redirectTo;
-  // Continue with the internationalization middleware
-  return createMiddleware(routing)(request);
+
+  const i18nMiddleware = createMiddleware(routing);
+  const i18nResponse = i18nMiddleware(request);
+
+  return i18nResponse;
 }
 
 /**
