@@ -1,3 +1,4 @@
+import AuthProviderWrapper from "@/components/providers/AuthProviderWrapper";
 import QueryProvider from "@/components/QueryProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import VazirFont from "@/components/VazirFont";
@@ -7,6 +8,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import "../globals.css";
 
@@ -53,19 +55,26 @@ export default async function LocaleLayout({
   const localeConfig = getLocaleConfig(locale);
   const messages = await getMessages();
 
+  // Get user data from middleware headers
+  const headersList = await headers();
+  const userHeader = headersList.get("x-user-data");
+  const user = userHeader ? JSON.parse(userHeader) : null;
+
   return (
     <html lang={locale} dir={localeConfig.dir} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <ThemeProvider>
-            <NextIntlClientProvider messages={messages}>
-              <VazirFont />
-              {children}
-            </NextIntlClientProvider>
-          </ThemeProvider>
-        </QueryProvider>
+        <AuthProviderWrapper user={user}>
+          <QueryProvider>
+            <ThemeProvider>
+              <NextIntlClientProvider messages={messages}>
+                <VazirFont />
+                {children}
+              </NextIntlClientProvider>
+            </ThemeProvider>
+          </QueryProvider>
+        </AuthProviderWrapper>
       </body>
     </html>
   );

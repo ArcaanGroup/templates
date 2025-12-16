@@ -1,4 +1,4 @@
-import createMiddleware from "next-intl/middleware";
+import createI18nMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -17,13 +17,33 @@ export type ProxyHandler = (
  */
 export default async function proxy(request: NextRequest) {
   const user = await authenticationMiddleware();
-  const redirectTo = await authorizationMiddleware(request, user);
-  if (redirectTo) return redirectTo;
 
-  const i18nMiddleware = createMiddleware(routing);
-  const i18nResponse = i18nMiddleware(request);
+  // Pass user data via request headers for the layout to use
+  const requestHeaders = new Headers(request.headers);
 
-  return i18nResponse;
+  if (user) {
+    // Store user in headers (for server components)
+    requestHeaders.set("x-user-data", JSON.stringify(user));
+
+    const redirectTo = await authorizationMiddleware(request, user);
+    if (redirectTo) return redirectTo;
+
+    const i18nMiddleware = createI18nMiddleware(routing);
+    const i18nResponse = i18nMiddleware(request);
+
+    // Merge i18n response with our user headers
+    i18nResponse.headers.set("x-user-data", requestHeaders.get("x-user-data")!);
+    return i18nResponse;
+  } else {
+    // No user - still pass null explicitly
+    requestHeaders.set("x-user-data", "null");
+
+    const redirectTo = await authorizationMiddleware(request, null);
+    if (redirectTo) return redirectTo;
+
+    const i18nMiddleware = createI18nMiddleware(routing);
+    return i18nMiddleware(request);
+  }
 }
 
 /**
