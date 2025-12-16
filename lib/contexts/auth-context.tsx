@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{
         _setIsPending(false);
       }
     },
-    [_getMe],
+    [_getMe, _setIsPending],
   );
 
   const logout = useCallback(async () => {
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{
         ) ?? false
       );
     },
-    [user],
+    [_getUserPermissions],
   );
 
   // Check if user is authenticated on initial load
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<{
     const checkAuthStatus = async () => {
       try {
         await _getMe();
-      } catch (error) {
+      } catch {
         // User is not authenticated, which is fine
       }
     };

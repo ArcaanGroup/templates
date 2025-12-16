@@ -137,7 +137,7 @@ class AxiosClient {
     originalRequest._retry = true;
 
     if (this.isRefreshing) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         this.refreshSubscribers.push(() => {
           resolve(this.instance(originalRequest));
         });
