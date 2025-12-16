@@ -18,10 +18,10 @@ export default async function RootLayout({
     if (res.data?.success) {
       me = res.data.payload as User;
     } else {
-      throw new Error("Not Authenticated");
+      console.log("Not Authenticated");
     }
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 
   return <AuthProviderWrapper user={me}>{children}</AuthProviderWrapper>;

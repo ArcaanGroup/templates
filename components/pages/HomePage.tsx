@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import LoginForm from "../login-form/LoginForm";
 import { useAuth } from "@/lib/contexts/auth-context";
 import UserProfile from "../UserProfile";
+import Protected from "../Protected";
 
 export default function HomePage() {
   const t = useTranslations("home");
@@ -18,7 +19,12 @@ export default function HomePage() {
         <LanguageSelect />
         <ThemeToggle />
       </div>
-      {Boolean(user) ? <UserProfile user={user!} /> : <LoginForm />}
+      <Protected reverse>
+        <LoginForm />
+      </Protected>
+      <Protected>
+        <UserProfile user={user!} />
+      </Protected>
     </div>
   );
 }

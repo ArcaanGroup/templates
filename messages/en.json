@@ -57,6 +57,7 @@
     "noRolesAssigned": "No roles assigned",
     "created": "Created",
     "updated": "Updated",
-    "logoutButton": "Logout"
+    "logoutButton": "Logout",
+    "protectedLink": "Go to protected page"
   }
 }

@@ -1,14 +1,22 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import createMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
+import { NextRequest, NextResponse } from "next/server";
+import { authProxyHandler } from "./lib/auth/auth-proxy-helper";
+
+// Define types for extensible middleware functionality
+export type ProxyHandler = (
+  request: NextRequest,
+) => Promise<NextResponse | undefined>;
 
 /**
- * Middleware for handling locale detection and routing
- * This runs on every request and handles:
- * - Locale detection from Accept-Language header
- * - Redirecting to the appropriate locale
- * - Setting locale cookies
+ * Main middleware function that combines internationalization with extensible handlers
  */
-export default createMiddleware(routing);
+export default async function proxy(request: NextRequest) {
+  const redirectTo = await authProxyHandler(request);
+  if (redirectTo) return redirectTo;
+  // Continue with the internationalization middleware
+  return createMiddleware(routing)(request);
+}
 
 /**
  * Matcher configuration
@@ -19,6 +27,5 @@ export const config = {
   // Match all pathnames except for
   // - … if they start with `/api`, `/_next` or `/_vercel`
   // - … the ones containing a dot (e.g. `favicon.ico`)
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };
-

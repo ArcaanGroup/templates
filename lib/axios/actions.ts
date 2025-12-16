@@ -44,7 +44,7 @@ export async function serverAction<T = unknown>(
 
     return { data: response.data };
   } catch (error) {
-    console.error("Server Action Error:", error);
+    console.log("Server Action Error:", error);
 
     // Return user-friendly error
     return {

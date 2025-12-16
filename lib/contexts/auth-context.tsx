@@ -20,12 +20,14 @@ interface AuthContextType {
   isPending: boolean;
   login: (credentials: UserLogin) => Promise<void>;
   logout: () => Promise<void>;
+  isAuthenticated: () => boolean;
+  checkUserPermissions: (requiredPermissions: string[]) => boolean;
+  _getUserPermissions: () => string[] | undefined;
   _getMe: () => Promise<void>;
   _setUser: (user: User) => void;
   _removeUser: () => void;
   _setIsPending: (to: boolean) => void;
   _refreshTokens: () => Promise<void>;
-  isAuthenticated: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -91,6 +93,25 @@ export const AuthProvider: React.FC<{
     return !!user;
   }, [user]);
 
+  const _getUserPermissions = useCallback(() => {
+    return user?.roles
+      ?.map((role) => role.permission_ids)
+      .filter(Boolean)
+      .flat() as string[] | undefined;
+  }, [user]);
+
+  const checkUserPermissions = useCallback(
+    (requiredPermissions: string[]) => {
+      const userPermissions = _getUserPermissions();
+      return (
+        requiredPermissions?.every((permId) =>
+          userPermissions?.includes(permId),
+        ) ?? false
+      );
+    },
+    [user],
+  );
+
   // Check if user is authenticated on initial load
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -109,12 +130,14 @@ export const AuthProvider: React.FC<{
     isPending,
     login,
     logout,
+    isAuthenticated,
+    checkUserPermissions,
+    _getUserPermissions,
     _getMe,
     _setUser,
     _removeUser,
     _setIsPending,
     _refreshTokens,
-    isAuthenticated,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

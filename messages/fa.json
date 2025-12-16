@@ -57,6 +57,11 @@
     "noRolesAssigned": "هیچ نقشی اختصاص داده نشده است",
     "created": "ایجاد شده",
     "updated": "به روزرسانی شده",
-    "logoutButton": "خروج"
+    "logoutButton": "خروج",
+    "protectedLink": "رفتن به صفحه محافظت شده"
+  },
+  "ProtectedPage": {
+    "title": "صفحه محافظت شده",
+    "backLink": "بازگشت به صفحه اصلی"
   }
 }

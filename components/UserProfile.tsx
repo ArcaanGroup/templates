@@ -2,6 +2,9 @@ import { User } from "@/lib/gen/schema";
 import React, { useCallback } from "react";
 import { useAuth } from "@/lib/contexts/auth-context";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
+import Protected from "./Protected";
+import { PERMISSIONS } from "@/lib/auth";
 
 interface UserProfileProps {
   user: User;
@@ -104,13 +107,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200">
+        <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition duration-200"
           >
             {t("logoutButton")}
           </button>
+          <Protected requiredPermissions={[PERMISSIONS.Super_User]}>
+            <Link
+              href="/protected"
+              className="w-full bg-cyan-700 hover:bg-cyan-600 text-white text-center font-medium py-2 px-4 rounded-md transition duration-200"
+            >
+              {t("protectedLink")}
+            </Link>
+          </Protected>
         </div>
       </div>
     </div>
