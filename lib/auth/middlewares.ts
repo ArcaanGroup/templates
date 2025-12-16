@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { serverAction } from "../axios";
-import { StandardResponseUser, User } from "../gen/schema";
-import { ROUTE_PERMISSIONS } from "./route-protection-table";
+import { serverAction } from "@/axios";
+import { StandardResponseUser, User } from "@/gen/schema";
+import { ROUTE_PERMISSIONS } from "@/auth/route-protection-table";
 import { transformError } from "@/errors/AppError";
 
 export async function authenticationMiddleware(): Promise<User | null> {
