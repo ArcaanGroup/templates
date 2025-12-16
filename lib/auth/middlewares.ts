@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { serverAction } from "../axios";
 import { StandardResponseUser, User } from "../gen/schema";
 import { ROUTE_PERMISSIONS } from "./route-protection-table";
+import { transformError } from "@/errors/AppError";
 
 export async function authenticationMiddleware(): Promise<User | null> {
   try {
@@ -12,7 +13,8 @@ export async function authenticationMiddleware(): Promise<User | null> {
     return res.data.payload as User;
   } catch (error) {
     // Log the error but don't throw - just return null for unauthenticated
-    console.error("Authentication check failed:", error);
+    const appError = transformError(error);
+    console.error("Authentication check failed:", appError);
     return null;
   }
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { axiosInstance } from "./instance";
+import { transformError } from "@/errors/AppError";
 
 export async function serverAction<T = unknown>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
@@ -44,12 +45,14 @@ export async function serverAction<T = unknown>(
 
     return { data: response.data };
   } catch (error) {
-    console.log("Server Action Error:", error);
+    console.error("Server Action Error:", error);
+
+    // Transform the error to a user-friendly message
+    const appError = transformError(error);
 
     // Return user-friendly error
     return {
-      error:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      error: appError.message || "An unexpected error occurred",
     };
   }
 }

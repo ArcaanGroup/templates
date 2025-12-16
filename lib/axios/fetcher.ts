@@ -1,6 +1,7 @@
 import axios from "axios";
 import { axiosInstance } from "./instance";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import { transformError, AppErrorCode } from "@/errors/AppError";
 
 // Orval-specific types
 export type OrvalFetcherConfig = {
@@ -94,11 +95,14 @@ export const orvalFetcher = async <T = unknown>(
       throw orvalError;
     }
 
+    // Transform non-Axios errors to application errors
+    const appError = transformError(error, AppErrorCode.REQUEST_ERROR);
+
     // Non-Axios errors
     throw {
       status: 0,
       statusText: "Network Error",
-      data: { message: "Network error occurred" },
+      data: { message: appError.message || "Network error occurred" },
       config,
       isAxiosError: false,
     };

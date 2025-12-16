@@ -14,6 +14,7 @@ import {
   refreshTokensApiAuthRefreshPost,
 } from "@/gen/hook";
 import { User, UserLogin } from "@/gen/schema";
+import { transformError, AppErrorCode } from "@/errors/AppError";
 
 interface AuthContextType {
   user: User | null;
@@ -88,8 +89,10 @@ export const AuthProvider: React.FC<{
     } catch (error) {
       // If refresh fails, remove user from store
       _removeUser();
+      // Transform and re-throw the error
+      const appError = transformError(error, AppErrorCode.AUTH_REFRESH_FAILED);
       // Only throw the error, don't handle redirects here
-      throw error;
+      throw appError;
     }
   }, [_getMe, _removeUser]);
 

@@ -1,3 +1,4 @@
+import { AppErrorCode, createAppError } from "@/errors/AppError";
 import axios, {
   AxiosError,
   AxiosInstance,
@@ -5,11 +6,10 @@ import axios, {
   CancelTokenSource,
   InternalAxiosRequestConfig,
 } from "axios";
-import { redirect } from "next/navigation";
 
 // Types
 export type ApiError = {
-  code: string;
+  code: AppErrorCode;
   message: string;
   details?: Record<string, unknown>;
 };
@@ -101,7 +101,7 @@ class AxiosClient {
         // Handle 403 - Forbidden
         if (error.response?.status === 403) {
           const apiError = this.transformError(error);
-          apiError.code = "FORBIDDEN_ERROR";
+          apiError.code = AppErrorCode.AUTH_FORBIDDEN;
           apiError.message =
             "Access denied. You don't have permission to access this resource.";
           return Promise.reject(apiError);
@@ -109,11 +109,16 @@ class AxiosClient {
 
         // Handle 429 - Rate limiting
         if (error.response?.status === 429) {
-          const retryAfter = error.response.headers["retry-after"] || 5;
+          const retryAfterRaw = error.response.headers["retry-after"];
+          // Parse the retry-after value safely, defaulting to 5 seconds
+          const retryAfter = Math.min(
+            60,
+            Math.max(1, parseInt(retryAfterRaw as string) || 5),
+          ); // Clamp between 1-60 seconds
           console.warn(`Rate limited. Retrying after ${retryAfter} seconds`);
 
           await new Promise((resolve) =>
-            setTimeout(resolve, parseInt(retryAfter.toString()) * 1000),
+            setTimeout(resolve, retryAfter * 1000),
           );
 
           return this.instance(originalRequest);
@@ -161,7 +166,12 @@ class AxiosClient {
       return response;
     } catch (refreshError) {
       // On refresh failure, throw specific error for auth handling
-      throw new Error("Token refresh failed. Please log in again.");
+      throw createAppError(
+        AppErrorCode.AUTH_REFRESH_FAILED,
+        "Token refresh failed. Please log in again.",
+        undefined,
+        refreshError,
+      );
     } finally {
       this.isRefreshing = false;
     }
@@ -171,21 +181,38 @@ class AxiosClient {
     if (error.response) {
       // Server responded with error
       const data = error.response.data as Record<string, unknown>;
+      const statusCode = error.response.status;
+
+      let errorCode: AppErrorCode;
+      switch (statusCode) {
+        case 401:
+          errorCode = AppErrorCode.AUTH_UNAUTHORIZED;
+          break;
+        case 403:
+          errorCode = AppErrorCode.AUTH_FORBIDDEN;
+          break;
+        case 429:
+          errorCode = AppErrorCode.RATE_LIMIT_EXCEEDED;
+          break;
+        default:
+          errorCode = AppErrorCode.API_ERROR;
+      }
+
       return {
-        code: (data?.code as string) || `HTTP_${error.response.status}`,
+        code: (data?.code as AppErrorCode) || errorCode,
         message: (data?.message as string) || error.response.statusText,
         details: data?.details as Record<string, string>,
       };
     } else if (error.request) {
       // No response received
       return {
-        code: "NETWORK_ERROR",
+        code: AppErrorCode.NETWORK_ERROR,
         message: "Network error. Please check your connection.",
       };
     } else {
       // Request setup error
       return {
-        code: "REQUEST_ERROR",
+        code: AppErrorCode.REQUEST_ERROR,
         message:
           error.message || "An error occurred while setting up the request.",
       };

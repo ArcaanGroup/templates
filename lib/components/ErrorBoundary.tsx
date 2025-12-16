@@ -46,6 +46,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // In production, you might want to send this to a logging service
     console.error("Error caught by boundary:", error, errorInfo);
   }
 
