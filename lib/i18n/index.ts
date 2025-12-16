@@ -4,8 +4,8 @@
  * Helper functions for working with locales and translations
  */
 
-import { getLocaleConfig, isValidLocale, type Locale } from "@/lib/i18n/config";
-import { routing } from "@/lib/i18n/routing";
+import { getLocaleConfig, isValidLocale, type Locale } from "@/i18n/config";
+import { routing } from "@/i18n/routing";
 
 /**
  * Get the current locale from the URL or default locale

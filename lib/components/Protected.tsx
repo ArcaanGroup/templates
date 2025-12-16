@@ -1,4 +1,4 @@
-import { useAuth } from "@/lib/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { PropsWithChildren } from "react";
 
 type Props = {

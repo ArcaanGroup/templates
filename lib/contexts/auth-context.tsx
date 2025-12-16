@@ -12,8 +12,8 @@ import {
   loginApiAuthLoginPost,
   logoutApiAuthLogoutPost,
   refreshTokensApiAuthRefreshPost,
-} from "@/lib/gen/hook";
-import { User, UserLogin } from "@/lib/gen/schema";
+} from "@/gen/hook";
+import { User, UserLogin } from "@/gen/schema";
 
 interface AuthContextType {
   user: User | null;

@@ -1,9 +1,9 @@
-import QueryProvider from "@/lib/components/QueryProvider";
-import { ThemeProvider } from "@/lib/components/ThemeProvider";
-import VazirFont from "@/lib/components/VazirFont";
-import { getLocaleConfig } from "@/lib/i18n/config";
-import { routing } from "@/lib/i18n/routing";
-import { AuthProvider } from "@/lib/contexts/auth-context";
+import QueryProvider from "@/components/QueryProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import VazirFont from "@/components/VazirFont";
+import { getLocaleConfig } from "@/i18n/config";
+import { routing } from "@/i18n/routing";
+import { AuthProvider } from "@/contexts/auth-context";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";

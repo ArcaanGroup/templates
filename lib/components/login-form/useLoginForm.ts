@@ -1,5 +1,5 @@
-import { UserLogin } from "@/lib/gen/schema";
-import { useAuth } from "@/lib/contexts/auth-context";
+import { UserLogin } from "@/gen/schema";
+import { useAuth } from "@/contexts/auth-context";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 

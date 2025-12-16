@@ -1,10 +1,10 @@
 "use client";
 
-import LanguageSelect from "@/lib/components/LanguageSelect";
-import ThemeToggle from "@/lib/components/ThemeToggle";
+import LanguageSelect from "@/components/LanguageSelect";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useTranslations } from "next-intl";
 import LoginForm from "../login-form/LoginForm";
-import { useAuth } from "@/lib/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import UserProfile from "../UserProfile";
 import Protected from "../Protected";
 

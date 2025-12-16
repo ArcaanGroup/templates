@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
 /**
  * Locale Switcher Component
- * 
+ *
  * Example component demonstrating:
  * - Client-side locale switching
  * - Using useRouter from next-intl
  * - Accessing available locales
  */
 
-import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/routing';
-import { getAvailableLocales } from '@/lib/i18n';
+import { useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/routing";
+import { getAvailableLocales } from "@/i18n";
 
 export default function LocaleSwitcher() {
   const locale = useLocale();
@@ -31,8 +31,8 @@ export default function LocaleSwitcher() {
           onClick={() => switchLocale(loc.code)}
           className={`px-4 py-2 rounded-md transition-colors ${
             locale === loc.code
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
           }`}
           aria-label={`Switch to ${loc.name}`}
         >
@@ -43,4 +43,3 @@ export default function LocaleSwitcher() {
     </div>
   );
 }
-

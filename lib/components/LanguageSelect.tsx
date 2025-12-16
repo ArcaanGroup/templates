@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "@/lib/i18n/routing";
-import { getAvailableLocales, isRTL } from "@/lib/i18n";
-import { getLocaleConfig } from "@/lib/i18n/config";
+import { useRouter, usePathname } from "@/i18n/routing";
+import { getAvailableLocales, isRTL } from "@/i18n";
+import { getLocaleConfig } from "@/i18n/config";
 
 /**
  * Language Select Dropdown Component

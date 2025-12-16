@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useEffect } from "react";
-import { isRTL } from "@/lib/i18n/config";
+import { isRTL } from "@/i18n/config";
 
 /**
  * Vazir Font Loader Component
