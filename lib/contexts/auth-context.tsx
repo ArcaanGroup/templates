@@ -122,15 +122,17 @@ export const AuthProvider: React.FC<{
   // Check if user is authenticated on initial load
   useEffect(() => {
     const checkAuthStatus = async () => {
-      try {
-        await _getMe();
-      } catch {
-        // User is not authenticated, which is fine
+      if (!user) {
+        try {
+          await _getMe();
+        } catch {
+          // User is not authenticated, which is fine
+        }
       }
     };
 
     checkAuthStatus();
-  }, [_getMe]);
+  }, [_getMe, user]);
 
   const value = {
     user,
