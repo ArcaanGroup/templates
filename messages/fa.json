@@ -8,6 +8,14 @@
       }
     }
   },
+  "routes": {
+    "all": {
+      "meta": {
+        "title": "به Next.js خوش آمدید",
+        "description": "از این قالب برای توسعه وب سایت‌های Next.js استفاده کنید."
+      }
+    }
+  },
   "common": {
     "welcome": "خوش آمدید",
     "hello": "سلام",

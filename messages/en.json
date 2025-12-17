@@ -8,6 +8,14 @@
       }
     }
   },
+  "routes": {
+    "all": {
+      "meta": {
+        "title": "Welcome to Next.js",
+        "description": "Use this template to build your Next.js website"
+      }
+    }
+  },
   "common": {
     "welcome": "Welcome",
     "hello": "Hello",
