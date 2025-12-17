@@ -99,11 +99,20 @@ async def refresh_tokens(
         path="/auth/refresh",  # Limit the cookie to the refresh endpoint path
     )
 
-    # Remove refresh token from the response payload for security
-    token_payload = new_token.model_dump()
-    del token_payload["refresh_token"]
+    # Also update the access token cookie with the new token
+    response.set_cookie(
+        key="access_token",
+        value=new_token.access_token,
+        httponly=True,
+        secure=False,  # Set to True in production with HTTPS
+        samesite="strict",
+        max_age=int(
+            timedelta(minutes=15).total_seconds()
+        ),  # Same as access token expiration
+        path="/",
+    )
 
-    return success(message="Token refreshed successfully", payload=token_payload)
+    return success(message="Token refreshed successfully")
 
 
 @auth_router.post("/logout", response_model=StandardResponse[None])
