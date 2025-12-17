@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from app.models.refresh_token.domain import RefreshTokenDomain
-from app.models.refresh_token.dto import RefreshToken, RefreshTokenCreate
+from app.models.refresh_token.dto import RefreshTokenCreate
 
 
 class IRefreshTokenRepository(ABC):
@@ -17,7 +17,7 @@ class IRefreshTokenRepository(ABC):
     @abstractmethod
     async def create_refresh_token(
         self, refresh_token_create: RefreshTokenCreate
-    ) -> RefreshToken:
+    ) -> RefreshTokenDomain:
         """Create a new refresh token in the repository."""
         pass
 
@@ -29,23 +29,6 @@ class IRefreshTokenRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_refresh_token_by_id(
-        self, token_id: str
-    ) -> Optional[RefreshTokenDomain]:
-        """Get a refresh token by its ID from the repository."""
-        pass
-
-    @abstractmethod
     async def revoke_refresh_token(self, token_id: str) -> bool:
         """Revoke a refresh token in the repository."""
-        pass
-
-    @abstractmethod
-    async def blacklist_refresh_token(self, token_id: str) -> bool:
-        """Blacklist a refresh token in the repository."""
-        pass
-
-    @abstractmethod
-    async def is_token_blacklisted(self, token: str) -> bool:
-        """Check if a refresh token is blacklisted."""
         pass

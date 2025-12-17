@@ -62,7 +62,7 @@ async def login(
         max_age=int(
             timedelta(days=7).total_seconds()
         ),  # Same as refresh token expiration
-        path="/api/auth/refresh",  # Limit the cookie to the refresh endpoint path
+        path="/api/auth",  # Limit the cookie to the refresh endpoint path
     )
 
     return success(message="Login successful")
@@ -97,7 +97,7 @@ async def refresh_tokens(
         max_age=int(
             timedelta(days=7).total_seconds()
         ),  # Same as refresh token expiration
-        path="/auth/refresh",  # Limit the cookie to the refresh endpoint path
+        path="/api/auth",  # Limit the cookie to the refresh endpoint path
     )
 
     # Also update the access token cookie with the new token
@@ -130,11 +130,14 @@ async def logout(
         # Blacklist the refresh token in the database
         await auth_service.logout(refresh_token)
 
-    # Clear the refresh token cookie
-    response.delete_cookie(key="access_token", path="/")
-    response.delete_cookie(key="refresh_token", path="/auth/refresh")
+        # Clear the refresh token cookie
+        response.delete_cookie(key="access_token", path="/")
+        response.delete_cookie(key="refresh_token", path="/api/auth")
 
-    return success(message="Logged out successfully", payload=None)
+        return success(message="Logged out successfully", payload=None)
+
+    else:
+        return failure(message="No refresh token provided", payload=None)
 
 
 @auth_router.get("/permissions", response_model=StandardResponse[list[PermissionDTO]])

@@ -154,7 +154,7 @@ class AuthService:
             return False
 
         # Blacklist the refresh token so it can't be used again
-        result = await self.refresh_token_repo.blacklist_refresh_token(
+        result = await self.refresh_token_repo.revoke_refresh_token(
             refresh_token_domain.id
         )
         return result
