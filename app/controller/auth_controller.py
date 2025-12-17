@@ -15,6 +15,7 @@ from app.error.exceptions import (
     DomainException,
 )
 from app.models.auth.dto import UserLogin
+from app.models.permission.dto import Permission as PermissionDTO
 from app.models.permission.mapper import PermissionMapper
 from app.models.responses import StandardResponse, failure, success
 from app.models.user.dto import User
@@ -136,7 +137,7 @@ async def logout(
     return success(message="Logged out successfully", payload=None)
 
 
-@auth_router.get("/permissions", response_model=StandardResponse[list[Permission]])
+@auth_router.get("/permissions", response_model=StandardResponse[list[PermissionDTO]])
 async def get_permissions(
     permission_service: PermissionService = Depends(get_permission_service),
     _=Depends(get_authorized_user([Permission.Permissions_Read])),
