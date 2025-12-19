@@ -76,7 +76,7 @@ class AxiosClient {
           typeof crypto !== "undefined" && crypto.randomUUID
             ? crypto.randomUUID()
             : Math.random().toString(36).substring(2, 15) +
-              Math.random().toString(36).substring(2, 15);
+            Math.random().toString(36).substring(2, 15);
 
         return config;
       },
@@ -102,7 +102,9 @@ class AxiosClient {
 
         // Handle 401 - Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
-          if (!isServer) {
+          if (isServer) {
+            return this.handleServerTokenRefresh(error, originalRequest);
+          } else {
             return this.handleTokenRefresh(error, originalRequest);
           }
         }
@@ -137,6 +139,88 @@ class AxiosClient {
         return Promise.reject(this.transformError(error));
       },
     );
+  }
+
+  private async handleServerTokenRefresh(
+    error: AxiosError,
+    originalRequest: InternalAxiosRequestConfig & { _retry?: boolean },
+  ): Promise<AxiosResponse> {
+    originalRequest._retry = true;
+
+    try {
+      // Extract cookies from the original request headers
+      // These are passed by serverAction from Next.js cookies()
+      const cookieHeader = originalRequest.headers?.["cookie"] as
+        | string
+        | undefined;
+
+      if (!cookieHeader) {
+        // No cookies available, cannot refresh
+        throw newAppError(
+          AppErrorCode.AUTH_REFRESH_FAILED,
+          "No cookies available for token refresh.",
+        );
+      }
+
+      // Call refresh endpoint with the same cookies from the original request
+      const res = await axios.post<StandardResponseToken>(
+        `${baseURL}/api/auth/refresh`,
+        {},
+        {
+          headers: {
+            cookie: cookieHeader,
+          },
+          withCredentials: true,
+        },
+      );
+
+      const accessToken = res.data.payload?.token;
+      if (!res.data?.success || !accessToken) {
+        throw newAppError(
+          AppErrorCode.AUTH_REFRESH_FAILED,
+          res.data.message || "Token refresh failed. Please log in again.",
+          undefined,
+          res.data?.payload,
+        );
+      }
+
+      // Update the browser cookie with the new access token
+      // This ensures the token is available for subsequent requests
+      try {
+        // Use Next.js cookies API to set the cookie in the browser
+        // This only works when called from server actions/components
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        cookieStore.set(Key.AccessToken, accessToken, {
+          httpOnly: false, // Allow client-side access (matching client behavior)
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+        });
+      } catch (cookieError) {
+        // If cookies() is not available in this context, log but don't fail
+        // The token will still work for the current request via Authorization header
+        console.warn(
+          "Could not set cookie after token refresh:",
+          cookieError instanceof Error ? cookieError.message : "Unknown error",
+        );
+      }
+
+      // Update the Authorization header in the original request with the new token
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+
+      // Retry original request with the new token
+      return await this.instance(originalRequest);
+    } catch (refreshError) {
+      // On refresh failure, throw specific error for auth handling
+      throw newAppError(
+        AppErrorCode.AUTH_REFRESH_FAILED,
+        "Token refresh failed. Please log in again.",
+        undefined,
+        refreshError,
+      );
+    }
   }
 
   private async handleTokenRefresh(

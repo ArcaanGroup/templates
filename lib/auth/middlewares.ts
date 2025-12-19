@@ -1,10 +1,9 @@
 import { ROUTE_PERMISSIONS } from "@/auth/route-protection-table";
 import { serverAction } from "@/axios";
-import { AppErrorCode, transformError } from "@/errors/AppError";
+import { transformError } from "@/errors/AppError";
 import {
-  StandardResponseToken,
   StandardResponseUser,
-  User,
+  User
 } from "@/gen/schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -54,37 +53,10 @@ export async function authMiddleware(request: NextRequest): Promise<{
 export async function authenticate(requset: NextRequest): Promise<User | null> {
   try {
     const res = await serverAction<StandardResponseUser>("GET", "/api/auth/me");
-    if (!res.data?.success) {
-      if (res.error === AppErrorCode.AUTH_UNAUTHORIZED) {
-        try {
-          const refreshTokenResponse =
-            await serverAction<StandardResponseToken>(
-              "POST",
-              "/api/auth/refresh",
-            );
-          if (
-            !refreshTokenResponse.data?.success ||
-            !refreshTokenResponse.data.payload?.token
-          )
-            return null;
-
-          const newAccessToken = refreshTokenResponse.data.payload.token;
-          requset.headers.set("x-new-access-token", newAccessToken);
-          // Get the user again
-          const res = await serverAction<StandardResponseUser>(
-            "GET",
-            "/api/auth/me",
-            undefined,
-            { explicitAccessToken: newAccessToken },
-          );
-          return res.data?.payload as User;
-        } catch {
-          return null;
-        }
-      }
-      return null;
+    if (!res.data?.payload) {
+      throw new Error("Not authenticated.");
     }
-    return res.data.payload as User;
+    return res.data?.payload as User;
   } catch (error) {
     // Log the error but don't throw - just return null for unauthenticated
     const appError = transformError(error);
