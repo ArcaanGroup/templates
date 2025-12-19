@@ -6,9 +6,11 @@
  */
 
 /**
- * User login request model.
+ * Token response model.
  */
-export interface UserLogin {
-  username: string;
-  password: string;
+export interface Token {
+  title: string;
+  token: string;
+  type: string;
+  expires_at: string;
 }

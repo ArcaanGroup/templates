@@ -1,57 +1,32 @@
 import createI18nMiddleware from "next-intl/middleware";
+import { NextRequest } from "next/server";
+import { authMiddleware } from "./lib/auth/middlewares";
 import { routing } from "./lib/i18n/routing";
-import { NextRequest, NextResponse } from "next/server";
-import {
-  authenticationMiddleware,
-  authorizationMiddleware,
-} from "./lib/auth/middlewares";
-
-// Define types for extensible middleware functionality
-export type ProxyHandler = (
-  request: NextRequest,
-) => Promise<NextResponse | undefined>;
+import { Key } from "@/utils/key.enum";
 
 /**
  * Main middleware function that combines
  * authentication, authorization and internationalization.
  */
 export default async function proxy(request: NextRequest) {
-  let user;
+  const { redirect, user } = await authMiddleware(request);
+  if (redirect) return redirect;
 
-  try {
-    user = await authenticationMiddleware();
-  } catch (error) {
-    // If authentication fails due to an error, treat as unauthenticated
-    console.error("Authentication middleware error:", error);
-    user = null;
-  }
-
-  // Pass user data via request headers for the layout to use
-  const requestHeaders = new Headers(request.headers);
+  const i18nMiddleware = createI18nMiddleware(routing);
+  const i18nResponse = i18nMiddleware(request);
 
   if (user) {
-    // Store user in headers (for server components)
-    requestHeaders.set("x-user-data", JSON.stringify(user));
-
-    const redirectTo = await authorizationMiddleware(request, user);
-    if (redirectTo) return redirectTo;
-
-    const i18nMiddleware = createI18nMiddleware(routing);
-    const i18nResponse = i18nMiddleware(request);
-
-    // Merge i18n response with our user headers
-    i18nResponse.headers.set("x-user-data", requestHeaders.get("x-user-data")!);
-    return i18nResponse;
-  } else {
-    // No user - still pass null explicitly
-    requestHeaders.set("x-user-data", "null");
-
-    const redirectTo = await authorizationMiddleware(request, null);
-    if (redirectTo) return redirectTo;
-
-    const i18nMiddleware = createI18nMiddleware(routing);
-    return i18nMiddleware(request);
+    // Set user data as response header
+    // so we can get it on the root layout (server component)
+    i18nResponse.headers.set("x-user-data", JSON.stringify(user));
   }
+
+  const newAccessToken = request.headers.get("x-new-access-token");
+  if (newAccessToken) {
+    i18nResponse.cookies.set(Key.AccessToken, newAccessToken);
+  }
+
+  return i18nResponse;
 }
 
 /**

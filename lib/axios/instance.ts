@@ -1,4 +1,6 @@
-import { AppErrorCode, createAppError } from "@/errors/AppError";
+import { AppErrorCode, newAppError } from "@/errors/AppError";
+import { StandardResponseToken } from "@/gen/schema";
+import { Key } from "@/utils/key.enum";
 import axios, {
   AxiosError,
   AxiosInstance,
@@ -6,6 +8,7 @@ import axios, {
   CancelTokenSource,
   InternalAxiosRequestConfig,
 } from "axios";
+import Cookies from "js-cookie";
 
 // Types
 export type ApiError = {
@@ -60,6 +63,12 @@ class AxiosClient {
           // Add SSR headers
           config.headers["x-ssr"] = "true";
           config.headers["x-request-from"] = "nextjs-server";
+        } else {
+          if (config.baseURL === process.env.NEXT_PUBLIC_API_URL) {
+            const accessToken = Cookies.get(Key.AccessToken);
+            if (accessToken)
+              config.headers["Authorization"] = `Bearer ${accessToken}`;
+          }
         }
 
         // Add request ID for tracing (using crypto.randomUUID with fallback)
@@ -150,11 +159,22 @@ class AxiosClient {
       // Call refresh endpoint
       // Since tokens are stored in HTTP-only cookies, no need to manually handle them
       // Just call the refresh endpoint and let the backend handle the refresh
-      await axios.post(
+      const res = await axios.post<StandardResponseToken>(
         `${baseURL}/api/auth/refresh`,
         {},
         { withCredentials: true },
       );
+      const accessToken = res.data.payload?.token;
+      if (!res.data?.success || !accessToken) {
+        throw newAppError(
+          AppErrorCode.AUTH_REFRESH_FAILED,
+          res.data.message || "Token refresh failed. Please log in again.",
+          undefined,
+          res.data?.payload,
+        );
+      }
+
+      Cookies.set(Key.AccessToken, accessToken);
 
       // Retry original request
       const response = await this.instance(originalRequest);
@@ -166,7 +186,7 @@ class AxiosClient {
       return response;
     } catch (refreshError) {
       // On refresh failure, throw specific error for auth handling
-      throw createAppError(
+      throw newAppError(
         AppErrorCode.AUTH_REFRESH_FAILED,
         "Token refresh failed. Please log in again.",
         undefined,

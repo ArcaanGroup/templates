@@ -38,7 +38,7 @@ export type AppError = {
 /**
  * Creates a standardized application error
  */
-export function createAppError(
+export function newAppError(
   code: AppErrorCode,
   message: string,
   details?: unknown,
@@ -100,25 +100,25 @@ export function transformError(
   // Axios error handling
   if (isAxiosError(error)) {
     if (error?.response?.status === 401) {
-      return createAppError(
+      return newAppError(
         AppErrorCode.AUTH_UNAUTHORIZED,
         "Unauthorized access",
         error?.response?.data,
       );
     } else if (error?.response?.status === 403) {
-      return createAppError(
+      return newAppError(
         AppErrorCode.AUTH_FORBIDDEN,
         "Access forbidden",
         error?.response?.data,
       );
     } else if (error?.response?.status === 429) {
-      return createAppError(
+      return newAppError(
         AppErrorCode.RATE_LIMIT_EXCEEDED,
         "Rate limit exceeded",
         error?.response?.headers,
       );
     } else if (error?.code === "ECONNABORTED" || error?.timeout) {
-      return createAppError(AppErrorCode.REQUEST_TIMEOUT, "Request timeout");
+      return newAppError(AppErrorCode.REQUEST_TIMEOUT, "Request timeout");
     } else {
       // Safely extract message from response data
       const message =
@@ -128,7 +128,7 @@ export function transformError(
           ? (error?.response?.data as { message?: string }).message
           : undefined;
 
-      return createAppError(
+      return newAppError(
         AppErrorCode.API_ERROR,
         message || error?.message || "API request failed",
         error?.response?.data,
@@ -138,11 +138,11 @@ export function transformError(
 
   // Standard Error
   if (error instanceof Error) {
-    return createAppError(defaultCode, error.message, undefined, error);
+    return newAppError(defaultCode, error.message, undefined, error);
   }
 
   // Fallback
-  return createAppError(defaultCode, "An unexpected error occurred", {
+  return newAppError(defaultCode, "An unexpected error occurred", {
     originalError: error,
   });
 }

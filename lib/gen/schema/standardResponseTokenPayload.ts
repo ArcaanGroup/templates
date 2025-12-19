@@ -4,6 +4,6 @@
  * Title: FastAPI Server
  * Version: 1.0.0
  */
-import type { PageUser } from "./pageUser";
+import type { Token } from "./token";
 
-export type StandardResponsePageUserPayload = PageUser | null;
+export type StandardResponseTokenPayload = Token | null;

@@ -1,9 +1,9 @@
 "use server";
 
+import { AppErrorCode } from "@/errors/AppError";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { axiosInstance } from "./instance";
-import { transformError } from "@/errors/AppError";
 
 export async function serverAction<T = unknown>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
@@ -13,12 +13,15 @@ export async function serverAction<T = unknown>(
     tags?: string[];
     paths?: string[];
     cache?: "force-cache" | "no-store";
+    explicitAccessToken?: string; // Access token which passed directly
   },
 ): Promise<{ data?: T; error?: string }> {
   try {
     // Get request headers for SSR
     const headersList = await headers();
     const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
+    const token = options?.explicitAccessToken || accessToken;
 
     const response = await axiosInstance({
       method,
@@ -28,6 +31,7 @@ export async function serverAction<T = unknown>(
         cookie: cookieStore.toString(),
         "user-agent": headersList.get("user-agent") || "",
         "x-forwarded-for": headersList.get("x-forwarded-for") || "",
+        Authorization: token ? `Bearer ${token}` : undefined,
       },
       ...(options?.cache && {
         next: { revalidate: options.cache === "force-cache" ? 3600 : 0 },
@@ -44,15 +48,12 @@ export async function serverAction<T = unknown>(
     }
 
     return { data: response.data };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Server Action Error:", error);
-
-    // Transform the error to a user-friendly message
-    const appError = transformError(error);
 
     // Return user-friendly error
     return {
-      error: appError.message || "An unexpected error occurred",
+      error: error.code || AppErrorCode.NETWORK_ERROR,
     };
   }
 }

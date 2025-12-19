@@ -6,7 +6,7 @@ dotenv.config();
 export default defineConfig({
   api: {
     output: {
-      mode: "single",
+      mode: "split",
       target: "./lib/gen/api/index.ts",
       schemas: "./lib/gen/schema",
       client: "axios",
@@ -20,6 +20,10 @@ export default defineConfig({
           `Title: ${info.title}`,
           `Version: ${info.version}`,
         ],
+        mutator: {
+          path: "./lib/axios/fetcher.ts",
+          name: "orvalFetcher",
+        },
         // Don't include schemas in the API file since they're in a separate file
         schemas: {
           // Override to prevent schema generation in the API file

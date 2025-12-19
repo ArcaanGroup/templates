@@ -1,28 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { serverAction } from "@/axios";
-import { StandardResponseUser, User } from "@/gen/schema";
 import { ROUTE_PERMISSIONS } from "@/auth/route-protection-table";
-import { transformError } from "@/errors/AppError";
+import { serverAction } from "@/axios";
+import { AppErrorCode, transformError } from "@/errors/AppError";
+import {
+  StandardResponseToken,
+  StandardResponseUser,
+  User,
+} from "@/gen/schema";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function authenticationMiddleware(): Promise<User | null> {
-  try {
-    const res = await serverAction<StandardResponseUser>("GET", "/api/auth/me");
-    if (!res.data?.success) {
-      return null; // Not authenticated
-    }
-    return res.data.payload as User;
-  } catch (error) {
-    // Log the error but don't throw - just return null for unauthenticated
-    const appError = transformError(error);
-    console.error("Authentication check failed:", appError);
-    return null;
-  }
-}
-
-export async function authorizationMiddleware(
-  request: NextRequest,
-  user: User | null,
-) {
+export async function authMiddleware(request: NextRequest): Promise<{
+  redirect?: NextResponse;
+  user?: User;
+}> {
+  const user = await authenticate(request);
   const requestPathname = request.nextUrl.pathname;
   const [, requiredPermissions] =
     Object.entries(ROUTE_PERMISSIONS).find(
@@ -32,7 +22,9 @@ export async function authorizationMiddleware(
   if (isRouteProtected) {
     if (user === null) {
       // Redirect to home if user is not authenticated
-      return NextResponse.redirect(new URL("/", request.url));
+      return {
+        redirect: NextResponse.redirect(new URL("/", request.url)),
+      };
     }
     if (requiredPermissions) {
       const userPermissions = user.roles
@@ -48,13 +40,55 @@ export async function authorizationMiddleware(
           )
         ) {
           // Redirect to home if user doesn't have required permissions
-          return NextResponse.redirect(new URL("/", request.url));
+          return { redirect: NextResponse.redirect(new URL("/", request.url)) };
         }
       } else {
         // Redirect to home if user has no permissions
-        return NextResponse.redirect(new URL("/", request.url));
+        return { redirect: NextResponse.redirect(new URL("/", request.url)) };
       }
     }
   }
-  return undefined; // Return undefined if no redirect is needed
+  return { user: user ?? undefined }; // Return undefined if no redirect is needed
+}
+
+export async function authenticate(requset: NextRequest): Promise<User | null> {
+  try {
+    const res = await serverAction<StandardResponseUser>("GET", "/api/auth/me");
+    if (!res.data?.success) {
+      if (res.error === AppErrorCode.AUTH_UNAUTHORIZED) {
+        try {
+          const refreshTokenResponse =
+            await serverAction<StandardResponseToken>(
+              "POST",
+              "/api/auth/refresh",
+            );
+          if (
+            !refreshTokenResponse.data?.success ||
+            !refreshTokenResponse.data.payload?.token
+          )
+            return null;
+
+          const newAccessToken = refreshTokenResponse.data.payload.token;
+          requset.headers.set("x-new-access-token", newAccessToken);
+          // Get the user again
+          const res = await serverAction<StandardResponseUser>(
+            "GET",
+            "/api/auth/me",
+            undefined,
+            { explicitAccessToken: newAccessToken },
+          );
+          return res.data?.payload as User;
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
+    return res.data.payload as User;
+  } catch (error) {
+    // Log the error but don't throw - just return null for unauthenticated
+    const appError = transformError(error);
+    console.error("Authentication check failed:", appError);
+    return null;
+  }
 }
