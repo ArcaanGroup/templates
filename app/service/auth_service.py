@@ -5,15 +5,13 @@ Authentication service for handling login and token management.
 from datetime import datetime, timedelta
 from typing import Optional
 
-from app.core.config import config
+from app.core import config
 from app.error.exceptions import CredentialsValidationException, InactiveUserException
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import Token, UserLogin
-from app.models.refresh_token.domain import RefreshTokenDomain
-from app.models.refresh_token.dto import RefreshTokenCreate
 from app.models.user.dto import User
 from app.models.user.mapper import UserMapper
 from app.utils import verify_password
@@ -74,13 +72,8 @@ class AuthService:
         user = await self.authenticate_user(user_login.username, user_login.password)
 
         # Generate access token
-        # access_token_expires_delta = timedelta(
-        #     minutes=config.access_token_expire_minutes
-        # )
-        access_token_expires_delta = timedelta(seconds=5)
         access_token = generate_access_token(
             data={"sub": user.id, "username": user.username},
-            expires_delta=access_token_expires_delta,
         )
 
         # Generate refresh token
@@ -90,7 +83,9 @@ class AuthService:
         )
 
         # Convert to DTO
-        access_token_expires_at = datetime.utcnow() + access_token_expires_delta
+        access_token_expires_at = datetime.utcnow() + timedelta(
+            minutes=config.access_token_expire_minutes
+        )
         access_token = Token(
             title="access_token",
             token=access_token,

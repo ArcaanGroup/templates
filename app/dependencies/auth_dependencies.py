@@ -10,6 +10,7 @@ from jose import JWTError, jwt
 
 from app.core.config import config
 from app.dependencies.permission_dependencies import get_permission_repository
+from app.dependencies.policy_dependencies import get_policy_engine_service
 from app.dependencies.refresh_token_dependencies import (
     get_refresh_token_repository,
 )
@@ -24,6 +25,7 @@ from app.interface.repositories.permission_repository_interface import (
 )
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
+from app.service.policy_engine_service import PolicyEngineService
 from app.models.auth.dto import TokenData
 from app.models.role.domain import RoleDomain
 from app.models.user.dto import User
@@ -43,6 +45,7 @@ security = HTTPBearer(auto_error=False)
 def get_refresh_token_from_cookie(
     refresh_token: str = Cookie(None, alias="refresh_token"),
 ):
+    """Extracts the refresh token from corresponding cookie"""
     if not refresh_token:
         raise CredentialsValidationException("No refresh token provided")
     return refresh_token
@@ -84,6 +87,7 @@ async def authorize(
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
     permission_repository: IPermissionRepository = Depends(get_permission_repository),
+    policy_engine_service: PolicyEngineService = Depends(get_policy_engine_service),
 ) -> Optional[User]:
     """
     Get the current user from the token in the request and check required permissions.
@@ -147,33 +151,19 @@ async def authorize(
                 if perm_id not in all_user_permission_ids:
                     raise UnauthorizedException()
 
-        all_policies = set()
+        policies_to_check = set()
         for perm_id in all_user_permission_ids:
             permission = await permission_repository.get_by_id(perm_id)
             if permission is not None:
                 for policy_id in permission.policies:
-                    all_policies.update(policy_id)
+                    policies_to_check.add(policy_id)
 
-        await evaluate_policies(list(all_policies))
+        await policy_engine_service.evaluate_policies(
+            policy_ids=list(policies_to_check)
+        )
     # -------------------- Authorization
 
     return user_dto
-
-
-# TODO: implement due to your policy contract
-async def evaluate_policies(policy_ids: list[str]):
-    """
-    The policy engine to evaluate them
-
-        Arguments:
-            policy_ids
-
-        Returns:
-            None
-
-    Raises an exception on policy violation
-    """
-    pass
 
 
 def get_authorized_user(required_permissions: List[Permission] = []):
@@ -194,6 +184,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
         permission_repository: IPermissionRepository = Depends(
             get_permission_repository
         ),
+        policy_engine_service: PolicyEngineService = Depends(get_policy_engine_service),
     ) -> Optional[User]:
         if access_token is None:
             raise CredentialsValidationException()
@@ -204,6 +195,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
             user_repository=user_repository,
             role_repository=role_repository,
             permission_repository=permission_repository,
+            policy_engine_service=policy_engine_service,
         )
 
     return authorize_dependency
