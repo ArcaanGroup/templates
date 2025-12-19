@@ -12,11 +12,12 @@ from app.interface.repositories.refresh_token_repository_interface import (
 )
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import Token, UserLogin
+from app.models.refresh_token.domain import RefreshTokenDomain
 from app.models.refresh_token.dto import RefreshTokenCreate
 from app.models.user.dto import User
 from app.models.user.mapper import UserMapper
 from app.utils import verify_password
-from app.utils.auth import create_access_token, generate_refresh_token
+from app.utils.auth import generate_access_token, generate_refresh_token
 
 
 class AuthService:
@@ -58,7 +59,9 @@ class AuthService:
 
         return UserMapper.to_dto(domain_user)
 
-    async def login(self, user_login: UserLogin) -> Token:
+    async def login(
+        self, user_login: UserLogin
+    ) -> tuple[Token, Token]:  # returns: (access_token, refresh_token)
         """
         Handle user login and return JWT token and refresh token.
 
@@ -70,30 +73,38 @@ class AuthService:
         """
         user = await self.authenticate_user(user_login.username, user_login.password)
 
-        access_token_expires = timedelta(minutes=config.access_token_expire_minutes)
-        access_token = create_access_token(
+        # Generate access token
+        # access_token_expires_delta = timedelta(
+        #     minutes=config.access_token_expire_minutes
+        # )
+        access_token_expires_delta = timedelta(seconds=5)
+        access_token = generate_access_token(
             data={"sub": user.id, "username": user.username},
-            expires_delta=access_token_expires,
+            expires_delta=access_token_expires_delta,
         )
 
         # Generate refresh token
         refresh_token_domain = generate_refresh_token(user.id)
-
-        # Create refresh token in the database
         refresh_token_dto = await self.refresh_token_repo.create_refresh_token(
-            RefreshTokenCreate(
-                user_id=user.id, expires_at=refresh_token_domain.expires_at
-            )
+            refresh_token_domain
         )
 
-        expires_at = datetime.utcnow() + access_token_expires
-
-        return Token(
-            access_token=access_token,
-            token_type="bearer",
-            expires_at=expires_at,
-            refresh_token=refresh_token_dto.token,
+        # Convert to DTO
+        access_token_expires_at = datetime.utcnow() + access_token_expires_delta
+        access_token = Token(
+            title="access_token",
+            token=access_token,
+            type="bearer",
+            expires_at=access_token_expires_at,
         )
+        refresh_token = Token(
+            title="refresh_token",
+            token=refresh_token_dto.token,
+            type="cookie",
+            expires_at=refresh_token_dto.expires_at,
+        )
+
+        return (access_token, refresh_token)
 
     async def refresh_access_token(self, refresh_token: str) -> Optional[Token]:
         """
@@ -111,29 +122,32 @@ class AuthService:
         )
 
         if not refresh_token_domain or not refresh_token_domain.is_valid():
-            return None
+            raise CredentialsValidationException("Invalid refresh token")
 
         # Get the user to make sure they exist and are active
         user = await self.user_repo.get_by_id(refresh_token_domain.user_id)
-        if not user or not user.is_active:
+        if not user:
+            raise CredentialsValidationException("Invalid refresh token")
+        elif not user.is_active:
             # If the user doesn't exist or is inactive, revoke the refresh token
             await self.refresh_token_repo.revoke_refresh_token(refresh_token_domain.id)
-            return None
+            raise InactiveUserException()
 
         # Generate a new access token
-        access_token_expires = timedelta(minutes=config.access_token_expire_minutes)
-        access_token = create_access_token(
-            data={"sub": user.id, "username": user.username},
-            expires_delta=access_token_expires,
+        access_token_expires_delta = timedelta(
+            seconds=5
+            # minutes=config.access_token_expire_minutes
         )
-
-        expires_at = datetime.utcnow() + access_token_expires
-
+        access_token = generate_access_token(
+            data={"sub": user.id, "username": user.username},
+            expires_delta=access_token_expires_delta,
+        )
+        access_token_expires_at = datetime.utcnow() + access_token_expires_delta
         return Token(
-            access_token=access_token,
-            token_type="bearer",
-            expires_at=expires_at,
-            refresh_token=refresh_token,  # Return the same refresh token for continuity
+            title="access_token",
+            token=access_token,
+            type="bearer",
+            expires_at=access_token_expires_at,
         )
 
     async def logout(self, refresh_token: str) -> bool:

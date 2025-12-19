@@ -24,17 +24,12 @@ class RefreshTokenRepository(IRefreshTokenRepository):
         self.session = db_session
 
     async def create_refresh_token(
-        self, refresh_token_create: RefreshTokenCreate
+        self, refresh_token_to_create: RefreshTokenDomain
     ) -> RefreshTokenDomain:
         """Create a new refresh token in the repository."""
-        # Create domain entity first to validate business rules
-        domain_token = RefreshTokenDomain.create(
-            user_id=refresh_token_create.user_id,
-            expires_at=refresh_token_create.expires_at,
-        )
 
         # Create SQLAlchemy RefreshToken object from domain entity
-        refresh_token_entity = RefreshTokenMapper.to_entity(domain_token)
+        refresh_token_entity = RefreshTokenMapper.to_entity(refresh_token_to_create)
 
         self.session.add(refresh_token_entity)
         await self.session.commit()

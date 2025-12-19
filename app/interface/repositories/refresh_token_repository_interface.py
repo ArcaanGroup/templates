@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from app.models.refresh_token.domain import RefreshTokenDomain
-from app.models.refresh_token.dto import RefreshTokenCreate
 
 
 class IRefreshTokenRepository(ABC):
@@ -16,7 +15,7 @@ class IRefreshTokenRepository(ABC):
 
     @abstractmethod
     async def create_refresh_token(
-        self, refresh_token_create: RefreshTokenCreate
+        self, refresh_token_to_create: RefreshTokenDomain
     ) -> RefreshTokenDomain:
         """Create a new refresh token in the repository."""
         pass

@@ -7,10 +7,10 @@ from pydantic import BaseModel
 class Token(BaseModel):
     """Token response model."""
 
-    access_token: str
-    token_type: str
+    title: str
+    token: str
+    type: str
     expires_at: datetime
-    refresh_token: Optional[str] = None
 
 
 class TokenData(BaseModel):

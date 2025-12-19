@@ -16,7 +16,7 @@ SECRET_KEY = config.secret_key
 ACCESS_TOKEN_EXPIRE_MINUTES = config.access_token_expire_minutes
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def generate_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
     Create an access token with the provided data.
 

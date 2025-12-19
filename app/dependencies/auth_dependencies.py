@@ -5,7 +5,7 @@ Authentication-related dependencies and dependency injection logic.
 from typing import List, Optional
 
 from fastapi import Cookie, Depends
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
 from app.core.config import config
@@ -40,12 +40,12 @@ ALGORITHM = config.algorithm
 security = HTTPBearer(auto_error=False)
 
 
-def get_access_token_from_cookie(
-    access_token: str = Cookie(None, alias="access_token"),
+def get_refresh_token_from_cookie(
+    refresh_token: str = Cookie(None, alias="refresh_token"),
 ):
-    if not access_token:
-        raise CredentialsValidationException("No access token provided")
-    return access_token
+    if not refresh_token:
+        raise CredentialsValidationException("No refresh token provided")
+    return refresh_token
 
 
 def verify_token(token: str) -> Optional[TokenData]:
@@ -80,7 +80,7 @@ def verify_token(token: str) -> Optional[TokenData]:
 
 async def authorize(
     required_permissions: List[Permission] = [],
-    access_token: str = Depends(get_access_token_from_cookie),
+    access_token: HTTPAuthorizationCredentials = Depends(security),
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
     permission_repository: IPermissionRepository = Depends(get_permission_repository),
@@ -98,7 +98,10 @@ async def authorize(
         UserDomain object if token is valid and user has required permissions, raises HTTPException otherwise
     """
     # Authentication --------------------
-    token_data = verify_token(access_token)
+    if not access_token.credentials:
+        raise CredentialsValidationException("No access token provided")
+
+    token_data = verify_token(access_token.credentials)
 
     if token_data is None or token_data.username is None:
         raise CredentialsValidationException()
@@ -173,7 +176,7 @@ async def evaluate_policies(policy_ids: list[str]):
     pass
 
 
-def get_authorized_user(required_permissions: List[Permission]):
+def get_authorized_user(required_permissions: List[Permission] = []):
     """
     Factory function to create a permission checker with specific permissions.
 
@@ -185,13 +188,16 @@ def get_authorized_user(required_permissions: List[Permission]):
     """
 
     async def authorize_dependency(
-        access_token: str = Depends(get_access_token_from_cookie),
+        access_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
         user_repository: IUserRepository = Depends(get_user_repository),
         role_repository: IRoleRepository = Depends(get_role_repository),
         permission_repository: IPermissionRepository = Depends(
             get_permission_repository
         ),
     ) -> Optional[User]:
+        if access_token is None:
+            raise CredentialsValidationException()
+
         return await authorize(
             access_token=access_token,
             required_permissions=required_permissions,
