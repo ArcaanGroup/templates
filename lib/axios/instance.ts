@@ -38,7 +38,11 @@ const baseURL =
 class AxiosClient {
   private instance: AxiosInstance;
   private isRefreshing = false;
-  private refreshSubscribers: (() => void)[] = [];
+  private refreshSubscribers: Array<{
+    resolve: (value: AxiosResponse) => void;
+    reject: (error: unknown) => void;
+    request: InternalAxiosRequestConfig & { _retry?: boolean };
+  }> = [];
 
   constructor() {
     this.instance = axios.create({
@@ -230,9 +234,12 @@ class AxiosClient {
     originalRequest._retry = true;
 
     if (this.isRefreshing) {
-      return new Promise((resolve) => {
-        this.refreshSubscribers.push(() => {
-          resolve(this.instance(originalRequest));
+      // If refresh is already in progress, queue this request
+      return new Promise<AxiosResponse>((resolve, reject) => {
+        this.refreshSubscribers.push({
+          resolve,
+          reject,
+          request: originalRequest,
         });
       });
     }
@@ -258,24 +265,48 @@ class AxiosClient {
         );
       }
 
+      // Set the new token in cookies - this ensures queued requests get the fresh token
       Cookies.set(Key.AccessToken, accessToken);
 
-      // Retry original request
+      // Clear any stale Authorization header to ensure fresh token from cookies
+      if (originalRequest.headers) {
+        delete originalRequest.headers["Authorization"];
+      }
+
+      // Retry original request - it will get the new token from cookies via request interceptor
       const response = await this.instance(originalRequest);
 
-      // Execute subscribers
-      this.refreshSubscribers.forEach((callback) => callback());
+      // Execute all queued subscribers (other requests that were waiting)
+      // They will retry with the new token from cookies
+      this.refreshSubscribers.forEach(({ resolve, reject, request }) => {
+        // Clear any stale Authorization header to ensure fresh token from cookies
+        if (request.headers) {
+          delete request.headers["Authorization"];
+        }
+        // Mark as retried to prevent infinite loops
+        request._retry = true;
+        // Retry the request - it will get the new token from cookies via request interceptor
+        this.instance(request).then(resolve).catch(reject);
+      });
       this.refreshSubscribers = [];
 
       return response;
     } catch (refreshError) {
-      // On refresh failure, throw specific error for auth handling
-      throw newAppError(
+      // On refresh failure, reject all queued requests
+      const errorToThrow = newAppError(
         AppErrorCode.AUTH_REFRESH_FAILED,
         "Token refresh failed. Please log in again.",
         undefined,
         refreshError,
       );
+
+      // Reject all queued subscribers
+      this.refreshSubscribers.forEach(({ reject }) => {
+        reject(errorToThrow);
+      });
+      this.refreshSubscribers = [];
+
+      throw errorToThrow;
     } finally {
       this.isRefreshing = false;
     }
