@@ -20,7 +20,6 @@ class PermissionMapper:
             id=domain_permission.id,
             title=domain_permission.title,
             description=domain_permission.description,
-            policies=domain_permission.policies,
             created_at=domain_permission.created_at,
             updated_at=domain_permission.updated_at,
         )

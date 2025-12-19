@@ -78,7 +78,6 @@ class JSONPermissionRepository(IPermissionRepository):
             id=perm_data["id"],
             title=perm_data["title"],
             description=perm_data["description"],
-            policies=perm_data["policies"],
             created_at=created_at,
             updated_at=updated_at,
         )

@@ -129,15 +129,12 @@ class AuthService:
             raise InactiveUserException()
 
         # Generate a new access token
-        access_token_expires_delta = timedelta(
-            seconds=5
-            # minutes=config.access_token_expire_minutes
-        )
         access_token = generate_access_token(
             data={"sub": user.id, "username": user.username},
-            expires_delta=access_token_expires_delta,
         )
-        access_token_expires_at = datetime.utcnow() + access_token_expires_delta
+        access_token_expires_at = datetime.utcnow() + timedelta(
+            config.access_token_expire_minutes
+        )
         return Token(
             title="access_token",
             token=access_token,

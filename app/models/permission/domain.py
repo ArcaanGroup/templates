@@ -4,7 +4,7 @@ Domain Entity for Permission - contains business logic and behavior
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 from uuid import uuid4
 
 
@@ -15,7 +15,6 @@ class PermissionDomain:
     id: str
     title: str
     description: str
-    policies: List[str]  # List of policy IDs
     created_at: datetime
     updated_at: datetime
 
@@ -24,7 +23,6 @@ class PermissionDomain:
         cls,
         title: str,
         description: str,
-        policies: List[str],
         permission_id: Optional[str] = None,
     ) -> "PermissionDomain":
         """Create a new PermissionDomain entity."""
@@ -35,7 +33,6 @@ class PermissionDomain:
             id=permission_id,
             title=title,
             description=description,
-            policies=policies,
             created_at=now,
             updated_at=now,
         )
