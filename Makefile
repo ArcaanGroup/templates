@@ -99,3 +99,14 @@ upgrade: ## Upgrade the database to the latest version
 seed: ## Seed the database with initial data
 	@echo "Seeding the database with initial data..."
 	$(PDM) run python scripts/seed.py
+
+.PHONY: init-db
+init-db: ## Create, Upgrade and Seed the database.
+	@echo "Initializing database (Create, Upgrade, Seed)..."
+	@echo "Step 1: Creating the database if it doesn't exist..."
+	@$(MAKE) create-db
+	@echo "Step 2: Upgrading the database to the latest version..."
+	@$(MAKE) upgrade
+	@echo "Step 3: Seeding the database with initial data..."
+	@$(MAKE) seed
+	@echo "Database initialization completed!"
