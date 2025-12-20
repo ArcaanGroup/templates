@@ -1,30 +1,18 @@
 import QueryProvider from "@/components/QueryProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import VazirFont from "@/components/VazirFont";
-import { getLocaleConfig } from "@/i18n/config";
-import { routing } from "@/i18n/routing";
 import { AuthProvider } from "@/contexts/auth-context";
-import type { Metadata, ResolvingMetadata } from "next";
+import { routing } from "@/i18n/routing";
+import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
   getTranslations,
   setRequestLocale,
 } from "next-intl/server";
-import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import "../globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 type Props = {
   children: React.ReactNode;
@@ -60,7 +48,6 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   // Get locale configuration for RTL/LTR support
-  const localeConfig = getLocaleConfig(locale);
   const messages = await getMessages();
 
   // Get user data from proxy headers
@@ -69,21 +56,15 @@ export default async function LocaleLayout({ children, params }: Props) {
   const user = userHeader ? JSON.parse(userHeader) : null;
 
   return (
-    <html lang={locale} dir={localeConfig.dir} suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider initialUser={user}>
-          <QueryProvider>
-            <ThemeProvider>
-              <NextIntlClientProvider messages={messages}>
-                <VazirFont />
-                {children}
-              </NextIntlClientProvider>
-            </ThemeProvider>
-          </QueryProvider>
-        </AuthProvider>
-      </body>
-    </html>
+    <AuthProvider initialUser={user}>
+      <QueryProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <VazirFont />
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
+      </QueryProvider>
+    </AuthProvider>
   );
 }

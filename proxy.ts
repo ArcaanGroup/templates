@@ -15,6 +15,11 @@ export default async function proxy(request: NextRequest) {
   const i18nMiddleware = createI18nMiddleware(routing);
   const i18nResponse = i18nMiddleware(request);
 
+  const locale = request.nextUrl.pathname.split("/")[1];
+  if (locale) {
+    i18nResponse.headers.set("x-locale", locale);
+  }
+
   if (user) {
     // Set user data as response header
     // so we can get it on the root layout (server component)
