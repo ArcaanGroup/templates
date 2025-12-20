@@ -11,11 +11,6 @@ from alembic import context
 from app.core.config import Config
 from app.models.base import Base
 
-# Import all enities
-from app.models.refresh_token.entity import RefreshTokenEntity  # noqa: F401
-from app.models.role import RoleEntity  # noqa: F401
-from app.models.user.entity import UserEntity  # noqa: F401
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

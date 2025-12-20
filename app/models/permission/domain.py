@@ -27,7 +27,7 @@ class PermissionDomain:
     ) -> "PermissionDomain":
         """Create a new PermissionDomain entity."""
         permission_id = permission_id or str(uuid4())
-        now = datetime.now()
+        now = datetime.utcnow()
 
         return cls(
             id=permission_id,

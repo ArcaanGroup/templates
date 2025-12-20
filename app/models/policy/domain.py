@@ -27,7 +27,7 @@ class PolicyDomain:
     ) -> "PolicyDomain":
         """Create a new PolicyDomain entity."""
         policy_id = policy_id or str(uuid4())
-        now = datetime.now()
+        now = datetime.utcnow()
 
         return cls(
             id=policy_id,

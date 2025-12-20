@@ -33,7 +33,7 @@ class RoleDomain:
         cls._validate_name(name)
 
         resource_id = resource_id or str(uuid4())
-        now = datetime.now()
+        now = datetime.utcnow()
 
         return cls(
             id=resource_id,
@@ -61,17 +61,17 @@ class RoleDomain:
         if permission_ids is not None:
             self.permission_ids = permission_ids
 
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
 
     def deactivate(self) -> None:
         """Deactivate the Role."""
         self.is_active = False
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
 
     def activate(self) -> None:
         """Activate the Role."""
         self.is_active = True
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
 
     @staticmethod
     def _validate_name(name: str) -> None:

@@ -143,8 +143,6 @@ async def authorize(
             for perm_id in required_permission_ids:
                 if perm_id not in all_user_permission_ids:
                     raise UnauthorizedException()
-
-        await policy_engine_service.evaluate_policies(policy_ids=[])
     # -------------------- Authorization
 
     return user_dto

@@ -20,10 +20,7 @@ class Config(BaseSettings):
     db_name: str = Field(default=..., alias="DB_NAME")  # Required field
 
     # JWT Configuration
-    secret_key: str = Field(
-        default="09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7",
-        alias="SECRET_KEY",
-    )
+    secret_key: str = Field(default=..., alias="SECRET_KEY")  # Required field
     algorithm: str = Field(default="HS256", alias="ALGORITHM")
     access_token_expire_minutes: int = Field(
         default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"

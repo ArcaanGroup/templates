@@ -5,7 +5,7 @@ RefreshToken entity as SQLAlchemy ORM model.
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -24,7 +24,7 @@ class RefreshTokenEntity(Base):
     user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now, nullable=False
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
     revoked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     blacklisted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

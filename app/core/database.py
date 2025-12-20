@@ -4,13 +4,18 @@ Database engine and session setup using SQLAlchemy.
 
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.core.config import Config
 
 # Global variables to store engine and sessionmaker
 _engine: Optional[AsyncEngine] = None
-_async_sessionmaker = None
+_async_sessionmaker: Optional[async_sessionmaker[AsyncSession]] = None
 
 
 def get_engine() -> AsyncEngine:
@@ -28,8 +33,13 @@ def get_engine() -> AsyncEngine:
     return _engine
 
 
-def get_async_session_local():
-    """Get the async session maker, initializing engine and sessionmaker only when needed."""
+def get_async_session_local() -> async_sessionmaker[AsyncSession]:
+    """
+    Get the async session maker, initializing engine and sessionmaker only when needed.
+    
+    Returns:
+        An async sessionmaker instance for creating database sessions.
+    """
     global _async_sessionmaker
     if _async_sessionmaker is None:
         engine = get_engine()  # This will initialize the engine if needed

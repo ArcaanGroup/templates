@@ -82,7 +82,7 @@ class RoleMapper:
             role_domain.permission_ids = update_data["permission_ids"]
 
         if update_data:  # Only update updated_at if there were actual changes
-            role_domain.updated_at = datetime.now()
+            role_domain.updated_at = datetime.utcnow()
 
         return role_domain
 
