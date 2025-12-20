@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { defaultLocale, getLocaleConfig } from "@/i18n/config";
 import { headers } from "next/headers";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

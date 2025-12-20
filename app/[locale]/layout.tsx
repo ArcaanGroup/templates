@@ -12,7 +12,6 @@ import {
 } from "next-intl/server";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import "../globals.css";
 
 type Props = {
   children: React.ReactNode;
