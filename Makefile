@@ -101,12 +101,42 @@ seed: ## Seed the database with initial data
 	$(PDM) run python scripts/seed.py
 
 .PHONY: init-db
-init-db: ## Create, Upgrade and Seed the database.
-	@echo "Initializing database (Create, Upgrade, Seed)..."
-	@echo "Step 1: Creating the database if it doesn't exist..."
-	@$(MAKE) create-db
-	@echo "Step 2: Upgrading the database to the latest version..."
-	@$(MAKE) upgrade
-	@echo "Step 3: Seeding the database with initial data..."
-	@$(MAKE) seed
-	@echo "Database initialization completed!"
+init-db: ## Initialize database with custom credentials (Create, Upgrade, Seed). Prompts user for DB_USER (default: postgres), DB_PASSWORD (default: secret), and DB_NAME (required).
+	@echo "Initializing database with custom parameters..."
+	@read -p "Enter database user (DB_USER) [postgres]: " DB_USER_IN; \
+	DB_USER=$${DB_USER_IN:-postgres}; \
+	\
+	echo "Enter database password (DB_PASSWORD) [secret] (input will be visible):"; \
+	read -r DB_PASSWORD_IN; \
+	DB_PASSWORD=$${DB_PASSWORD_IN:-secret}; \
+	\
+	read -p "Enter database name (DB_NAME) (required): " DB_NAME; \
+	\
+	if [ -z "$$DB_NAME" ]; then \
+		echo ""; \
+		echo "Error: Database name (DB_NAME) is required."; \
+		exit 1; \
+	fi; \
+	\
+	echo "Setting up database configuration with user: $$DB_USER, database: $$DB_NAME"; \
+	\
+	echo "Step 1: Creating .env file from .env.example with provided credentials..."; \
+	sed -e "s/DB_USER=.*/DB_USER=$$DB_USER/" \
+	    -e "s/DB_PASSWORD=.*/DB_PASSWORD=$$DB_PASSWORD/" \
+	    -e "s/DB_NAME=.*/DB_NAME=$$DB_NAME/" \
+	    .env.example > .env; \
+	\
+	echo "Step 2: Updating sqlalchemy.url in alembic.ini..."; \
+	sed -i.bak -e "s|sqlalchemy\.url =.*|sqlalchemy.url = postgresql://$$DB_USER:$$DB_PASSWORD@localhost/$$DB_NAME|" alembic.ini; \
+	rm alembic.ini.bak; \
+	\
+	echo "Step 3: Creating the database if it doesn't exist..."; \
+	$(MAKE) create-db; \
+	\
+	echo "Step 4: Upgrading the database to the latest version..."; \
+	$(MAKE) upgrade; \
+	\
+	echo "Step 5: Seeding the database with initial data..."; \
+	$(MAKE) seed; \
+	\
+	echo "Database initialization completed with custom configuration!"
