@@ -80,7 +80,7 @@ class AxiosClient {
           typeof crypto !== "undefined" && crypto.randomUUID
             ? crypto.randomUUID()
             : Math.random().toString(36).substring(2, 15) +
-            Math.random().toString(36).substring(2, 15);
+              Math.random().toString(36).substring(2, 15);
 
         return config;
       },
@@ -167,24 +167,27 @@ class AxiosClient {
       }
 
       // Call refresh endpoint with the same cookies from the original request
-      const res = await axios.post<StandardResponseToken>(
-        `${baseURL}/api/auth/refresh`,
-        {},
-        {
-          headers: {
-            cookie: cookieHeader,
+      let res;
+      try {
+        res = await axios.post<StandardResponseToken>(
+          `${baseURL}/api/auth/refresh`,
+          {},
+          {
+            headers: {
+              cookie: cookieHeader,
+            },
+            withCredentials: true,
           },
-          withCredentials: true,
-        },
-      );
+        );
+      } catch {}
 
-      const accessToken = res.data.payload?.token;
-      if (!res.data?.success || !accessToken) {
+      const accessToken = res?.data.payload?.token;
+      if (!res?.data?.success || !accessToken) {
         throw newAppError(
           AppErrorCode.AUTH_REFRESH_FAILED,
-          res.data.message || "Token refresh failed. Please log in again.",
+          res?.data.message || "Token refresh failed. Please log in again.",
           undefined,
-          res.data?.payload,
+          res?.data?.payload,
         );
       }
 
