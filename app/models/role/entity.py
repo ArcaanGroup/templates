@@ -20,9 +20,7 @@ class RoleEntity(Base):
     __tablename__ = "roles"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(
-        String(100), nullable=False
-    )  # Default field, change as needed
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

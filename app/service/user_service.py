@@ -1,5 +1,6 @@
+from typing import Optional
+
 from fastapi_pagination import Page, Params
-from typing_extensions import Optional
 
 from app.core.config import config
 from app.error.exceptions import ConflictException, ResourceNotFoundException

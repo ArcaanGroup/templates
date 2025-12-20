@@ -66,8 +66,9 @@ class UserMapper:
                     RoleMapper.from_entity(role_entity)
                     for role_entity in entity_user.roles
                 ]
+        # except (AttributeError, KeyError):
         except Exception:
-            # If there's any issue accessing roles (e.g., DetachedInstanceError, MissingGreenlet), return empty list
+            # If there's any issue accessing roles (e.g., relationship not loaded), return empty list
             roles_domain = []
 
         return UserDomain(

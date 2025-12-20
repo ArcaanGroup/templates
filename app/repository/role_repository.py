@@ -76,6 +76,9 @@ class RoleRepository(IRoleRepository):
         """Delete a role from the repository."""
         role_entity = await self.session.get(RoleEntity, role_id)
 
+        if not role_entity:
+            return None
+
         await self.session.delete(role_entity)
         await self.session.commit()
 

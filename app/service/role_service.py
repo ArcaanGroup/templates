@@ -54,7 +54,7 @@ class RoleService:
 
         # Create domain entity first to validate business rules
         domain_role = RoleDomain.create(
-            name=role_create.name,  # Default field, change as needed
+            name=role_create.name,
             permission_ids=final_permission_ids,
         )
 

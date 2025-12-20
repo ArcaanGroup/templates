@@ -21,7 +21,7 @@ class RoleMapper:
     def from_dto(dto: RoleCreate) -> RoleDomain:
         """Convert DTO Role to domain."""
         return RoleDomain.create(
-            name=dto.name,  # Default field, change as needed
+            name=dto.name,
             permission_ids=dto.permission_ids,
         )
 
@@ -30,7 +30,7 @@ class RoleMapper:
         """Convert domain Role to DTO."""
         return RoleDTO(
             id=domain_role.id,
-            name=domain_role.name,  # Default field, change as needed
+            name=domain_role.name,
             created_at=domain_role.created_at,
             updated_at=domain_role.updated_at,
             is_active=domain_role.is_active,
@@ -42,7 +42,7 @@ class RoleMapper:
         """Convert entity Role to domain."""
         return RoleDomain(
             id=entity_role.id,
-            name=entity_role.name,  # Default field, change as needed
+            name=entity_role.name,
             created_at=entity_role.created_at,
             updated_at=entity_role.updated_at,
             is_active=entity_role.is_active,
@@ -54,7 +54,7 @@ class RoleMapper:
         """Convert domain Role to entity."""
         entity = RoleEntity(
             id=domain_role.id,
-            name=domain_role.name,  # Default field, change as needed
+            name=domain_role.name,
             created_at=domain_role.created_at,
             updated_at=domain_role.updated_at,
             is_active=domain_role.is_active,

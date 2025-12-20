@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class RoleBase(BaseModel):
     """Base Role model with common fields."""
 
-    name: str  # Default field, change as needed
+    name: str
 
 
 class RoleCreate(RoleBase):
@@ -28,7 +28,7 @@ class Role(BaseModel):
     """Public Role model without sensitive data"""
 
     id: str
-    name: str  # Default field, change as needed
+    name: str
     created_at: datetime
     updated_at: datetime
     is_active: bool = True

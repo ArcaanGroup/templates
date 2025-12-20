@@ -15,7 +15,7 @@ class RoleDomain:
     """Domain entity for Role with business logic."""
 
     id: str
-    name: str  # Default field, change as needed
+    name: str
     created_at: datetime
     updated_at: datetime
     is_active: bool = True
@@ -24,7 +24,7 @@ class RoleDomain:
     @classmethod
     def create(
         cls,
-        name: str,  # Default field, change as needed
+        name: str,
         resource_id: Optional[str] = None,
         permission_ids: Optional[List[str]] = None,
     ) -> "RoleDomain":
@@ -37,7 +37,7 @@ class RoleDomain:
 
         return cls(
             id=resource_id,
-            name=name,  # Default field, change as needed
+            name=name,
             created_at=now,
             updated_at=now,
             is_active=True,
@@ -53,7 +53,7 @@ class RoleDomain:
         """Update Role information with validation."""
         if name is not None:
             self._validate_name(name)
-            self.name = name  # Default field, change as needed
+            self.name = name
 
         if is_active is not None:
             self.is_active = is_active
