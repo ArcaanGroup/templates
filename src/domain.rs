@@ -1,7 +1,7 @@
 pub mod entities;
-pub mod value_objects;
-pub mod services;
 pub mod events;
+pub mod services;
+pub mod value_objects;
 
 // Common domain types and traits
 use serde::{Deserialize, Serialize};

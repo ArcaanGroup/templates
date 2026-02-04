@@ -1,4 +1,4 @@
-use sqlx::{PgPool, postgres::PgPoolOptions};
+use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::time::Duration;
 
 pub async fn create_connection_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
