@@ -6,32 +6,31 @@ This is a template for a Rust web application following Clean Architecture and D
 
 ```
 src/
-├── application/          # Application layer: use cases, DTOs, ports
-│   ├── dtos/            # Data Transfer Objects
-│   ├── ports/           # Port interfaces
-│   ├── usecases/        # Use case implementations
-│   └── mod.rs           # Module declarations
-├── domain/              # Domain layer: entities, value objects, domain services
-│   ├── entities/        # Domain entities
-│   ├── events/          # Domain events
-│   ├── services/        # Domain services and repositories
-│   ├── value_objects/   # Value objects
-│   └── mod.rs           # Module declarations
-├── infrastructure/      # Infrastructure layer: database, config, repositories
-│   ├── config/          # Configuration management
-│   ├── database/        # Database connections and migrations
-│   ├── middleware/      # Middleware implementations
-│   ├── repositories/    # Repository implementations
-│   └── mod.rs           # Module declarations
-├── presentation/        # Presentation layer: web handlers, controllers
-│   ├── handlers/        # Request handlers
-│   ├── middleware/      # Web-specific middleware
-│   └── mod.rs           # Module declarations
-├── shared_kernel/       # Shared types and utilities
-│   ├── types/           # Common types
-│   ├── utils/           # Common utilities
-│   └── mod.rs           # Module declarations
-└── main.rs              # Application entry point
+├── application.rs       # Application layer: use cases, DTOs, ports
+├── domain.rs            # Domain layer: entities, value objects, domain services
+├── infrastructure.rs    # Infrastructure layer: database, config, repositories
+├── presentation.rs      # Presentation layer: web handlers, controllers
+├── shared_kernel.rs     # Shared types and utilities
+├── application/         # Application layer submodules
+│   ├── dtos.rs          # Data Transfer Objects
+│   ├── ports.rs         # Port interfaces
+│   └── usecases.rs      # Use case implementations
+├── domain/              # Domain layer submodules
+│   ├── entities.rs      # Domain entities
+│   ├── events.rs        # Domain events
+│   ├── services.rs      # Domain services and repositories
+│   └── value_objects.rs # Value objects
+├── infrastructure/      # Infrastructure layer submodules
+│   ├── config.rs        # Configuration management
+│   ├── database.rs      # Database connections and migrations
+│   ├── middleware.rs    # Middleware implementations
+│   └── repositories.rs  # Repository implementations
+├── presentation/        # Presentation layer submodules (handlers and middleware if any)
+├── shared_kernel/       # Shared types and utilities submodules
+│   ├── types.rs         # Common types
+│   └── utils.rs         # Common utilities
+├── main.rs              # Application entry point
+└── lib.rs               # Library exports for testing
 ```
 
 ## Architecture Principles
