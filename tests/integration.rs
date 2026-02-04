@@ -1,16 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use crate::{
-        application::{dtos::CreateUserRequest, usecases::CreateUserUsecase},
-        domain::value_objects::{Email, Password},
-        infrastructure::repositories::UserPostgresRepository,
-    };
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
+    use axum::http::StatusCode;
+    use clean::application::dtos::CreateUserRequest;
     use serde_json::json;
-    use tower::ServiceExt; // for `app.oneshot()`
 
     #[tokio::test]
     async fn test_health_endpoint() {

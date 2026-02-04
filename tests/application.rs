@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::application::{dtos::CreateUserRequest, usecases::CreateUserUsecase};
-    use crate::domain::{
-        value_objects::{Email, Password},
-        User,
-    };
     use async_trait::async_trait;
+    use clean::application::{dtos::CreateUserRequest, usecases::CreateUserUsecase};
+    use clean::domain::{
+        entities::User,
+        value_objects::{Email, Password},
+    };
     use std::collections::HashMap;
     use uuid::Uuid;
 
@@ -24,37 +24,37 @@ mod tests {
     }
 
     #[async_trait]
-    impl crate::domain::services::UserRepository for MockUserRepository {
-        async fn find_by_id(&self, id: Uuid) -> Result<User, crate::domain::DomainError> {
+    impl clean::domain::services::UserRepository for MockUserRepository {
+        async fn find_by_id(&self, id: Uuid) -> Result<User, clean::domain::DomainError> {
             let users = self.users.lock().await;
             users
                 .get(&id)
                 .cloned()
-                .ok_or_else(|| crate::domain::DomainError::NotFound {
+                .ok_or_else(|| clean::domain::DomainError::NotFound {
                     entity: "User".to_string(),
                     id,
                 })
         }
 
-        async fn find_by_email(&self, email: &str) -> Result<User, crate::domain::DomainError> {
+        async fn find_by_email(&self, email: &str) -> Result<User, clean::domain::DomainError> {
             let users = self.users.lock().await;
             users
                 .iter()
                 .find(|(_, user)| user.email.as_str() == email)
                 .map(|(_, user)| user.clone())
-                .ok_or_else(|| crate::domain::DomainError::NotFound {
+                .ok_or_else(|| clean::domain::DomainError::NotFound {
                     entity: "User".to_string(),
                     id: Uuid::nil(),
                 })
         }
 
-        async fn save(&self, user: User) -> Result<(), crate::domain::DomainError> {
+        async fn save(&self, user: User) -> Result<(), clean::domain::DomainError> {
             let mut users = self.users.lock().await;
             users.insert(user.id, user);
             Ok(())
         }
 
-        async fn delete(&self, id: Uuid) -> Result<(), crate::domain::DomainError> {
+        async fn delete(&self, id: Uuid) -> Result<(), clean::domain::DomainError> {
             let mut users = self.users.lock().await;
             users.remove(&id);
             Ok(())

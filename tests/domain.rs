@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::domain::{
+    use clean::domain::{
         entities::User,
         value_objects::{Email, Password},
     };
