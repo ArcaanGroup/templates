@@ -1,8 +1,10 @@
 use crate::application::usecases::CreateUserUsecase;
+use crate::infrastructure::middleware::logging_middleware;
 use crate::infrastructure::repositories::InMemoryUserRepository;
 use axum::{
     extract::State,
     http::StatusCode,
+    middleware,
     response::Json,
     routing::{get, post},
     Router,
@@ -17,6 +19,7 @@ pub fn create_app(user_usecase: Arc<CreateUserUsecase<InMemoryUserRepository>>) 
         .route("/users", post(create_user_handler))
         .route("/users/:id", get(get_user_handler))
         .with_state(user_usecase)
+        .layer(middleware::from_fn(logging_middleware))
 }
 
 async fn health_handler() -> Json<serde_json::Value> {

@@ -16,8 +16,11 @@ mod shared_kernel;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize tracing
-    tracing_subscriber::fmt::init();
+    // Initialize tracing with environment-based configuration
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO) // Default to INFO level
+        .with_target(false) // Simplify output by removing module targets
+        .init();
 
     // Load configuration
     let config = AppConfig::from_env()?;

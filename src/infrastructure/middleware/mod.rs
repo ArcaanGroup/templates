@@ -5,14 +5,14 @@ pub async fn logging_middleware(req: Request<Body>, next: Next) -> Result<Respon
     let method = req.method().clone();
     let uri = req.uri().clone();
 
-    info!("Started {} {}", method, uri);
+    info!("<--- {} {}", method, uri);
 
     let start = std::time::Instant::now();
     let response = next.run(req).await;
     let duration = start.elapsed();
 
     info!(
-        "Completed {} {} with status {} in {:?}",
+        "---> {} {} with status {} in {:?}",
         method,
         uri,
         response.status(),
