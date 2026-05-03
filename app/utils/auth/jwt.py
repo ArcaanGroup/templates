@@ -8,7 +8,7 @@ from typing import Optional
 from jose import JWTError, jwt
 
 from app.core.config import config
-from app.models.auth.dto import TokenPayload
+from app.models import TokenPayload
 
 # Export constants for backward compatibility
 ALGORITHM = config.algorithm

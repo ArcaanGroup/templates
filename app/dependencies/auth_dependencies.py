@@ -21,8 +21,7 @@ from app.error.exceptions import (
 from app.infrastructure.mappers import UserMapper
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.models.auth.dto import TokenData
-from app.models.user.dto import User
+from app.models import TokenData, User
 from app.use_cases.auth_use_cases import AuthUseCase
 from app.use_cases.policy_engine_use_cases import PolicyEngineUseCase
 from app.utils.auth.permission import Permission

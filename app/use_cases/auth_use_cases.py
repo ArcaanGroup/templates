@@ -8,7 +8,7 @@ from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.models.auth.dto import Token, UserLogin
+from app.models import Token, UserLogin
 from app.utils import verify_password
 from app.utils.auth import generate_access_token, generate_refresh_token
 

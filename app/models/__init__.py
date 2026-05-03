@@ -2,8 +2,28 @@
 Models package initialization.
 """
 
-# Import all model modules here to make them available at the package level
-from app.models import permission, policy, refresh_token, role, user
+from .auth_dto import Token, TokenData, TokenPayload, UserLogin
+from .permission_dto import Permission
+from .policy_dto import Policy
+from .refresh_token_dto import RefreshToken, RefreshTokenCreate
+from .role_dto import Role, RoleBase, RoleCreate, RoleUpdate
+from .user_dto import User, UserBase, UserCreate, UserUpdate
 
-# Define what gets imported with "from app.models import *"
-__all__ = ["user", "role", "refresh_token", "permission", "policy"]
+__all__ = [
+    "Token",
+    "TokenData",
+    "UserLogin",
+    "TokenPayload",
+    "Permission",
+    "Policy",
+    "RefreshToken",
+    "RefreshTokenCreate",
+    "Role",
+    "RoleBase",
+    "RoleCreate",
+    "RoleUpdate",
+    "User",
+    "UserBase",
+    "UserCreate",
+    "UserUpdate",
+]

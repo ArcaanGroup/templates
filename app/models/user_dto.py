@@ -53,4 +53,4 @@ class UserWithPassword(User):
 
 
 # Add the Role import at the end to handle circular imports
-from app.models.role.dto import Role  # noqa: E402
+from app.models import Role  # noqa: E402

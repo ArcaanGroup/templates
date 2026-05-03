@@ -328,8 +328,8 @@ No Direct conversions from Entity to DTO or DTO to Entity
 """
 
 from app.domain.entities import {resource_pascal}Entity
-from app.models.{resource_snake}.dto import {resource_pascal} as {resource_pascal}DTO
-from app.models.{resource_snake}.dto import {resource_pascal}Create, {resource_pascal}Update
+from app.models import {resource_pascal} as {resource_pascal}DTO
+from app.models import {resource_pascal}Create, {resource_pascal}Update
 from app.infrastructure.orm import {resource_pascal}Entity
 
 
@@ -562,7 +562,7 @@ def create_service(resource_snake, resource_pascal, service_dir):
 
 from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
-from app.models.{resource_snake}.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
+from app.models import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from app.infrastructure.mappers  import {resource_pascal}Mapper
 
 
@@ -691,7 +691,7 @@ from fastapi_pagination import Page, Params
 
 from app.dependencies.{resource_snake}_dependencies import get_{resource_snake}_service
 from app.models.responses import StandardResponse, success
-from app.models.{resource_snake}.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
+from app.models import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from app.service.{resource_snake}_service import {resource_pascal}Service
 
 # Create router with prefix and tags

@@ -9,7 +9,7 @@ from app.interface.repositories.permission_repository_interface import (
     IPermissionRepository,
 )
 from app.interface.repositories.role_repository_interface import IRoleRepository
-from app.models.role.dto import Role, RoleCreate, RoleUpdate
+from app.models import Role, RoleCreate, RoleUpdate
 
 
 class RoleUseCase:

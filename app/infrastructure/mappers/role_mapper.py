@@ -10,8 +10,8 @@ from datetime import datetime
 
 from app.domain.entities import RoleEntity
 from app.infrastructure.orm import RoleORM
-from app.models.role.dto import Role as RoleDTO
-from app.models.role.dto import RoleCreate, RoleUpdate
+from app.models import Role as RoleDTO
+from app.models import RoleCreate, RoleUpdate
 
 
 class RoleMapper:

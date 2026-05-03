@@ -7,7 +7,7 @@ No Direct conversions from Entity to DTO or DTO to Entity (no entities needed fo
 """
 
 from app.domain.entities import PermissionEntity
-from app.models.permission.dto import Permission as PermissionDTO
+from app.models import Permission as PermissionDTO
 
 
 class PermissionMapper:

@@ -3,8 +3,8 @@ from fastapi_pagination import Page, Params
 
 from app.dependencies.auth_dependencies import get_authorized_user
 from app.dependencies.role_dependencies import get_role_service
+from app.models import Role, RoleCreate, RoleUpdate
 from app.models.responses import StandardResponse, success
-from app.models.role.dto import Role, RoleCreate, RoleUpdate
 from app.use_cases.role_use_cases import RoleUseCase
 from app.utils.auth.permission import Permission
 

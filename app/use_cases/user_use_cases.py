@@ -6,7 +6,7 @@ from app.error.exceptions import ConflictException, ResourceNotFoundException
 from app.infrastructure.mappers import UserMapper
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.models.user.dto import User, UserCreate, UserUpdate
+from app.models import User, UserCreate, UserUpdate
 
 
 class UserUseCase:
