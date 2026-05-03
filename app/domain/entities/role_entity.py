@@ -11,7 +11,7 @@ from app.error.exceptions import ValidationException
 
 
 @dataclass
-class RoleDomain:
+class RoleEntity:
     """Domain entity for Role with business logic."""
 
     id: str
@@ -27,8 +27,8 @@ class RoleDomain:
         name: str,
         resource_id: Optional[str] = None,
         permission_ids: Optional[List[str]] = None,
-    ) -> "RoleDomain":
-        """Create a new RoleDomain entity with validation."""
+    ) -> "RoleEntity":
+        """Create a new RoleEntity entity with validation."""
         # Validate inputs
         cls._validate_name(name)
 

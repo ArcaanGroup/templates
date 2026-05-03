@@ -20,7 +20,7 @@ from app.error.exceptions import (
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import TokenData
-from app.models.role.domain import RoleDomain
+from app.domain.entities import RoleEntity
 from app.models.user.dto import User
 from app.models.user.mapper import UserMapper
 from app.use_cases.auth_use_cases import AuthUseCase
@@ -92,7 +92,7 @@ async def authorize(
         role_repository: Role repository for database access
 
     Returns:
-        UserDomain object if token is valid and user has required permissions, raises HTTPException otherwise
+        UserEntity object if token is valid and user has required permissions, raises HTTPException otherwise
     """
     # Authentication --------------------
     if not access_token.credentials:
@@ -124,7 +124,7 @@ async def authorize(
         user_role_ids = [role.id for role in user_dto.roles] if user_dto.roles else []
 
         # Fetch all user roles with their permission_ids
-        user_roles: list[RoleDomain] = []
+        user_roles: list[RoleEntity] = []
         for role_id in user_role_ids:
             role = await role_repository.get_by_id(role_id)
             if role:

@@ -1,14 +1,14 @@
 """
-Role Mapper - handles conversion between RoleEntity, RoleDomain, and Role DTO
-The Domain is the core of conversions
-The Domain gets converted from DTO and Entity
-And DTO and Entity gets converted from Domain
+Role Mapper - handles conversion between RoleEntity, RoleEntity, and Role DTO
+The Entity is the core of conversions
+The Entity gets converted from DTO and Entity
+And DTO and Entity gets converted from Entity
 No Direct conversions from Entity to DTO or DTO to Entity
 """
 
 from datetime import datetime
 
-from app.models.role.domain import RoleDomain
+from app.domain.entities import RoleEntity
 from app.models.role.dto import Role as RoleDTO
 from app.models.role.dto import RoleCreate, RoleUpdate
 from app.models.role.entity import RoleEntity
@@ -18,15 +18,15 @@ class RoleMapper:
     """Mapper class to handle conversions between Role representations."""
 
     @staticmethod
-    def from_dto(dto: RoleCreate) -> RoleDomain:
+    def from_dto(dto: RoleCreate) -> RoleEntity:
         """Convert DTO Role to domain."""
-        return RoleDomain.create(
+        return RoleEntity.create(
             name=dto.name,
             permission_ids=dto.permission_ids,
         )
 
     @staticmethod
-    def to_dto(domain_role: RoleDomain) -> RoleDTO:
+    def to_dto(domain_role: RoleEntity) -> RoleDTO:
         """Convert domain Role to DTO."""
         return RoleDTO(
             id=domain_role.id,
@@ -38,9 +38,9 @@ class RoleMapper:
         )
 
     @staticmethod
-    def from_entity(entity_role: RoleEntity) -> RoleDomain:
+    def from_entity(entity_role: RoleEntity) -> RoleEntity:
         """Convert entity Role to domain."""
-        return RoleDomain(
+        return RoleEntity(
             id=entity_role.id,
             name=entity_role.name,
             created_at=entity_role.created_at,
@@ -50,7 +50,7 @@ class RoleMapper:
         )
 
     @staticmethod
-    def to_entity(domain_role: RoleDomain) -> RoleEntity:
+    def to_entity(domain_role: RoleEntity) -> RoleEntity:
         """Convert domain Role to entity."""
         entity = RoleEntity(
             id=domain_role.id,
@@ -65,8 +65,8 @@ class RoleMapper:
         return entity
 
     @staticmethod
-    def update_from_dto(role_update: RoleUpdate, role_domain: RoleDomain) -> RoleDomain:
-        """Apply RoleUpdate DTO to an existing RoleDomain and return updated domain entity."""
+    def update_from_dto(role_update: RoleUpdate, role_domain: RoleEntity) -> RoleEntity:
+        """Apply RoleUpdate DTO to an existing RoleEntity and return updated domain entity."""
         update_data = {
             k: v for k, v in role_update.model_dump().items() if v is not None
         }
@@ -87,7 +87,7 @@ class RoleMapper:
         return role_domain
 
     @staticmethod
-    def update_entity(target: RoleEntity, source: RoleDomain):
+    def update_entity(target: RoleEntity, source: RoleEntity):
         """Apply updated domain Role fields to the entity Role."""
         target.name = source.name
         target.is_active = source.is_active

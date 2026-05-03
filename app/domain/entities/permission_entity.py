@@ -9,7 +9,7 @@ from uuid import uuid4
 
 
 @dataclass
-class PermissionDomain:
+class PermissionEntity:
     """Domain entity for Permission with business logic."""
 
     id: str
@@ -24,8 +24,8 @@ class PermissionDomain:
         title: str,
         description: str,
         permission_id: Optional[str] = None,
-    ) -> "PermissionDomain":
-        """Create a new PermissionDomain entity."""
+    ) -> "PermissionEntity":
+        """Create a new PermissionEntity entity."""
         permission_id = permission_id or str(uuid4())
         now = datetime.utcnow()
 

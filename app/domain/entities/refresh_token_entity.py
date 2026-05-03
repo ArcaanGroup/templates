@@ -2,8 +2,8 @@ import secrets
 from datetime import datetime
 
 
-class RefreshTokenDomain:
-    """Domain model for refresh tokens with business logic."""
+class RefreshTokenEntity:
+    """Domain entity for refresh tokens with business logic."""
 
     def __init__(
         self,
@@ -31,7 +31,7 @@ class RefreshTokenDomain:
     @classmethod
     def create(
         cls, user_id: str, expires_at: datetime, id: str | None = None
-    ) -> "RefreshTokenDomain":
+    ) -> "RefreshTokenEntity":
         """Create a new refresh token domain entity."""
         import uuid
 

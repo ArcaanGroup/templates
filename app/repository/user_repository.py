@@ -17,7 +17,7 @@ from app.models.role import (
     UserRolesAssociation,
 )
 from app.models.role.entity import RoleEntity
-from app.models.user.domain import UserDomain
+from app.domain.entities import UserEntity
 from app.models.user.entity import UserEntity
 from app.models.user.mapper import UserMapper
 
@@ -28,7 +28,7 @@ class UserRepository(IUserRepository):
     def __init__(self, db_session: AsyncSession):
         self.session = db_session
 
-    async def create(self, user_to_create: UserDomain) -> UserDomain:
+    async def create(self, user_to_create: UserEntity) -> UserEntity:
         """Create a new user in the repository."""
         # Convert domain entity to database entity for persistence
         user_entity = UserMapper.to_entity(user_to_create)
@@ -48,7 +48,7 @@ class UserRepository(IUserRepository):
         # Convert back to domain entity for return
         return UserMapper.from_entity(refreshed_user_entity)
 
-    async def get_by_id(self, user_id: str) -> Optional[UserDomain]:
+    async def get_by_id(self, user_id: str) -> Optional[UserEntity]:
         """Get a user by ID from the repository."""
         result = await self.session.execute(
             select(UserEntity)
@@ -62,12 +62,12 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(user_in_db)
 
-    async def get_all(self, params: Params) -> Page[UserDomain]:
+    async def get_all(self, params: Params) -> Page[UserEntity]:
         """Get all users from the repository."""
         query = select(UserEntity).options(selectinload(UserEntity.roles))
         users_page: Page[UserEntity] = await paginate(self.session, query, params)
 
-        user_domains: List[UserDomain] = []
+        user_domains: List[UserEntity] = []
         for user in users_page.items:
             domain = UserMapper.from_entity(user)
             user_domains.append(domain)
@@ -76,7 +76,7 @@ class UserRepository(IUserRepository):
 
         return users_page  # pyright: ignore[reportReturnType]
 
-    async def update(self, source: UserDomain) -> Optional[UserDomain]:
+    async def update(self, source: UserEntity) -> Optional[UserEntity]:
         """Update a user in the repository."""
         user_entity = await self.session.get(UserEntity, source.id)
 
@@ -90,7 +90,7 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(user_entity)
 
-    async def delete(self, user_id: str) -> UserDomain:
+    async def delete(self, user_id: str) -> UserEntity:
         """Delete a user from the repository."""
         # Get the user to check if it exists
         result = await self.session.execute(
@@ -109,7 +109,7 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(target)
 
-    async def get_by_email(self, email: str) -> Optional[UserDomain]:
+    async def get_by_email(self, email: str) -> Optional[UserEntity]:
         """Get a user by email from the repository."""
         result = await self.session.execute(
             select(UserEntity)
@@ -123,7 +123,7 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(target)
 
-    async def get_by_username(self, username: str) -> Optional[UserDomain]:
+    async def get_by_username(self, username: str) -> Optional[UserEntity]:
         """Get a user by username from the repository."""
         result = await self.session.execute(
             select(UserEntity)
@@ -137,7 +137,7 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(target)
 
-    async def assign_role(self, user_id: str, role_id: str) -> UserDomain:
+    async def assign_role(self, user_id: str, role_id: str) -> UserEntity:
         """Assign a role to a user."""
 
         result_user = await self.session.execute(
@@ -177,7 +177,7 @@ class UserRepository(IUserRepository):
 
         return UserMapper.from_entity(target_user)
 
-    async def remove_role(self, user_id: str, role_id: str) -> UserDomain:
+    async def remove_role(self, user_id: str, role_id: str) -> UserEntity:
         """Remove a role from a user."""
 
         result = await self.session.execute(

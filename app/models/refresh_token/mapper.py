@@ -1,12 +1,12 @@
 """
 Mapper for converting between RefreshToken domain, DTO, and entity models.
-The Domain is the core of conversions
-The Domain gets converted from DTO and Entity
-And DTO and Entity gets converted from Domain
+The Entity is the core of conversions
+The Entity gets converted from DTO and Entity
+And DTO and Entity gets converted from Entity
 No Direct conversions from Entity to DTO or DTO to Entity
 """
 
-from app.models.refresh_token.domain import RefreshTokenDomain
+from app.domain.entities import RefreshTokenEntity
 from app.models.refresh_token.dto import RefreshToken, RefreshTokenCreate
 from app.models.refresh_token.entity import RefreshTokenEntity
 
@@ -15,7 +15,7 @@ class RefreshTokenMapper:
     """Mapper for converting between RefreshToken domain, DTO, and entity models."""
 
     @staticmethod
-    def to_dto(refresh_token_domain: RefreshTokenDomain) -> RefreshToken:
+    def to_dto(refresh_token_domain: RefreshTokenEntity) -> RefreshToken:
         """Convert SQLAlchemy entity to DTO."""
         return RefreshToken(
             id=refresh_token_domain.id,
@@ -29,7 +29,7 @@ class RefreshTokenMapper:
 
     @staticmethod
     def to_create_dto(
-        refresh_token_domain: RefreshTokenDomain,
+        refresh_token_domain: RefreshTokenEntity,
     ) -> RefreshTokenCreate:
         """Convert RefreshToken domain model to DTO."""
         return RefreshTokenCreate(
@@ -40,9 +40,9 @@ class RefreshTokenMapper:
     @staticmethod
     def from_entity(
         refresh_token_entity: RefreshTokenEntity,
-    ) -> RefreshTokenDomain:
+    ) -> RefreshTokenEntity:
         """Convert SQLAlchemy entity to RefreshToken domain model."""
-        return RefreshTokenDomain(
+        return RefreshTokenEntity(
             id=refresh_token_entity.id,
             token=refresh_token_entity.token,
             user_id=refresh_token_entity.user_id,
@@ -54,7 +54,7 @@ class RefreshTokenMapper:
 
     @staticmethod
     def to_entity(
-        refresh_token_domain: RefreshTokenDomain,
+        refresh_token_domain: RefreshTokenEntity,
     ) -> RefreshTokenEntity:
         """Convert RefreshToken domain model to SQLAlchemy entity."""
         # Create the entity

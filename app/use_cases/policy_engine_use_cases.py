@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from app.error.exceptions import UnauthorizedException
 from app.interface.repositories.policy_repository_interface import IPolicyRepository
-from app.models.policy.domain import PolicyDomain
+from app.domain.entities import PolicyEntity
 
 
 class PolicyEngineUseCase:
@@ -20,7 +20,7 @@ class PolicyEngineUseCase:
             return
 
         invalid_policy_ids = []
-        policies: List[PolicyDomain] = []
+        policies: List[PolicyEntity] = []
 
         for policy_id in policy_ids:
             policy = await self.policy_repository.get_by_id(policy_id)
@@ -40,7 +40,7 @@ class PolicyEngineUseCase:
 
     async def _evaluate_policy(
         self,
-        policy: PolicyDomain,
+        policy: PolicyEntity,
         context: Optional[dict] = None,
     ) -> None:
         # Extend this method to implement custom policy evaluation logic.

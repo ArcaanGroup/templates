@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to create all necessary files for a new resource following the CSR architecture with Domain-Driven Design.
+Script to create all necessary files for a new resource following the CSR architecture with Entity-Driven Design.
 Creates model (domain, entity, dto, mapper), service, repository, interface, and controller files.
 """
 
@@ -154,18 +154,18 @@ def create_model_files(resource_snake, resource_pascal, model_dir):
     """Create all model files for the resource."""
 
     # Create __init__.py
-    init_content = f'''from .domain import {resource_pascal}Domain
+    init_content = f'''from .domain import {resource_pascal}Entity
 from .dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from .entity import {resource_pascal}Entity
 
-__all__ = ["{resource_pascal}", "{resource_pascal}Create", "{resource_pascal}Update", "{resource_pascal}Domain", "{resource_pascal}Entity"]
+__all__ = ["{resource_pascal}", "{resource_pascal}Create", "{resource_pascal}Update", "{resource_pascal}Entity", "{resource_pascal}Entity"]
 '''
     with open(model_dir / "__init__.py", "w") as f:
         f.write(init_content)
 
     # Create domain.py
     domain_content = f'''"""
-Domain Entity for {resource_pascal} - contains business logic and behavior
+Entity Entity for {resource_pascal} - contains business logic and behavior
 """
 
 from dataclasses import dataclass
@@ -177,8 +177,8 @@ from app.error.exceptions import ValidationException
 
 
 @dataclass
-class {resource_pascal}Domain:
-    """Domain entity for {resource_pascal} with business logic."""
+class {resource_pascal}Entity:
+    """Entity entity for {resource_pascal} with business logic."""
 
     id: str
     name: str  # Default field, change as needed
@@ -191,8 +191,8 @@ class {resource_pascal}Domain:
         cls,
         name: str,  # Default field, change as needed
         resource_id: Optional[str] = None,
-    ) -> "{resource_pascal}Domain":
-        """Create a new {resource_pascal}Domain entity with validation."""
+    ) -> "{resource_pascal}Entity":
+        """Create a new {resource_pascal}Entity entity with validation."""
         # Validate inputs
         cls._validate_name(name)
 
@@ -320,14 +320,14 @@ class {resource_pascal}(BaseModel):
 
     # Create mapper.py
     mapper_content = f'''"""
-{resource_pascal} Mapper - handles conversion between {resource_pascal}Entity, {resource_pascal}Domain, and {resource_pascal} DTO
-The Domain is the core of conversions
-The Domain gets converted from DTO and Entity
-And DTO and Entity gets converted from Domain
+{resource_pascal} Mapper - handles conversion between {resource_pascal}Entity, {resource_pascal}Entity, and {resource_pascal} DTO
+The Entity is the core of conversions
+The Entity gets converted from DTO and Entity
+And DTO and Entity gets converted from Entity
 No Direct conversions from Entity to DTO or DTO to Entity
 """
 
-from app.models.{resource_snake}.domain import {resource_pascal}Domain
+from app.domain.entities import {resource_pascal}Entity
 from app.models.{resource_snake}.dto import {resource_pascal} as {resource_pascal}DTO
 from app.models.{resource_snake}.dto import {resource_pascal}Create, {resource_pascal}Update
 from app.models.{resource_snake}.entity import {resource_pascal}Entity
@@ -337,14 +337,14 @@ class {resource_pascal}Mapper:
     """Mapper class to handle conversions between {resource_pascal} representations."""
 
     @staticmethod
-    def from_dto(dto: {resource_pascal}Create) -> {resource_pascal}Domain:
+    def from_dto(dto: {resource_pascal}Create) -> {resource_pascal}Entity:
         """Convert DTO {resource_pascal} to domain."""
-        return {resource_pascal}Domain.create(
+        return {resource_pascal}Entity.create(
             name=dto.name,  # Default field, change as needed
         )
 
     @staticmethod
-    def to_dto(domain_{resource_snake}: {resource_pascal}Domain) -> {resource_pascal}DTO:
+    def to_dto(domain_{resource_snake}: {resource_pascal}Entity) -> {resource_pascal}DTO:
         """Convert domain {resource_pascal} to DTO."""
         return {resource_pascal}DTO(
             id=domain_{resource_snake}.id,
@@ -355,9 +355,9 @@ class {resource_pascal}Mapper:
         )
 
     @staticmethod
-    def from_entity(entity_{resource_snake}: {resource_pascal}Entity) -> {resource_pascal}Domain:
+    def from_entity(entity_{resource_snake}: {resource_pascal}Entity) -> {resource_pascal}Entity:
         """Convert entity {resource_pascal} to domain."""
-        return {resource_pascal}Domain(
+        return {resource_pascal}Entity(
             id=entity_{resource_snake}.id,
             name=entity_{resource_snake}.name,  # Default field, change as needed
             created_at=entity_{resource_snake}.created_at,
@@ -366,7 +366,7 @@ class {resource_pascal}Mapper:
         )
 
     @staticmethod
-    def to_entity(domain_{resource_snake}: {resource_pascal}Domain) -> {resource_pascal}Entity:
+    def to_entity(domain_{resource_snake}: {resource_pascal}Entity) -> {resource_pascal}Entity:
         """Convert domain {resource_pascal} to entity."""
         entity = {resource_pascal}Entity(
             id=domain_{resource_snake}.id,
@@ -378,8 +378,8 @@ class {resource_pascal}Mapper:
         return entity
 
     @staticmethod
-    def update_from_dto({resource_snake}_update: {resource_pascal}Update, domain_{resource_snake}: {resource_pascal}Domain) -> {resource_pascal}Domain:
-        """Apply {resource_pascal}Update DTO to an existing {resource_pascal}Domain and return updated domain entity."""
+    def update_from_dto({resource_snake}_update: {resource_pascal}Update, domain_{resource_snake}: {resource_pascal}Entity) -> {resource_pascal}Entity:
+        """Apply {resource_pascal}Update DTO to an existing {resource_pascal}Entity and return updated domain entity."""
         # Update only the fields that are provided in the update DTO
         update_data = {{
             k: v for k, v in {resource_snake}_update.model_dump().items() if v is not None
@@ -394,7 +394,7 @@ class {resource_pascal}Mapper:
         return domain_{resource_snake}
 
     @staticmethod
-    def update_entity(entity: {resource_pascal}Entity, domain: {resource_pascal}Domain):
+    def update_entity(entity: {resource_pascal}Entity, domain: {resource_pascal}Entity):
         entity.name = domain.name  # Default field, change as needed
         entity.is_active = domain.is_active
         entity.updated_at = domain.updated_at
@@ -416,34 +416,34 @@ from typing import Optional
 
 from fastapi_pagination import Page, Params
 
-from app.models.{resource_snake}.domain import {resource_pascal}Domain
+from app.domain.entities import {resource_pascal}Entity
 
 
 class I{resource_pascal}Repository(ABC):
     """Interface for {resource_snake} repository operations."""
 
     @abstractmethod
-    async def get_by_id(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Domain]:
+    async def get_by_id(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Entity]:
         """Get a {resource_snake} by ID from the repository."""
         pass
 
     @abstractmethod
-    async def get_all(self, params: Params) -> Page[{resource_pascal}Domain]:
+    async def get_all(self, params: Params) -> Page[{resource_pascal}Entity]:
         """Get all {resource_snake}s from the repository."""
         pass
 
     @abstractmethod
-    async def create(self, {resource_snake}_to_create: {resource_pascal}Domain) -> {resource_pascal}Domain:
+    async def create(self, {resource_snake}_to_create: {resource_pascal}Entity) -> {resource_pascal}Entity:
         """Create a new {resource_snake} in the repository."""
         pass
 
     @abstractmethod
-    async def update(self, source: {resource_pascal}Domain) -> Optional[{resource_pascal}Domain]:
+    async def update(self, source: {resource_pascal}Entity) -> Optional[{resource_pascal}Entity]:
         """Update a {resource_snake} in the repository."""
         pass
 
     @abstractmethod
-    async def delete(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Domain]:
+    async def delete(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Entity]:
         """Delete a {resource_snake} from the repository."""
         pass
 '''
@@ -467,7 +467,7 @@ from sqlalchemy.future import select
 
 from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
-from app.models.{resource_snake}.domain import {resource_pascal}Domain
+from app.domain.entities import {resource_pascal}Entity
 from app.models.{resource_snake}.entity import {resource_pascal}Entity
 from app.models.{resource_snake}.mapper import {resource_pascal}Mapper
 
@@ -478,7 +478,7 @@ class {resource_pascal}Repository(I{resource_pascal}Repository):
     def __init__(self, db_session: AsyncSession):
         self.session = db_session
 
-    async def create(self, {resource_snake}_to_create: {resource_pascal}Domain) -> {resource_pascal}Domain:
+    async def create(self, {resource_snake}_to_create: {resource_pascal}Entity) -> {resource_pascal}Entity:
         """Create a new {resource_snake} in the repository."""
         # Convert domain entity to database entity for persistence
         {resource_snake}_entity = {resource_pascal}Mapper.to_entity({resource_snake}_to_create)
@@ -492,7 +492,7 @@ class {resource_pascal}Repository(I{resource_pascal}Repository):
         # Convert back to domain entity for return
         return {resource_pascal}Mapper.from_entity({resource_snake}_entity)
 
-    async def get_by_id(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Domain]:
+    async def get_by_id(self, {resource_snake}_id: str) -> Optional[{resource_pascal}Entity]:
         """Get a {resource_snake} by ID from the repository."""
         result = await self.session.execute(
             select({resource_pascal}Entity).where({resource_pascal}Entity.id == {resource_snake}_id)
@@ -504,12 +504,12 @@ class {resource_pascal}Repository(I{resource_pascal}Repository):
 
         return {resource_pascal}Mapper.from_entity({resource_snake}_in_db)
 
-    async def get_all(self, params: Params) -> Page[{resource_pascal}Domain]:
+    async def get_all(self, params: Params) -> Page[{resource_pascal}Entity]:
         """Get all {resource_snake}s from the repository."""
         query = select({resource_pascal}Entity)
         {resource_snake}s_page: Page[{resource_pascal}Entity] = await paginate(self.session, query, params)
 
-        {resource_snake}_domains: List[{resource_pascal}Domain] = []
+        {resource_snake}_domains: List[{resource_pascal}Entity] = []
         for {resource_snake} in {resource_snake}s_page.items:
             domain = {resource_pascal}Mapper.from_entity({resource_snake})
             {resource_snake}_domains.append(domain)
@@ -518,7 +518,7 @@ class {resource_pascal}Repository(I{resource_pascal}Repository):
 
         return {resource_snake}s_page  # pyright: ignore[reportReturnType]
 
-    async def update(self, source: {resource_pascal}Domain) -> Optional[{resource_pascal}Domain]:
+    async def update(self, source: {resource_pascal}Entity) -> Optional[{resource_pascal}Entity]:
         """Update a {resource_snake} in the repository."""
         {resource_snake}_entity = await self.session.get({resource_pascal}Entity, source.id)
 
@@ -532,7 +532,7 @@ class {resource_pascal}Repository(I{resource_pascal}Repository):
 
         return {resource_pascal}Mapper.from_entity({resource_snake}_entity)
 
-    async def delete(self, {resource_snake}_id: str) -> {resource_pascal}Domain:
+    async def delete(self, {resource_snake}_id: str) -> {resource_pascal}Entity:
         """Delete a {resource_snake} from the repository."""
         # Get the {resource_snake} to check if it exists
         result = await self.session.execute(

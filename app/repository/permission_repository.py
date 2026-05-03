@@ -10,7 +10,7 @@ from app.core.config import config
 from app.interface.repositories.permission_repository_interface import (
     IPermissionRepository,
 )
-from app.models.permission.domain import PermissionDomain
+from app.domain.entities import PermissionEntity
 
 
 class JSONPermissionRepository(IPermissionRepository):
@@ -19,7 +19,7 @@ class JSONPermissionRepository(IPermissionRepository):
     def __init__(self):
         self.permissions_path = config.permissions_path
 
-    async def get_by_id(self, permission_id: str) -> Optional[PermissionDomain]:
+    async def get_by_id(self, permission_id: str) -> Optional[PermissionEntity]:
         """Get a permission by ID from the JSON file."""
         permissions = await self._load_permissions()
         for perm_data in permissions:
@@ -27,7 +27,7 @@ class JSONPermissionRepository(IPermissionRepository):
                 return self._create_permission_domain(perm_data)
         return None
 
-    async def get_by_title(self, title: str) -> Optional[PermissionDomain]:
+    async def get_by_title(self, title: str) -> Optional[PermissionEntity]:
         """Get a permission by title from the JSON file."""
         permissions = await self._load_permissions()
         for perm_data in permissions:
@@ -35,12 +35,12 @@ class JSONPermissionRepository(IPermissionRepository):
                 return self._create_permission_domain(perm_data)
         return None
 
-    async def get_all(self) -> List[PermissionDomain]:
+    async def get_all(self) -> List[PermissionEntity]:
         """Get all permissions from the JSON file."""
         permissions = await self._load_permissions()
         return [self._create_permission_domain(perm_data) for perm_data in permissions]
 
-    async def search_by_title(self, title_query: str) -> List[PermissionDomain]:
+    async def search_by_title(self, title_query: str) -> List[PermissionEntity]:
         """Search permissions by title from the JSON file."""
         permissions = await self._load_permissions()
         matching_perms = [
@@ -62,8 +62,8 @@ class JSONPermissionRepository(IPermissionRepository):
         except json.JSONDecodeError:
             return []
 
-    def _create_permission_domain(self, perm_data: dict) -> PermissionDomain:
-        """Create a PermissionDomain from JSON data."""
+    def _create_permission_domain(self, perm_data: dict) -> PermissionEntity:
+        """Create a PermissionEntity from JSON data."""
         from datetime import datetime
 
         # Parse datetime strings
@@ -74,7 +74,7 @@ class JSONPermissionRepository(IPermissionRepository):
             perm_data["updated_at"].replace("Z", "+00:00")
         )
 
-        return PermissionDomain(
+        return PermissionEntity(
             id=perm_data["id"],
             title=perm_data["title"],
             description=perm_data["description"],

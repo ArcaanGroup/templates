@@ -11,7 +11,7 @@ from sqlalchemy.future import select
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
-from app.models.refresh_token.domain import RefreshTokenDomain
+from app.domain.entities import RefreshTokenEntity
 from app.models.refresh_token.dto import RefreshTokenCreate
 from app.models.refresh_token.entity import RefreshTokenEntity
 from app.models.refresh_token.mapper import RefreshTokenMapper
@@ -24,8 +24,8 @@ class RefreshTokenRepository(IRefreshTokenRepository):
         self.session = db_session
 
     async def create_refresh_token(
-        self, refresh_token_to_create: RefreshTokenDomain
-    ) -> RefreshTokenDomain:
+        self, refresh_token_to_create: RefreshTokenEntity
+    ) -> RefreshTokenEntity:
         """Create a new refresh token in the repository."""
 
         # Create SQLAlchemy RefreshToken object from domain entity
@@ -40,7 +40,7 @@ class RefreshTokenRepository(IRefreshTokenRepository):
 
     async def get_refresh_token_by_token(
         self, token: str
-    ) -> Optional[RefreshTokenDomain]:
+    ) -> Optional[RefreshTokenEntity]:
         """Get a refresh token by its token value from the repository."""
         result = await self.session.execute(
             select(RefreshTokenEntity).where(

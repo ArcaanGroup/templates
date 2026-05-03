@@ -11,11 +11,11 @@ from app.error.exceptions import ValidationException
 from app.utils import hash_password
 
 if TYPE_CHECKING:
-    from app.models.role.domain import RoleDomain
+    from app.domain.entities import RoleEntity
 
 
 @dataclass
-class UserDomain:
+class UserEntity:
     """Domain entity for User with business logic."""
 
     id: str
@@ -27,7 +27,7 @@ class UserDomain:
     created_at: datetime
     updated_at: datetime
     is_active: bool
-    roles: Optional[List["RoleDomain"]] = None
+    roles: Optional[List["RoleEntity"]] = None
 
     @classmethod
     def create(
@@ -38,9 +38,9 @@ class UserDomain:
         username: str,
         password: str,
         user_id: Optional[str] = None,
-        roles: Optional[List["RoleDomain"]] = None,
-    ) -> "UserDomain":
-        """Create a new UserDomain entity with validation."""
+        roles: Optional[List["RoleEntity"]] = None,
+    ) -> "UserEntity":
+        """Create a new UserEntity entity with validation."""
         # Validate inputs
         cls._validate_email(email)
         cls._validate_username(username)

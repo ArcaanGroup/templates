@@ -11,6 +11,9 @@ import os
 import sys
 from typing import List
 
+from app.use_cases.permission_use_cases import PermissionUseCase
+from app.use_cases.role_use_cases import RoleUseCase
+
 # Add the project root to the path
 sys.path.insert(0, os.path.abspath("."))
 
@@ -19,14 +22,11 @@ from fastapi_pagination import Params
 from app.core.database import get_db_session
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.models.role.domain import RoleDomain
-from app.models.user.domain import UserDomain
+from app.domain.entities import RoleEntity
+from app.domain.entities import UserEntity
 from app.repository.permission_repository import JSONPermissionRepository
 from app.repository.role_repository import RoleRepository
 from app.repository.user_repository import UserRepository
-from app.service.permission_service import PermissionService
-from app.service.role_service import RoleService
-
 
 async def create_roles(role_repository: IRoleRepository):
     """Create initial roles in the database."""
@@ -34,7 +34,7 @@ async def create_roles(role_repository: IRoleRepository):
 
     roles_data = [{"name": "Admin"}]
 
-    roles: List[RoleDomain] = []
+    roles: List[RoleEntity] = []
     for role_data in roles_data:
         try:
             # Check if role already exists - get all roles and check if one exists with that name
@@ -44,19 +44,19 @@ async def create_roles(role_repository: IRoleRepository):
 
             if role_data["name"] not in existing_role_names:
                 # Create role domain directly instead of using DTO
-                role_domain = RoleDomain.create(name=role_data["name"])
+                role_domain = RoleEntity.create(name=role_data["name"])
                 role = await role_repository.create(role_domain)
                 print(f"Created role: {role.name}")
 
                 # Create permission repository and service to get the 'super:user' permission
                 permission_repo = JSONPermissionRepository()
-                permission_service = PermissionService(permission_repo)
+                permission_service = PermissionUseCase(permission_repo)
 
                 # Get the 'super:user' permission
                 super_user_permission = await permission_repo.get_by_title("super:user")
                 if super_user_permission:
                     # Create role service to assign permission
-                    role_service = RoleService(role_repository, permission_service)
+                    role_service = RoleUseCase(role_repository, permission_service)
                     await role_service.assign_permission_to_role(
                         role.id, super_user_permission.id
                     )
@@ -89,14 +89,14 @@ async def create_users(
         },
     ]
 
-    users: List[UserDomain] = []
+    users: List[UserEntity] = []
     for user_data in users_data:
         try:
             # Check if user already exists
             existing_user = await user_repository.get_by_email(user_data["email"])
             if existing_user is None:
                 # Create user domain directly instead of using DTO
-                user_domain = UserDomain.create(
+                user_domain = UserEntity.create(
                     first_name=user_data["first_name"],
                     last_name=user_data["last_name"],
                     email=user_data["email"],

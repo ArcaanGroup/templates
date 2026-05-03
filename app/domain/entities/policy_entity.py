@@ -9,7 +9,7 @@ from uuid import uuid4
 
 
 @dataclass
-class PolicyDomain:
+class PolicyEntity:
     """Domain entity for Policy with business logic."""
 
     id: str
@@ -24,7 +24,7 @@ class PolicyDomain:
         title: str,
         description: str,
         policy_id: Optional[str] = None,
-    ) -> "PolicyDomain":
+    ) -> "PolicyEntity":
         """Create a new PolicyDomain entity."""
         policy_id = policy_id or str(uuid4())
         now = datetime.utcnow()

@@ -1,15 +1,15 @@
 """
-User Mapper - handles conversion between UserEntity, UserDomain, and User DTO
-The Domain is the core of conversions
-The Domain gets converted from DTO and Entity
-And DTO and Entity gets converted from Domain
+User Mapper - handles conversion between UserEntity, UserEntity, and User DTO
+The Entity is the core of conversions
+The Entity gets converted from DTO and Entity
+And DTO and Entity gets converted from Entity
 No Direct conversions from Entity to DTO or DTO to Entity
 """
 
 from sqlalchemy import inspect as sa_inspect
 
 from app.models.role.mapper import RoleMapper
-from app.models.user.domain import UserDomain
+from app.domain.entities import UserEntity
 from app.models.user.dto import User as UserDTO
 from app.models.user.dto import UserCreate, UserUpdate
 from app.models.user.entity import UserEntity
@@ -19,9 +19,9 @@ class UserMapper:
     """Mapper class to handle conversions between user representations."""
 
     @staticmethod
-    def from_dto(dto: UserCreate) -> UserDomain:
+    def from_dto(dto: UserCreate) -> UserEntity:
         """Convert DTO user to domain."""
-        return UserDomain.create(
+        return UserEntity.create(
             first_name=dto.first_name,
             last_name=dto.last_name,
             email=dto.email,
@@ -30,7 +30,7 @@ class UserMapper:
         )
 
     @staticmethod
-    def to_dto(domain_user: UserDomain) -> UserDTO:
+    def to_dto(domain_user: UserEntity) -> UserDTO:
         """Convert domain user to DTO."""
         # Convert roles from domain to DTO
         roles_dto = []
@@ -50,7 +50,7 @@ class UserMapper:
         )
 
     @staticmethod
-    def from_entity(entity_user: UserEntity) -> UserDomain:
+    def from_entity(entity_user: UserEntity) -> UserEntity:
         """Convert entity user to domain."""
         # Convert roles from entity to domain
         roles_domain = []
@@ -71,7 +71,7 @@ class UserMapper:
             # If there's any issue accessing roles (e.g., relationship not loaded), return empty list
             roles_domain = []
 
-        return UserDomain(
+        return UserEntity(
             id=entity_user.id,
             first_name=entity_user.first_name,
             last_name=entity_user.last_name,
@@ -85,7 +85,7 @@ class UserMapper:
         )
 
     @staticmethod
-    def to_entity(domain_user: UserDomain) -> UserEntity:
+    def to_entity(domain_user: UserEntity) -> UserEntity:
         """Convert domain user to entity."""
         entity = UserEntity(
             id=domain_user.id,
@@ -103,8 +103,8 @@ class UserMapper:
         return entity
 
     @staticmethod
-    def update_from_dto(user_update: UserUpdate, domain_user: UserDomain) -> UserDomain:
-        """Apply UserUpdate DTO to an existing UserDomain and return updated domain entity."""
+    def update_from_dto(user_update: UserUpdate, domain_user: UserEntity) -> UserEntity:
+        """Apply UserUpdate DTO to an existing UserEntity and return updated domain entity."""
         # Update only the fields that are provided in the update DTO
         update_data = {
             k: v for k, v in user_update.model_dump().items() if v is not None
@@ -122,7 +122,7 @@ class UserMapper:
         return domain_user
 
     @staticmethod
-    def update_entity(entity: UserEntity, domain: UserDomain):
+    def update_entity(entity: UserEntity, domain: UserEntity):
         entity.first_name = domain.first_name
         entity.last_name = domain.last_name
         entity.email = domain.email

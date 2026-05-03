@@ -7,7 +7,7 @@ depend on this abstraction rather than concrete implementations.
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.models.refresh_token.domain import RefreshTokenDomain
+from app.domain.entities import RefreshTokenEntity
 
 
 class IRefreshTokenRepository(ABC):
@@ -15,15 +15,15 @@ class IRefreshTokenRepository(ABC):
 
     @abstractmethod
     async def create_refresh_token(
-        self, refresh_token_to_create: RefreshTokenDomain
-    ) -> RefreshTokenDomain:
+        self, refresh_token_to_create: RefreshTokenEntity
+    ) -> RefreshTokenEntity:
         """Create a new refresh token in the repository."""
         pass
 
     @abstractmethod
     async def get_refresh_token_by_token(
         self, token: str
-    ) -> Optional[RefreshTokenDomain]:
+    ) -> Optional[RefreshTokenEntity]:
         """Get a refresh token by its token value from the repository."""
         pass
 

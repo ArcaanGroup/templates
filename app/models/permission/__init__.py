@@ -1,4 +1,3 @@
-from .domain import PermissionDomain
 from .dto import Permission
 
-__all__ = ["Permission", "PermissionDomain"]
+__all__ = ["Permission", "PermissionEntity"]

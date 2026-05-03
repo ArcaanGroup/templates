@@ -5,7 +5,7 @@ from fastapi_pagination import Page, Params
 from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.permission_repository_interface import IPermissionRepository
 from app.interface.repositories.role_repository_interface import IRoleRepository
-from app.models.role.domain import RoleDomain
+from app.domain.entities import RoleEntity
 from app.models.role.dto import Role, RoleCreate, RoleUpdate
 from app.models.role.mapper import RoleMapper
 
@@ -43,7 +43,7 @@ class RoleUseCase:
                 role_create.permission_ids
             )
 
-        domain_role = RoleDomain.create(
+        domain_role = RoleEntity.create(
             name=role_create.name,
             permission_ids=final_permission_ids,
         )
