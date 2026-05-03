@@ -3,12 +3,12 @@ from typing import Optional
 
 from app.core import config
 from app.error.exceptions import CredentialsValidationException, InactiveUserException
+from app.infrastructure.mappers import UserMapper
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import Token, UserLogin
-from app.models.user.mapper import UserMapper
 from app.utils import verify_password
 from app.utils.auth import generate_access_token, generate_refresh_token
 
@@ -26,7 +26,9 @@ class AuthUseCase:
 
     async def authenticate_user(self, username: str, password: str):
         domain_user = await self.user_repo.get_by_username(username)
-        if not domain_user or not verify_password(password, domain_user.hashed_password):
+        if not domain_user or not verify_password(
+            password, domain_user.hashed_password
+        ):
             raise CredentialsValidationException("Incorrect username or password")
 
         if not domain_user.is_active:

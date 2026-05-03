@@ -3,10 +3,10 @@ from typing import Optional
 from fastapi_pagination import Page, Params
 
 from app.error.exceptions import ConflictException, ResourceNotFoundException
+from app.infrastructure.mappers import UserMapper
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.user.dto import User, UserCreate, UserUpdate
-from app.models.user.mapper import UserMapper
 
 
 class UserUseCase:
@@ -22,7 +22,9 @@ class UserUseCase:
         """Get all users and map domain models to DTOs."""
         user_domains_page = await self.user_repo.get_all(params)
 
-        user_dtos = [UserMapper.to_dto(domain_user) for domain_user in user_domains_page.items]
+        user_dtos = [
+            UserMapper.to_dto(domain_user) for domain_user in user_domains_page.items
+        ]
         user_domains_page.items = user_dtos  # pyright: ignore[reportAttributeAccessIssue]
 
         return user_domains_page  # pyright: ignore[reportReturnType]

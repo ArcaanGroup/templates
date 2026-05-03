@@ -4,7 +4,7 @@ Association table for many-to-many relationship between users and roles.
 
 from sqlalchemy import Column, ForeignKey, String, Table
 
-from app.models.base import Base
+from app.infrastructure.orm import Base
 
 # Association table for users and roles many-to-many relationship
 UsersRolesAssociation = Table(

@@ -255,7 +255,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base
+from app.infrastructure.orm import Base
 
 
 class {resource_pascal}Entity(Base):
@@ -469,7 +469,7 @@ from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.domain.entities import {resource_pascal}Entity
 from app.infrastructure.orm import {resource_pascal}Entity
-from app.models.{resource_snake}.mapper import {resource_pascal}Mapper
+from app.infrastructure.mappers  import {resource_pascal}Mapper
 
 
 class {resource_pascal}Repository(I{resource_pascal}Repository):
@@ -563,7 +563,7 @@ def create_service(resource_snake, resource_pascal, service_dir):
 from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.models.{resource_snake}.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
-from app.models.{resource_snake}.mapper import {resource_pascal}Mapper
+from app.infrastructure.mappers  import {resource_pascal}Mapper
 
 
 class {resource_pascal}Service:

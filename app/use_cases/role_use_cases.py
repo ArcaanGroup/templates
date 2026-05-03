@@ -2,12 +2,14 @@ from typing import List, Optional
 
 from fastapi_pagination import Page, Params
 
-from app.error.exceptions import ResourceNotFoundException
-from app.interface.repositories.permission_repository_interface import IPermissionRepository
-from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.domain.entities import RoleEntity
+from app.error.exceptions import ResourceNotFoundException
+from app.infrastructure.mappers import RoleMapper
+from app.interface.repositories.permission_repository_interface import (
+    IPermissionRepository,
+)
+from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.models.role.dto import Role, RoleCreate, RoleUpdate
-from app.models.role.mapper import RoleMapper
 
 
 class RoleUseCase:

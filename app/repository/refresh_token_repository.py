@@ -9,11 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.domain.entities import RefreshTokenEntity
+from app.infrastructure.mappers import RefreshTokenMapper
 from app.infrastructure.orm import RefreshTokenORM
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
-from app.models.refresh_token.mapper import RefreshTokenMapper
 
 
 class RefreshTokenRepository(IRefreshTokenRepository):

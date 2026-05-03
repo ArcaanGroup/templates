@@ -12,9 +12,9 @@ from app.dependencies.auth_dependencies import (
 )
 from app.dependencies.permission_dependencies import get_permission_service
 from app.error.exceptions import CredentialsValidationException
+from app.infrastructure.mappers import PermissionMapper
 from app.models.auth.dto import Token, UserLogin
 from app.models.permission.dto import Permission as PermissionDTO
-from app.models.permission.mapper import PermissionMapper
 from app.models.responses import StandardResponse, failure, success
 from app.models.user.dto import User
 from app.use_cases.auth_use_cases import AuthUseCase

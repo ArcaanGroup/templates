@@ -12,17 +12,17 @@ from app.core.config import config
 from app.dependencies.policy_dependencies import get_policy_engine_service
 from app.dependencies.refresh_token_dependencies import get_refresh_token_repository
 from app.dependencies.role_dependencies import get_role_repository
+from app.domain.entities import RoleEntity
 from app.error.exceptions import (
     CredentialsValidationException,
     InactiveUserException,
     UnauthorizedException,
 )
+from app.infrastructure.mappers import UserMapper
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.models.auth.dto import TokenData
-from app.domain.entities import RoleEntity
 from app.models.user.dto import User
-from app.models.user.mapper import UserMapper
 from app.use_cases.auth_use_cases import AuthUseCase
 from app.use_cases.policy_engine_use_cases import PolicyEngineUseCase
 from app.utils.auth.permission import Permission

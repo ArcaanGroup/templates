@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import JSON, Boolean, DateTime, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.infrastructure.orm import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.orm import UserORM

@@ -16,9 +16,9 @@ from app.error.exceptions import ConflictException, ResourceNotFoundException
 from app.infrastructure.association import (
     UsersRolesAssociation,
 )
+from app.infrastructure.mappers import UserMapper
 from app.infrastructure.orm import RoleORM, UserORM
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.models.user.mapper import UserMapper
 
 
 class UserRepository(IUserRepository):
