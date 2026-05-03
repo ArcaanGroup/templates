@@ -11,22 +11,22 @@ import os
 import sys
 from typing import List
 
-from app.use_cases.permission_use_cases import PermissionUseCase
-from app.use_cases.role_use_cases import RoleUseCase
+from app.application.use_cases.permission_use_cases import PermissionUseCase
+from app.application.use_cases.role_use_cases import RoleUseCase
 
 # Add the project root to the path
 sys.path.insert(0, os.path.abspath("."))
 
 from fastapi_pagination import Params
 
-from app.core.database import get_db_session
+from app.domain.entities import RoleEntity, UserEntity
+from app.infrastructure.core.database import get_db_session
+from app.infrastructure.repository.permission_repository import JSONPermissionRepository
+from app.infrastructure.repository.role_repository import RoleRepository
+from app.infrastructure.repository.user_repository import UserRepository
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
-from app.domain.entities import RoleEntity
-from app.domain.entities import UserEntity
-from app.repository.permission_repository import JSONPermissionRepository
-from app.repository.role_repository import RoleRepository
-from app.repository.user_repository import UserRepository
+
 
 async def create_roles(role_repository: IRoleRepository):
     """Create initial roles in the database."""

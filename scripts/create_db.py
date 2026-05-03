@@ -16,7 +16,7 @@ import logging
 
 from sqlalchemy import create_engine, text
 
-from app.core.config import Config
+from app.infrastructure.core.config import Config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

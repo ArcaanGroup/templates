@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
 
-from app.error.exceptions import ValidationException
+from app.infrastructure.error.exceptions import ValidationException
 
 
 @dataclass

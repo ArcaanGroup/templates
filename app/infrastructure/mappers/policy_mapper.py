@@ -7,7 +7,7 @@ No Direct conversions from Entity to DTO or DTO to Entity (no entities needed fo
 """
 
 from app.domain.entities import PolicyEntity
-from app.models import Policy as PolicyDTO
+from app.interface.dto import Policy as PolicyDTO
 
 
 class PolicyMapper:

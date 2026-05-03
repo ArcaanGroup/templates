@@ -8,7 +8,7 @@ No Direct conversions from Entity to DTO or DTO to Entity
 
 from app.domain.entities import RefreshTokenEntity
 from app.infrastructure.orm import RefreshTokenORM
-from app.models import RefreshToken, RefreshTokenCreate
+from app.interface.dto import RefreshToken, RefreshTokenCreate
 
 
 class RefreshTokenMapper:

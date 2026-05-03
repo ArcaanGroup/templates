@@ -11,8 +11,8 @@ from sqlalchemy import inspect as sa_inspect
 from app.domain.entities import UserEntity
 from app.infrastructure.mappers import RoleMapper
 from app.infrastructure.orm import UserORM
-from app.models import User as UserDTO
-from app.models import UserCreate, UserUpdate
+from app.interface.dto import User as UserDTO
+from app.interface.dto import UserCreate, UserUpdate
 
 
 class UserMapper:

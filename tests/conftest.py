@@ -30,7 +30,7 @@ def db_session():
     """
     from unittest.mock import MagicMock
 
-    from app.core.database import get_db_session
+    from app.infrastructure.core.database import get_db_session
     from app.main import app
 
     session = MagicMock()

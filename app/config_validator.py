@@ -5,7 +5,8 @@ Configuration validation and application startup guard.
 import os
 import sys
 from typing import List
-from app.core.config import Config
+
+from app.infrastructure.core.config import Config
 
 
 def validate_config(config: Config) -> List[str]:

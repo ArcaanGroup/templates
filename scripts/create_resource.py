@@ -173,7 +173,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from app.error.exceptions import ValidationException
+from app.infrastructure.error.exceptions import ValidationException
 
 
 @dataclass
@@ -328,8 +328,8 @@ No Direct conversions from Entity to DTO or DTO to Entity
 """
 
 from app.domain.entities import {resource_pascal}Entity
-from app.models import {resource_pascal} as {resource_pascal}DTO
-from app.models import {resource_pascal}Create, {resource_pascal}Update
+from app.interface.dto import {resource_pascal} as {resource_pascal}DTO
+from app.interface.dto import {resource_pascal}Create, {resource_pascal}Update
 from app.infrastructure.orm import {resource_pascal}Entity
 
 
@@ -465,7 +465,7 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.error.exceptions import ResourceNotFoundException
+from app.infrastructure.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.domain.entities import {resource_pascal}Entity
 from app.infrastructure.orm import {resource_pascal}Entity
@@ -560,9 +560,9 @@ def create_service(resource_snake, resource_pascal, service_dir):
 
     service_content = f'''from fastapi_pagination import Page, Params
 
-from app.error.exceptions import ResourceNotFoundException
+from app.infrastructure.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
-from app.models import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
+from app.interface.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from app.infrastructure.mappers  import {resource_pascal}Mapper
 
 
@@ -662,9 +662,9 @@ def create_controller_dependencies(resource_snake, resource_pascal, dependencies
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db_session
+from app.infrastructure.core.database import get_db_session
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
-from app.repository.{resource_snake}_repository import {resource_pascal}Repository
+from app.infrastructure.repository.{resource_snake}_repository import {resource_pascal}Repository
 from app.service.{resource_snake}_service import {resource_pascal}Service
 
 
@@ -689,9 +689,9 @@ def create_controller(resource_snake, resource_pascal, controller_dir):
     controller_content = f'''from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
 
-from app.dependencies.{resource_snake}_dependencies import get_{resource_snake}_service
-from app.models.responses import StandardResponse, success
-from app.models import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
+from app.infrastructure.dependencies.{resource_snake}_dependencies import get_{resource_snake}_service
+from app.interface.dto.responses import StandardResponse, success
+from app.interface.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from app.service.{resource_snake}_service import {resource_pascal}Service
 
 # Create router with prefix and tags

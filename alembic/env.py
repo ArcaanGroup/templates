@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app.core.config import Config
+from app.infrastructure.core.config import Config
 from app.infrastructure.orm import Base
 
 # this is the Alembic Config object, which provides
