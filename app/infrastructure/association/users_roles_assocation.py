@@ -7,7 +7,7 @@ from sqlalchemy import Column, ForeignKey, String, Table
 from app.models.base import Base
 
 # Association table for users and roles many-to-many relationship
-UserRolesAssociation = Table(
+UsersRolesAssociation = Table(
     "user_roles",
     Base.metadata,
     Column("user_id", String, ForeignKey("users.id"), primary_key=True),

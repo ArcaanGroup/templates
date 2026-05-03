@@ -1,5 +1,5 @@
 """
-User entity as SQLAlchemy ORM model.
+User as SQLAlchemy ORM model.
 """
 
 from datetime import datetime
@@ -11,11 +11,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
-    from app.models.refresh_token.entity import RefreshTokenEntity
-    from app.models.role.entity import RoleEntity
+    from app.infrastructure.orm import RefreshTokenORM, RoleORM
 
 
-class UserEntity(Base):
+class UserORM(Base):
     """User entity for database storage."""
 
     __tablename__ = "users"
@@ -37,11 +36,11 @@ class UserEntity(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Relationship with refresh tokens
-    refresh_tokens: Mapped[list["RefreshTokenEntity"]] = relationship(
+    refresh_tokens: Mapped[list["RefreshTokenORM"]] = relationship(
         "RefreshTokenEntity", back_populates="user", cascade="all, delete-orphan"
     )
 
     # Relationship with roles (many-to-many)
-    roles: Mapped[list["RoleEntity"]] = relationship(
+    roles: Mapped[list["RoleORM"]] = relationship(
         "RoleEntity", secondary="user_roles", back_populates="users"
     )

@@ -330,7 +330,7 @@ No Direct conversions from Entity to DTO or DTO to Entity
 from app.domain.entities import {resource_pascal}Entity
 from app.models.{resource_snake}.dto import {resource_pascal} as {resource_pascal}DTO
 from app.models.{resource_snake}.dto import {resource_pascal}Create, {resource_pascal}Update
-from app.models.{resource_snake}.entity import {resource_pascal}Entity
+from app.infrastructure.orm import {resource_pascal}Entity
 
 
 class {resource_pascal}Mapper:
@@ -468,7 +468,7 @@ from sqlalchemy.future import select
 from app.error.exceptions import ResourceNotFoundException
 from app.interface.repositories.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.domain.entities import {resource_pascal}Entity
-from app.models.{resource_snake}.entity import {resource_pascal}Entity
+from app.infrastructure.orm import {resource_pascal}Entity
 from app.models.{resource_snake}.mapper import {resource_pascal}Mapper
 
 

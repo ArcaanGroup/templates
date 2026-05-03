@@ -8,12 +8,11 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.domain.entities import RefreshTokenEntity
+from app.infrastructure.orm import RefreshTokenORM
 from app.interface.repositories.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
-from app.domain.entities import RefreshTokenEntity
-from app.models.refresh_token.dto import RefreshTokenCreate
-from app.models.refresh_token.entity import RefreshTokenEntity
 from app.models.refresh_token.mapper import RefreshTokenMapper
 
 
@@ -29,42 +28,42 @@ class RefreshTokenRepository(IRefreshTokenRepository):
         """Create a new refresh token in the repository."""
 
         # Create SQLAlchemy RefreshToken object from domain entity
-        refresh_token_entity = RefreshTokenMapper.to_entity(refresh_token_to_create)
+        refresh_token_orm = RefreshTokenMapper.to_orm(refresh_token_to_create)
 
-        self.session.add(refresh_token_entity)
+        self.session.add(refresh_token_orm)
         await self.session.commit()
-        await self.session.refresh(refresh_token_entity)
+        await self.session.refresh(refresh_token_orm)
 
         # Convert to domain entity for return to match interface
-        return RefreshTokenMapper.from_entity(refresh_token_entity)
+        return RefreshTokenMapper.from_orm(refresh_token_orm)
 
     async def get_refresh_token_by_token(
         self, token: str
     ) -> Optional[RefreshTokenEntity]:
         """Get a refresh token by its token value from the repository."""
         result = await self.session.execute(
-            select(RefreshTokenEntity).where(
-                RefreshTokenEntity.token == token,
+            select(RefreshTokenORM).where(
+                RefreshTokenORM.token == token,
             )
         )
-        db_refresh_token = result.scalar_one_or_none()
+        refresh_token_orm = result.scalar_one_or_none()
 
-        if not db_refresh_token:
+        if not refresh_token_orm:
             return None
 
-        return RefreshTokenMapper.from_entity(db_refresh_token)
+        return RefreshTokenMapper.from_orm(refresh_token_orm)
 
     async def revoke_refresh_token(self, token_id: str) -> bool:
         """Revoke a refresh token in the repository."""
         result = await self.session.execute(
-            select(RefreshTokenEntity).where(RefreshTokenEntity.id == token_id)
+            select(RefreshTokenORM).where(RefreshTokenORM.id == token_id)
         )
-        db_refresh_token = result.scalar_one_or_none()
+        refresh_token_orm = result.scalar_one_or_none()
 
-        if not db_refresh_token:
+        if not refresh_token_orm:
             return False
 
-        await self.session.delete(db_refresh_token)
+        await self.session.delete(refresh_token_orm)
         await self.session.commit()
 
         return True

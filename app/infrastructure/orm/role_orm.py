@@ -1,5 +1,5 @@
 """
-Role entity as SQLAlchemy ORM model.
+Role as SQLAlchemy ORM model.
 """
 
 from datetime import datetime
@@ -11,10 +11,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
-    from app.models.user.entity import UserEntity
+    from app.infrastructure.orm import UserORM
 
 
-class RoleEntity(Base):
+class RoleORM(Base):
     """Role entity for database storage."""
 
     __tablename__ = "roles"
@@ -37,6 +37,6 @@ class RoleEntity(Base):
     )
 
     # Relationship with users (many-to-many)
-    users: Mapped[list["UserEntity"]] = relationship(
+    users: Mapped[list["UserORM"]] = relationship(
         "UserEntity", secondary="user_roles", back_populates="roles"
     )

@@ -1,5 +1,5 @@
 """
-RefreshToken entity as SQLAlchemy ORM model.
+RefreshToken as SQLAlchemy ORM model.
 """
 
 from datetime import datetime
@@ -11,10 +11,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
-    from app.models.user.entity import UserEntity
+    from app.infrastructure.orm import UserORM
 
 
-class RefreshTokenEntity(Base):
+class RefreshTokenORM(Base):
     """Refresh token entity for database storage."""
 
     __tablename__ = "refresh_tokens"
@@ -30,6 +30,6 @@ class RefreshTokenEntity(Base):
     blacklisted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Relationship
-    user: Mapped["UserEntity"] = relationship(
+    user: Mapped["UserORM"] = relationship(
         "UserEntity", back_populates="refresh_tokens"
     )

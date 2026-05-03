@@ -8,11 +8,11 @@ No Direct conversions from Entity to DTO or DTO to Entity
 
 from sqlalchemy import inspect as sa_inspect
 
-from app.models.role.mapper import RoleMapper
 from app.domain.entities import UserEntity
+from app.infrastructure.orm import UserORM
+from app.models.role.mapper import RoleMapper
 from app.models.user.dto import User as UserDTO
 from app.models.user.dto import UserCreate, UserUpdate
-from app.models.user.entity import UserEntity
 
 
 class UserMapper:
@@ -50,21 +50,20 @@ class UserMapper:
         )
 
     @staticmethod
-    def from_entity(entity_user: UserEntity) -> UserEntity:
+    def from_orm(user_orm: UserORM) -> UserEntity:
         """Convert entity user to domain."""
         # Convert roles from entity to domain
         roles_domain = []
 
         try:
             # Use SQLAlchemy's inspection to check if the relationship is loaded
-            state = sa_inspect(entity_user)
+            state = sa_inspect(user_orm)
             attr_state = state.attrs["roles"]
 
             # Check if the relationship attribute is loaded without triggering a load
             if attr_state.loaded_value is not None:
                 roles_domain = [
-                    RoleMapper.from_entity(role_entity)
-                    for role_entity in entity_user.roles
+                    RoleMapper.from_orm(role_entity) for role_entity in user_orm.roles
                 ]
         # except (AttributeError, KeyError):
         except Exception:
@@ -72,46 +71,46 @@ class UserMapper:
             roles_domain = []
 
         return UserEntity(
-            id=entity_user.id,
-            first_name=entity_user.first_name,
-            last_name=entity_user.last_name,
-            email=entity_user.email,
-            username=entity_user.username,
-            hashed_password=entity_user.hashed_password,
-            created_at=entity_user.created_at,
-            updated_at=entity_user.updated_at,
-            is_active=entity_user.is_active,
+            id=user_orm.id,
+            first_name=user_orm.first_name,
+            last_name=user_orm.last_name,
+            email=user_orm.email,
+            username=user_orm.username,
+            hashed_password=user_orm.hashed_password,
+            created_at=user_orm.created_at,
+            updated_at=user_orm.updated_at,
+            is_active=user_orm.is_active,
             roles=roles_domain,
         )
 
     @staticmethod
-    def to_entity(domain_user: UserEntity) -> UserEntity:
+    def to_orm(user_entity: UserEntity) -> UserORM:
         """Convert domain user to entity."""
-        entity = UserEntity(
-            id=domain_user.id,
-            first_name=domain_user.first_name,
-            last_name=domain_user.last_name,
-            email=domain_user.email,
-            username=domain_user.username,
-            hashed_password=domain_user.hashed_password,
-            created_at=domain_user.created_at,
-            updated_at=domain_user.updated_at,
-            is_active=domain_user.is_active,
+        orm = UserORM(
+            id=user_entity.id,
+            first_name=user_entity.first_name,
+            last_name=user_entity.last_name,
+            email=user_entity.email,
+            username=user_entity.username,
+            hashed_password=user_entity.hashed_password,
+            created_at=user_entity.created_at,
+            updated_at=user_entity.updated_at,
+            is_active=user_entity.is_active,
         )
         # Note: The roles relationship is handled by SQLAlchemy's ORM when the entity is loaded
         # The many-to-many relationship will be established when the entity is saved to the database
-        return entity
+        return orm
 
     @staticmethod
-    def update_from_dto(user_update: UserUpdate, domain_user: UserEntity) -> UserEntity:
-        """Apply UserUpdate DTO to an existing UserEntity and return updated domain entity."""
+    def update_from_dto(user_update: UserUpdate, user_entity: UserEntity) -> UserEntity:
+        """Apply UserUpdate DTO to an existing UserEntity and return updated entity."""
         # Update only the fields that are provided in the update DTO
         update_data = {
             k: v for k, v in user_update.model_dump().items() if v is not None
         }
 
         # Apply the updates to the domain user using its update_info method
-        domain_user.update_info(
+        user_entity.update_info(
             first_name=update_data.get("first_name"),
             last_name=update_data.get("last_name"),
             email=update_data.get("email"),
@@ -119,13 +118,13 @@ class UserMapper:
             is_active=update_data.get("is_active"),
         )
 
-        return domain_user
+        return user_entity
 
     @staticmethod
-    def update_entity(entity: UserEntity, domain: UserEntity):
-        entity.first_name = domain.first_name
-        entity.last_name = domain.last_name
-        entity.email = domain.email
-        entity.username = domain.username
-        entity.is_active = domain.is_active
-        entity.updated_at = domain.updated_at
+    def update_orm(orm: UserORM, entity: UserEntity):
+        orm.first_name = entity.first_name
+        orm.last_name = entity.last_name
+        orm.email = entity.email
+        orm.username = entity.username
+        orm.is_active = entity.is_active
+        orm.updated_at = entity.updated_at

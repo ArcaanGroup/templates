@@ -9,9 +9,9 @@ No Direct conversions from Entity to DTO or DTO to Entity
 from datetime import datetime
 
 from app.domain.entities import RoleEntity
+from app.infrastructure.orm import RoleORM
 from app.models.role.dto import Role as RoleDTO
 from app.models.role.dto import RoleCreate, RoleUpdate
-from app.models.role.entity import RoleEntity
 
 
 class RoleMapper:
@@ -38,34 +38,34 @@ class RoleMapper:
         )
 
     @staticmethod
-    def from_entity(entity_role: RoleEntity) -> RoleEntity:
+    def from_orm(role_orm: RoleORM) -> RoleEntity:
         """Convert entity Role to domain."""
         return RoleEntity(
-            id=entity_role.id,
-            name=entity_role.name,
-            created_at=entity_role.created_at,
-            updated_at=entity_role.updated_at,
-            is_active=entity_role.is_active,
-            permission_ids=entity_role.permission_ids or [],
+            id=role_orm.id,
+            name=role_orm.name,
+            created_at=role_orm.created_at,
+            updated_at=role_orm.updated_at,
+            is_active=role_orm.is_active,
+            permission_ids=role_orm.permission_ids or [],
         )
 
     @staticmethod
-    def to_entity(domain_role: RoleEntity) -> RoleEntity:
+    def to_orm(role_entity: RoleEntity) -> RoleORM:
         """Convert domain Role to entity."""
-        entity = RoleEntity(
-            id=domain_role.id,
-            name=domain_role.name,
-            created_at=domain_role.created_at,
-            updated_at=domain_role.updated_at,
-            is_active=domain_role.is_active,
-            permission_ids=domain_role.permission_ids or [],
+        entity = RoleORM(
+            id=role_entity.id,
+            name=role_entity.name,
+            created_at=role_entity.created_at,
+            updated_at=role_entity.updated_at,
+            is_active=role_entity.is_active,
+            permission_ids=role_entity.permission_ids or [],
         )
         # Note: The users relationship is handled by SQLAlchemy's ORM when the entity is loaded
         # The many-to-many relationship will be established when the entity is saved to the database
         return entity
 
     @staticmethod
-    def update_from_dto(role_update: RoleUpdate, role_domain: RoleEntity) -> RoleEntity:
+    def update_from_dto(role_update: RoleUpdate, role_entity: RoleEntity) -> RoleEntity:
         """Apply RoleUpdate DTO to an existing RoleEntity and return updated domain entity."""
         update_data = {
             k: v for k, v in role_update.model_dump().items() if v is not None
@@ -73,22 +73,22 @@ class RoleMapper:
 
         # Update fields directly since we're managing the state in the domain
         if "name" in update_data:
-            role_domain.name = update_data["name"]
+            role_entity.name = update_data["name"]
 
         if "is_active" in update_data:
-            role_domain.is_active = update_data["is_active"]
+            role_entity.is_active = update_data["is_active"]
 
         if "permission_ids" in update_data:
-            role_domain.permission_ids = update_data["permission_ids"]
+            role_entity.permission_ids = update_data["permission_ids"]
 
         if update_data:  # Only update updated_at if there were actual changes
-            role_domain.updated_at = datetime.utcnow()
+            role_entity.updated_at = datetime.utcnow()
 
-        return role_domain
+        return role_entity
 
     @staticmethod
-    def update_entity(target: RoleEntity, source: RoleEntity):
-        """Apply updated domain Role fields to the entity Role."""
+    def update_orm(target: RoleORM, source: RoleEntity):
+        """Apply updated Role entity fields to the Role ORM."""
         target.name = source.name
         target.is_active = source.is_active
         target.updated_at = source.updated_at

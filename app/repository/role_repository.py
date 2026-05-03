@@ -10,9 +10,9 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.domain.entities import RoleEntity
-from app.models.role.entity import RoleEntity
+from app.infrastructure.orm import RoleORM
+from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.models.role.mapper import RoleMapper
 
 
@@ -25,61 +25,61 @@ class RoleRepository(IRoleRepository):
     async def get_all(self, params: Params) -> Page[RoleEntity]:
         """Get all roles from the repository."""
 
-        query = select(RoleEntity)
-        roles_page: Page[RoleEntity] = await paginate(self.session, query, params)
+        query = select(RoleORM)
+        roles_page: Page[RoleORM] = await paginate(self.session, query, params)
 
-        role_domains = []
-        for entity in roles_page.items:
-            role_domains.append(RoleMapper.from_entity(entity))
+        role_entities = []
+        for orm in roles_page.items:
+            role_entities.append(RoleMapper.from_orm(orm))
 
-        roles_page.items = role_domains
+        roles_page.items = role_entities
 
         return roles_page  # pyright: ignore[reportReturnType]
 
     async def get_by_id(self, role_id: str) -> Optional[RoleEntity]:
         """Get a role by ID from the repository."""
 
-        role_entity = await self.session.get(RoleEntity, role_id)
+        role_orm = await self.session.get(RoleORM, role_id)
 
-        if role_entity is None:
+        if role_orm is None:
             return None
 
-        return RoleMapper.from_entity(role_entity)
+        return RoleMapper.from_orm(role_orm)
 
     async def create(self, created_domain: RoleEntity) -> RoleEntity:
         """Create a new role in the repository."""
-        role_entity = RoleMapper.to_entity(created_domain)
+        role_entity = RoleMapper.to_orm(created_domain)
 
         self.session.add(role_entity)
         await self.session.commit()
         await self.session.refresh(role_entity)
 
-        return RoleMapper.from_entity(role_entity)
+        return RoleMapper.from_orm(role_entity)
 
     async def update(self, updated_domain: RoleEntity) -> Optional[RoleEntity]:
         """Update a role in the repository."""
         # First, get the existing role from the database
-        existing_role_entity = await self.session.get(RoleEntity, updated_domain.id)
+        existing_role_orm = await self.session.get(RoleORM, updated_domain.id)
 
-        if not existing_role_entity:
+        if not existing_role_orm:
             return None
 
         # Update the existing entity with the new values
-        RoleMapper.update_entity(existing_role_entity, updated_domain)
+        RoleMapper.update_orm(existing_role_orm, updated_domain)
 
         await self.session.commit()
-        await self.session.refresh(existing_role_entity)
+        await self.session.refresh(existing_role_orm)
 
-        return RoleMapper.from_entity(existing_role_entity)
+        return RoleMapper.from_orm(existing_role_orm)
 
     async def delete(self, role_id: str) -> Optional[RoleEntity]:
         """Delete a role from the repository."""
-        role_entity = await self.session.get(RoleEntity, role_id)
+        role_orm = await self.session.get(RoleORM, role_id)
 
-        if not role_entity:
+        if not role_orm:
             return None
 
-        await self.session.delete(role_entity)
+        await self.session.delete(role_orm)
         await self.session.commit()
 
-        return RoleMapper.from_entity(role_entity)
+        return RoleMapper.from_orm(role_orm)
