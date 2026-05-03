@@ -17,8 +17,8 @@ from app.models.permission.dto import Permission as PermissionDTO
 from app.models.permission.mapper import PermissionMapper
 from app.models.responses import StandardResponse, failure, success
 from app.models.user.dto import User
-from app.service.auth_service import AuthService
-from app.service.permission_service import PermissionService
+from app.use_cases.auth_use_cases import AuthUseCase
+from app.use_cases.permission_use_cases import PermissionUseCase
 from app.utils.auth.permission import Permission
 
 # Create router with prefix and tags
@@ -29,7 +29,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 async def login(
     response: Response,
     user_login: UserLogin,
-    auth_service: AuthService = Depends(get_auth_service),
+    auth_service: AuthUseCase = Depends(get_auth_service),
 ):
     """Authenticate user and return JWT token."""
     (access_token, refresh_token) = await auth_service.login(user_login)
@@ -49,7 +49,7 @@ async def login(
 
 @auth_router.post("/refresh", response_model=StandardResponse[Token])
 async def refresh_tokens(
-    auth_service: AuthService = Depends(get_auth_service),
+    auth_service: AuthUseCase = Depends(get_auth_service),
     refresh_token: str = Depends(get_refresh_token_from_cookie),
 ):
     """Refresh the access token using the refresh token from HTTP-only cookie."""
@@ -63,7 +63,7 @@ async def refresh_tokens(
 async def logout(
     request: Request,
     response: Response,
-    auth_service: AuthService = Depends(get_auth_service),
+    auth_service: AuthUseCase = Depends(get_auth_service),
 ):
     """Logout the user by blacklisting the refresh token."""
     # Get the refresh token from the cookie
@@ -84,7 +84,7 @@ async def logout(
 
 @auth_router.get("/permissions", response_model=StandardResponse[list[PermissionDTO]])
 async def get_permissions(
-    permission_service: PermissionService = Depends(get_permission_service),
+    permission_service: PermissionUseCase = Depends(get_permission_service),
     _=Depends(get_authorized_user([Permission.Permissions_Read])),
 ):
     """Return all permissions with their associated policy objects from the JSON files."""

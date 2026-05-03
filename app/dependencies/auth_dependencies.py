@@ -23,8 +23,8 @@ from app.models.auth.dto import TokenData
 from app.models.role.domain import RoleDomain
 from app.models.user.dto import User
 from app.models.user.mapper import UserMapper
-from app.service.auth_service import AuthService
-from app.service.policy_engine_service import PolicyEngineService
+from app.use_cases.auth_use_cases import AuthUseCase
+from app.use_cases.policy_engine_use_cases import PolicyEngineUseCase
 from app.utils.auth.permission import Permission
 
 from .user_dependencies import get_user_repository
@@ -80,7 +80,7 @@ async def authorize(
     access_token: HTTPAuthorizationCredentials = Depends(security),
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
-    policy_engine_service: PolicyEngineService = Depends(get_policy_engine_service),
+    policy_engine_service: PolicyEngineUseCase = Depends(get_policy_engine_service),
 ) -> Optional[User]:
     """
     Get the current user from the token in the request and check required permissions.
@@ -163,7 +163,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
         access_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
         user_repository: IUserRepository = Depends(get_user_repository),
         role_repository: IRoleRepository = Depends(get_role_repository),
-        policy_engine_service: PolicyEngineService = Depends(get_policy_engine_service),
+        policy_engine_service: PolicyEngineUseCase = Depends(get_policy_engine_service),
     ) -> Optional[User]:
         if access_token is None:
             raise CredentialsValidationException()
@@ -182,6 +182,6 @@ def get_authorized_user(required_permissions: List[Permission] = []):
 async def get_auth_service(
     user_repository: IUserRepository = Depends(get_user_repository),
     refresh_token_repository=Depends(get_refresh_token_repository),
-) -> AuthService:
+) -> AuthUseCase:
     """Dependency to get auth service instance."""
-    return AuthService(user_repository, refresh_token_repository)
+    return AuthUseCase(user_repository, refresh_token_repository)

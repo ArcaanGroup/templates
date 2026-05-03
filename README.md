@@ -17,12 +17,14 @@ An e-commerce for Datasets.
 The project follows clean architecture principles with clear separation of concerns:
 
 ### Architecture
-- **Entities**: `app/entities/` contains SQLAlchemy ORM models and base classes
-- **DTOs**: `app/dto/` contains Data Transfer Objects for API communication
-- **Repository Interface**: `app/repository/user_repository.py` defines the contract
-- **PostgreSQL Implementation**: `app/infrastructure/postgresql_user_repository.py`
-- **In-Memory Implementation**: `app/infrastructure/in_memory_user_repository.py` for testing
-- **Infrastructure**: `app/infrastructure/` contains configuration and database engine setup
+- **Entities / Domain**: `app/models/**/domain.py` contains rich domain entities with business rules
+- **DTOs**: `app/models/**/dto.py` contains request and response payload models
+- **Mappers**: `app/models/**/mapper.py` converts between entities, domain models, and DTOs
+- **Use Cases**: `app/use_cases/` contains application business logic interactors
+- **Repository Interfaces**: `app/interface/repositories/` defines persistence contracts
+- **Framework Adapters**: `app/repository/` contains SQLAlchemy and JSON persistence implementations
+- **Delivery / Controllers**: `app/controller/` contains FastAPI route adapters
+- **Dependency Wiring**: `app/dependencies/` connects the framework layer to use case and repository boundaries
 - **Migrations**: `alembic/` contains database migration scripts
 
 ### Configuration

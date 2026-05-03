@@ -10,7 +10,7 @@ from app.dependencies.role_dependencies import get_role_repository
 from app.interface.repositories.role_repository_interface import IRoleRepository
 from app.interface.repositories.user_repository_interface import IUserRepository
 from app.repository.user_repository import UserRepository
-from app.service.user_service import UserService
+from app.use_cases.user_use_cases import UserUseCase
 
 
 async def get_user_repository(
@@ -23,6 +23,6 @@ async def get_user_repository(
 async def get_user_service(
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
-):
-    """Dependency to provide UserService instance with database session."""
-    return UserService(user_repository, role_repository)
+) -> UserUseCase:
+    """Dependency to provide UserUseCase instance with database session."""
+    return UserUseCase(user_repository, role_repository)

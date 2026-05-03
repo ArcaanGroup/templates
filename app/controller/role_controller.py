@@ -5,7 +5,7 @@ from app.dependencies.auth_dependencies import get_authorized_user
 from app.dependencies.role_dependencies import get_role_service
 from app.models.responses import StandardResponse, success
 from app.models.role.dto import Role, RoleCreate, RoleUpdate
-from app.service.role_service import RoleService
+from app.use_cases.role_use_cases import RoleUseCase
 from app.utils.auth.permission import Permission
 
 # Create router with prefix and tags
@@ -15,7 +15,7 @@ role_router = APIRouter(prefix="/roles", tags=["roles"])
 @role_router.get("/", response_model=StandardResponse[Page[Role]])
 async def get_roles(
     params: Params = Depends(),
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_Read])),
 ):
     """Get a list of all roles"""
@@ -29,7 +29,7 @@ async def get_roles(
 @role_router.get("/{role_id}", response_model=StandardResponse[Role])
 async def get_role_by_id(
     role_id: str,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_Read])),
 ):
     """Get a specific role by ID"""
@@ -40,7 +40,7 @@ async def get_role_by_id(
 @role_router.post("/", response_model=StandardResponse[Role])
 async def create_role(
     role_create: RoleCreate,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_Create])),
 ):
     """Create a new role"""
@@ -52,7 +52,7 @@ async def create_role(
 async def update_role(
     role_id: str,
     role_update: RoleUpdate,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_Update])),
 ):
     """Update a specific role by ID"""
@@ -63,7 +63,7 @@ async def update_role(
 @role_router.delete("/{role_id}", response_model=StandardResponse[Role])
 async def delete_role(
     role_id: str,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_Delete])),
 ):
     """Delete a specific role by ID"""
@@ -77,7 +77,7 @@ async def delete_role(
 async def assign_permission_to_role(
     role_id: str,
     permission_id: str,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_AssignPermission])),
 ):
     """Assign a permission to a role"""
@@ -91,7 +91,7 @@ async def assign_permission_to_role(
 async def remove_permission_from_role(
     role_id: str,
     permission_id: str,
-    service: RoleService = Depends(get_role_service),
+    service: RoleUseCase = Depends(get_role_service),
     _=Depends(get_authorized_user([Permission.Roles_UnassignPermission])),
 ):
     """Remove a permission from a role"""

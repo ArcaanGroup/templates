@@ -6,8 +6,8 @@ from app.interface.repositories.policy_repository_interface import (
     IPolicyRepository,
 )
 from app.repository.policy_repository import JSONPolicyRepository
-from app.service.policy_engine_service import PolicyEngineService
-from app.service.policy_service import PolicyService
+from app.use_cases.policy_engine_use_cases import PolicyEngineUseCase
+from app.use_cases.policy_use_cases import PolicyUseCase
 
 
 async def get_policy_repository() -> IPolicyRepository:
@@ -17,13 +17,13 @@ async def get_policy_repository() -> IPolicyRepository:
 
 async def get_policy_service(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
-) -> PolicyService:
-    """Dependency to provide PolicyService instance."""
-    return PolicyService(policy_repository)
+) -> PolicyUseCase:
+    """Dependency to provide PolicyUseCase instance."""
+    return PolicyUseCase(policy_repository)
 
 
 async def get_policy_engine_service(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
-) -> PolicyEngineService:
-    """Dependency to provide PolicyEngineService instance."""
-    return PolicyEngineService(policy_repository)
+) -> PolicyEngineUseCase:
+    """Dependency to provide PolicyEngineUseCase instance."""
+    return PolicyEngineUseCase(policy_repository)
