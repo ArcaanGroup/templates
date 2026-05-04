@@ -11,7 +11,6 @@ import os
 import sys
 from typing import List
 
-from app.application.use_cases.permission_use_cases import PermissionUseCase
 from app.application.use_cases.role_use_cases import RoleUseCase
 
 # Add the project root to the path
@@ -52,13 +51,12 @@ async def create_roles(role_repository: IRoleRepository):
 
                 # Create permission repository and service to get the 'super:user' permission
                 permission_repo = JSONPermissionRepository()
-                permission_service = PermissionUseCase(permission_repo)
 
                 # Get the 'super:user' permission
                 super_user_permission = await permission_repo.get_by_title("super:user")
                 if super_user_permission:
                     # Create role service to assign permission
-                    role_service = RoleUseCase(role_repository, permission_service)
+                    role_service = RoleUseCase(role_repository, permission_repo)
                     await role_service.assign_permission_to_role(
                         role.id, super_user_permission.id
                     )
