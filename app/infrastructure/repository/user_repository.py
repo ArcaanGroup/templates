@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.domain.entities import UserEntity
-from app.infrastructure.association import (
+from app.infrastructure.db.association import (
     UsersRolesAssociation,
 )
 from app.infrastructure.error.exceptions import (
