@@ -11,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from app.application.mappers import UserMapper
 from app.domain.entities import UserEntity
 from app.domain.error.exceptions import (
     ConflictException,
@@ -21,6 +20,7 @@ from app.infrastructure.db.association import (
     UsersRolesAssociation,
 )
 from app.infrastructure.db.orm import RoleORM, UserORM
+from app.interface.mappers import UserMapper
 from app.interface.repository.user_repository_interface import IUserRepository
 
 

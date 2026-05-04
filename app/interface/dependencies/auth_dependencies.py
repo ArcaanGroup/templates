@@ -8,14 +8,6 @@ from fastapi import Cookie, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
-from app.application.dependencies.policy_dependencies import (
-    get_policy_engine_service,
-)
-from app.application.dependencies.refresh_token_dependencies import (
-    get_refresh_token_repository,
-)
-from app.application.dependencies.role_dependencies import get_role_repository
-from app.application.mappers import UserMapper
 from app.application.use_cases.auth_use_cases import AuthUseCase
 from app.application.use_cases.policy_engine_use_cases import PolicyEngineUseCase
 from app.domain.entities import RoleEntity
@@ -26,7 +18,15 @@ from app.domain.error.exceptions import (
 )
 from app.infrastructure.core.config import config
 from app.infrastructure.utils.auth.permission import Permission
+from app.interface.dependencies.policy_dependencies import (
+    get_policy_engine_service,
+)
+from app.interface.dependencies.refresh_token_dependencies import (
+    get_refresh_token_repository,
+)
+from app.interface.dependencies.role_dependencies import get_role_repository
 from app.interface.dto import TokenData, User
+from app.interface.mappers import UserMapper
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
 

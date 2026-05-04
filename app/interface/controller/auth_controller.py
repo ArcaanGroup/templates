@@ -4,23 +4,23 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from app.application.dependencies.auth_dependencies import (
-    get_auth_service,
-    get_authorized_user,
-    get_refresh_token_from_cookie,
-)
-from app.application.dependencies.permission_dependencies import (
-    get_permission_service,
-)
-from app.application.mappers import PermissionMapper
 from app.application.use_cases.auth_use_cases import AuthUseCase
 from app.application.use_cases.permission_use_cases import PermissionUseCase
 from app.domain.error.exceptions import CredentialsValidationException
 from app.infrastructure.core.config import config
 from app.infrastructure.utils.auth.permission import Permission
+from app.interface.dependencies.auth_dependencies import (
+    get_auth_service,
+    get_authorized_user,
+    get_refresh_token_from_cookie,
+)
+from app.interface.dependencies.permission_dependencies import (
+    get_permission_service,
+)
 from app.interface.dto import Permission as PermissionDTO
 from app.interface.dto import Token, User, UserLogin
 from app.interface.dto.responses import StandardResponse, failure, success
+from app.interface.mappers import PermissionMapper
 
 # Create router with prefix and tags
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
