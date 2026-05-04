@@ -1,10 +1,35 @@
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
 
-from app.application.use_cases.user_use_cases import UserUseCase
+from app.application.use_cases import (
+    AssignRoleToUserUseCase,
+    CreateUserUseCase,
+    DeleteUserUseCase,
+    GetAllUsersUseCase,
+    GetUserByIdUseCase,
+    RemoveRoleFromUserUseCase,
+    UpdateUserUseCase,
+)
+from app.application.use_cases.user_use_cases import (
+    AssignRoleRequest,
+    CreateUserRequest,
+    DeleteUserRequest,
+    GetAllUsersRequest,
+    GetUserByIdRequest,
+    RemoveRoleRequest,
+    UpdateUserRequest,
+)
 from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.auth_dependencies import get_authorized_user
-from app.interface.dependencies.user_dependencies import get_user_usecase
+from app.interface.dependencies.user_dependencies import (
+    get_assign_role_to_user_usecase,
+    get_create_user_usecase,
+    get_delete_user_usecase,
+    get_get_all_users_usecase,
+    get_get_user_by_id_usecase,
+    get_remove_role_from_user_usecase,
+    get_update_user_usecase,
+)
 from app.interface.dto import User, UserCreate, UserUpdate
 from app.interface.dto.responses import StandardResponse, success
 
@@ -14,91 +39,126 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 
 @user_router.get("/", response_model=StandardResponse[Page[User]])
 async def get_users(
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: GetAllUsersUseCase = Depends(get_get_all_users_usecase),
     params: Params = Depends(),
     _=Depends(get_authorized_user([Permission.Users_Read])),
 ):
     """Get a list of all users"""
-    users = await service.get_all(params)
+    result = await usecase.execute(
+        GetAllUsersRequest(page=params.page, size=params.size)
+    )
 
+    # Convert domain entities to DTOs
+    from app.interface.mappers import UserMapper
+
+    users_dto = [UserMapper.to_dto(user) for user in result.users]
     return success(
         message="Users retrieved successfully",
-        payload=users,
+        payload=users_dto,
     )
 
 
 @user_router.post("/", response_model=StandardResponse[User])
 async def create_user(
     user_create: UserCreate,
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: CreateUserUseCase = Depends(get_create_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_Create])),
 ):
     """Create a new user"""
-    user = await service.create(user_create)
+    result = await usecase.execute(
+        CreateUserRequest(
+            first_name=user_create.first_name,
+            last_name=user_create.last_name,
+            email=user_create.email,
+            username=user_create.username,
+            password=user_create.password,
+        )
+    )
+    from app.interface.mappers import UserMapper
 
-    return success(message="User created successfully", payload=user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="User created successfully", payload=user_dto)
 
 
 @user_router.get("/{user_id}", response_model=StandardResponse[User])
 async def get_user(
     user_id: str,
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: GetUserByIdUseCase = Depends(get_get_user_by_id_usecase),
     _=Depends(get_authorized_user([Permission.Users_Read])),
 ):
     """Get a specific user by ID"""
-    user = await service.get_by_id(user_id)
+    result = await usecase.execute(GetUserByIdRequest(user_id=user_id))
+    from app.interface.mappers import UserMapper
 
-    return success(message="User retrieved successfully", payload=user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="User retrieved successfully", payload=user_dto)
 
 
 @user_router.put("/{user_id}", response_model=StandardResponse[User])
 async def update_user(
     user_id: str,
     user_update: UserUpdate,
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: UpdateUserUseCase = Depends(get_update_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_Update])),
 ):
     """Update a specific user by ID"""
-    user = await service.update(user_id, user_update)
+    result = await usecase.execute(
+        UpdateUserRequest(
+            user_id=user_id,
+            first_name=user_update.first_name,
+            last_name=user_update.last_name,
+            email=user_update.email,
+            username=user_update.username,
+            is_active=user_update.is_active,
+        )
+    )
+    from app.interface.mappers import UserMapper
 
-    return success(message="User updated successfully", payload=user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="User updated successfully", payload=user_dto)
 
 
 @user_router.delete("/{user_id}", response_model=StandardResponse[User])
 async def delete_user(
     user_id: str,
-    service: UserUseCase = Depends(
-        get_user_usecase,
+    usecase: DeleteUserUseCase = Depends(
+        get_delete_user_usecase,
     ),
     _=Depends(get_authorized_user([Permission.Users_Delete])),
 ):
     """Delete a specific user by ID"""
-    deleted_user = await service.delete(user_id)
+    result = await usecase.execute(DeleteUserRequest(user_id=user_id))
+    from app.interface.mappers import UserMapper
 
-    return success(message="User deleted successfully", payload=deleted_user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="User deleted successfully", payload=user_dto)
 
 
 @user_router.post("/{user_id}/roles/{role_id}", response_model=StandardResponse[User])
 async def assign_role_to_user(
     user_id: str,
     role_id: str,
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: AssignRoleToUserUseCase = Depends(get_assign_role_to_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_AssignRole])),
 ):
     """Assign a role to a user"""
-    user = await service.assign_role(user_id, role_id)
+    result = await usecase.execute(AssignRoleRequest(user_id=user_id, role_id=role_id))
+    from app.interface.mappers import UserMapper
 
-    return success(message="Role assigned to user successfully", payload=user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="Role assigned to user successfully", payload=user_dto)
 
 
 @user_router.delete("/{user_id}/roles/{role_id}", response_model=StandardResponse[User])
 async def remove_role_from_user(
     user_id: str,
     role_id: str,
-    service: UserUseCase = Depends(get_user_usecase),
+    usecase: RemoveRoleFromUserUseCase = Depends(get_remove_role_from_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_UnassignRole])),
 ):
     """Remove a role from a user"""
-    user = await service.remove_role(user_id, role_id)
+    result = await usecase.execute(RemoveRoleRequest(user_id=user_id, role_id=role_id))
+    from app.interface.mappers import UserMapper
 
-    return success(message="Role removed from user successfully", payload=user)
+    user_dto = UserMapper.to_dto(result.user)
+    return success(message="Role removed from user successfully", payload=user_dto)

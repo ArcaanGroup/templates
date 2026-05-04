@@ -8,8 +8,12 @@ from fastapi import Cookie, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
-from app.application.use_cases.auth_use_cases import AuthUseCase
-from app.application.use_cases.policy_engine_use_cases import PolicyEngineUseCase
+from app.application.use_cases.auth_use_cases import (
+    AuthenticateUserUseCase,
+    LoginUseCase,
+    LogoutUseCase,
+    RefreshAccessTokenUseCase,
+)
 from app.domain.entities import RoleEntity
 from app.domain.error.exceptions import (
     CredentialsValidationException,
@@ -17,6 +21,7 @@ from app.domain.error.exceptions import (
     UnauthorizedException,
 )
 from app.infra.core.config import config
+from app.infra.services import BcryptPasswordService, JoseTokenService
 from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.policy_dependencies import (
     get_policy_engine_usecase,
@@ -46,6 +51,16 @@ def get_refresh_token_from_cookie(
     if not refresh_token:
         raise CredentialsValidationException("No refresh token provided")
     return refresh_token
+
+
+def get_password_service() -> BcryptPasswordService:
+    """Dependency to provide BcryptPasswordService instance."""
+    return BcryptPasswordService()
+
+
+def get_token_service() -> JoseTokenService:
+    """Dependency to provide JoseTokenService instance."""
+    return JoseTokenService()
 
 
 def verify_token(token: str) -> Optional[TokenData]:
@@ -83,7 +98,6 @@ async def authorize(
     access_token: HTTPAuthorizationCredentials = Depends(security),
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
-    policy_engine_usecase: PolicyEngineUseCase = Depends(get_policy_engine_usecase),
 ) -> Optional[User]:
     """
     Get the current user from the token in the request and check required permissions.
@@ -166,7 +180,6 @@ def get_authorized_user(required_permissions: List[Permission] = []):
         access_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
         user_repository: IUserRepository = Depends(get_user_repository),
         role_repository: IRoleRepository = Depends(get_role_repository),
-        policy_engine_usecase: PolicyEngineUseCase = Depends(get_policy_engine_usecase),
     ) -> Optional[User]:
         if access_token is None:
             raise CredentialsValidationException()
@@ -176,15 +189,43 @@ def get_authorized_user(required_permissions: List[Permission] = []):
             required_permissions=required_permissions,
             user_repository=user_repository,
             role_repository=role_repository,
-            policy_engine_usecase=policy_engine_usecase,
         )
 
     return authorize_dependency
 
 
-async def get_auth_usecase(
+async def get_authenticate_user_usecase(
     user_repository: IUserRepository = Depends(get_user_repository),
+    password_service: BcryptPasswordService = Depends(get_password_service),
+) -> AuthenticateUserUseCase:
+    """Dependency to provide AuthenticateUserUseCase instance."""
+    return AuthenticateUserUseCase(user_repository, password_service)
+
+
+async def get_login_usecase(
+    authenticate_usecase: AuthenticateUserUseCase = Depends(
+        get_authenticate_user_usecase
+    ),
+    token_service: JoseTokenService = Depends(get_token_service),
     refresh_token_repository=Depends(get_refresh_token_repository),
-) -> AuthUseCase:
-    """Dependency to get auth service instance."""
-    return AuthUseCase(user_repository, refresh_token_repository)
+) -> LoginUseCase:
+    """Dependency to provide LoginUseCase instance."""
+    return LoginUseCase(authenticate_usecase, token_service, refresh_token_repository)
+
+
+async def get_refresh_access_token_usecase(
+    refresh_token_repository=Depends(get_refresh_token_repository),
+    user_repository: IUserRepository = Depends(get_user_repository),
+    token_service: JoseTokenService = Depends(get_token_service),
+) -> RefreshAccessTokenUseCase:
+    """Dependency to provide RefreshAccessTokenUseCase instance."""
+    return RefreshAccessTokenUseCase(
+        refresh_token_repository, user_repository, token_service
+    )
+
+
+async def get_logout_usecase(
+    refresh_token_repository=Depends(get_refresh_token_repository),
+) -> LogoutUseCase:
+    """Dependency to provide LogoutUseCase instance."""
+    return LogoutUseCase(refresh_token_repository)

@@ -2,8 +2,15 @@
 
 from fastapi import Depends
 
-from app.application.use_cases.policy_engine_use_cases import PolicyEngineUseCase
-from app.application.use_cases.policy_use_cases import PolicyUseCase
+from app.application.use_cases.policy_engine_use_cases import (
+    EvaluatePoliciesUseCase,
+)
+from app.application.use_cases.policy_use_cases import (
+    GetAllPoliciesUseCase,
+    GetPolicyByIdUseCase,
+    GetPolicyByTitleUseCase,
+    SearchPoliciesUseCase,
+)
 from app.infra.repositories.policy_repository import JSONPolicyRepository
 from app.interface.repository.policy_repository_interface import (
     IPolicyRepository,
@@ -15,15 +22,36 @@ async def get_policy_repository() -> IPolicyRepository:
     return JSONPolicyRepository()
 
 
-async def get_policy_usecase(
+async def get_get_all_policies_usecase(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
-) -> PolicyUseCase:
-    """Dependency to provide PolicyUseCase instance."""
-    return PolicyUseCase(policy_repository)
+) -> GetAllPoliciesUseCase:
+    """Dependency to provide GetAllPoliciesUseCase instance."""
+    return GetAllPoliciesUseCase(policy_repository)
+
+
+async def get_get_policy_by_id_usecase(
+    policy_repository: IPolicyRepository = Depends(get_policy_repository),
+) -> GetPolicyByIdUseCase:
+    """Dependency to provide GetPolicyByIdUseCase instance."""
+    return GetPolicyByIdUseCase(policy_repository)
+
+
+async def get_get_policy_by_title_usecase(
+    policy_repository: IPolicyRepository = Depends(get_policy_repository),
+) -> GetPolicyByTitleUseCase:
+    """Dependency to provide GetPolicyByTitleUseCase instance."""
+    return GetPolicyByTitleUseCase(policy_repository)
+
+
+async def get_search_policies_usecase(
+    policy_repository: IPolicyRepository = Depends(get_policy_repository),
+) -> SearchPoliciesUseCase:
+    """Dependency to provide SearchPoliciesUseCase instance."""
+    return SearchPoliciesUseCase(policy_repository)
 
 
 async def get_policy_engine_usecase(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
-) -> PolicyEngineUseCase:
-    """Dependency to provide PolicyEngineUseCase instance."""
-    return PolicyEngineUseCase(policy_repository)
+) -> EvaluatePoliciesUseCase:
+    """Dependency to provide EvaluatePoliciesUseCase instance."""
+    return EvaluatePoliciesUseCase(policy_repository)

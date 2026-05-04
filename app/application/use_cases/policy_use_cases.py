@@ -1,29 +1,116 @@
-from typing import List
+"""
+True Clean Architecture Use Cases for Policy operations.
+Use cases contain business logic and are independent of frameworks and external concerns.
+"""
+
+from dataclasses import dataclass
+from typing import List, Optional
 
 from app.domain.entities import PolicyEntity
 from app.interface.repository.policy_repository_interface import IPolicyRepository
 
 
-class PolicyUseCase:
-    """Use case layer for policy operations."""
+@dataclass(frozen=True)
+class GetAllPoliciesRequest:
+    """Input port for getting all policies."""
+    pass
+
+
+@dataclass(frozen=True)
+class GetAllPoliciesResponse:
+    """Output port for getting all policies."""
+    policies: List[PolicyEntity]
+
+
+@dataclass(frozen=True)
+class GetPolicyByIdRequest:
+    """Input port for getting a policy by ID."""
+    policy_id: str
+
+
+@dataclass(frozen=True)
+class GetPolicyByIdResponse:
+    """Output port for getting a policy by ID."""
+    policy: PolicyEntity
+
+
+@dataclass(frozen=True)
+class GetPolicyByTitleRequest:
+    """Input port for getting a policy by title."""
+    title: str
+
+
+@dataclass(frozen=True)
+class GetPolicyByTitleResponse:
+    """Output port for getting a policy by title."""
+    policy: PolicyEntity
+
+
+@dataclass(frozen=True)
+class SearchPoliciesRequest:
+    """Input port for searching policies by title."""
+    title_query: str
+
+
+@dataclass(frozen=True)
+class SearchPoliciesResponse:
+    """Output port for searching policies by title."""
+    policies: List[PolicyEntity]
+
+
+class GetAllPoliciesUseCase:
+    """Use case for retrieving all policies."""
 
     def __init__(self, policy_repository: IPolicyRepository):
-        self.policy_repository = policy_repository
+        self._policy_repo = policy_repository
 
-    async def get_all_policies(self) -> List[PolicyEntity]:
-        return await self.policy_repository.get_all()
+    async def execute(self, request: GetAllPoliciesRequest) -> GetAllPoliciesResponse:
+        """Execute the use case to get all policies."""
+        policies = await self._policy_repo.get_all()
+        return GetAllPoliciesResponse(policies=policies)
 
-    async def get_policy_by_id(self, policy_id: str) -> PolicyEntity:
-        policy = await self.policy_repository.get_by_id(policy_id)
+
+class GetPolicyByIdUseCase:
+    """Use case for retrieving a policy by ID."""
+
+    def __init__(self, policy_repository: IPolicyRepository):
+        self._policy_repo = policy_repository
+
+    async def execute(
+        self, request: GetPolicyByIdRequest
+    ) -> GetPolicyByIdResponse:
+        """Execute the use case to get a policy by ID."""
+        policy = await self._policy_repo.get_by_id(request.policy_id)
         if policy is None:
-            raise ValueError(f"Policy with ID {policy_id} not found")
-        return policy
+            raise ValueError(f"Policy with ID {request.policy_id} not found")
+        return GetPolicyByIdResponse(policy=policy)
 
-    async def get_policy_by_title(self, title: str) -> PolicyEntity:
-        policy = await self.policy_repository.get_by_title(title)
+
+class GetPolicyByTitleUseCase:
+    """Use case for retrieving a policy by title."""
+
+    def __init__(self, policy_repository: IPolicyRepository):
+        self._policy_repo = policy_repository
+
+    async def execute(
+        self, request: GetPolicyByTitleRequest
+    ) -> GetPolicyByTitleResponse:
+        """Execute the use case to get a policy by title."""
+        policy = await self._policy_repo.get_by_title(request.title)
         if policy is None:
-            raise ValueError(f"Policy with title {title} not found")
-        return policy
+            raise ValueError(f"Policy with title {request.title} not found")
+        return GetPolicyByTitleResponse(policy=policy)
 
-    async def search_policies_by_title(self, title_query: str) -> List[PolicyEntity]:
-        return await self.policy_repository.search_by_title(title_query)
+
+class SearchPoliciesUseCase:
+    """Use case for searching policies by title."""
+
+    def __init__(self, policy_repository: IPolicyRepository):
+        self._policy_repo = policy_repository
+
+    async def execute(
+        self, request: SearchPoliciesRequest
+    ) -> SearchPoliciesResponse:
+        """Execute the use case to search policies by title."""
+        policies = await self._policy_repo.search_by_title(request.title_query)
+        return SearchPoliciesResponse(policies=policies)
