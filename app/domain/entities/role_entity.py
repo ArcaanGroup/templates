@@ -2,7 +2,7 @@
 Domain Entity for Role - contains business logic and behavior
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
@@ -19,7 +19,9 @@ class RoleEntity:
     created_at: datetime
     updated_at: datetime
     is_active: bool = True
-    permission_ids: List[str] = []  # List of permission IDs for M:N relationship
+    permission_ids: List[str] = field(
+        default_factory=list
+    )  # List of permission IDs for M:N relationship
 
     @classmethod
     def create(
