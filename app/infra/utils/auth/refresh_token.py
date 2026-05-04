@@ -5,7 +5,7 @@ Refresh token utilities for authentication.
 from datetime import datetime, timedelta
 
 from app.domain.entities import RefreshTokenEntity
-from app.infrastructure.core.config import config
+from app.infra.core.config import config
 
 
 def generate_refresh_token(user_id: str) -> RefreshTokenEntity:

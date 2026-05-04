@@ -9,7 +9,7 @@ No Direct conversions from Entity to DTO or DTO to Entity
 from sqlalchemy import inspect as sa_inspect
 
 from app.domain.entities import UserEntity
-from app.infrastructure.db.orm import UserORM
+from app.infra.db.orm import UserORM
 from app.interface.dto import User as UserDTO
 from app.interface.dto import UserCreate, UserUpdate
 from app.interface.mappers import RoleMapper

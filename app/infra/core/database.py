@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from app.infrastructure.core.config import Config
+from app.infra.core.config import Config
 
 # Global variables to store engine and sessionmaker
 _engine: Optional[AsyncEngine] = None

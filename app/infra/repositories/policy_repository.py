@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from app.domain.entities import PolicyEntity
-from app.infrastructure.core.config import config
+from app.infra.core.config import config
 from app.interface.repository.policy_repository_interface import (
     IPolicyRepository,
 )

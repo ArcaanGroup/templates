@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from app.application.use_cases.policy_engine_use_cases import PolicyEngineUseCase
 from app.application.use_cases.policy_use_cases import PolicyUseCase
-from app.infrastructure.repositories.policy_repository import JSONPolicyRepository
+from app.infra.repositories.policy_repository import JSONPolicyRepository
 from app.interface.repository.policy_repository_interface import (
     IPolicyRepository,
 )

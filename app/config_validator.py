@@ -6,7 +6,7 @@ import os
 import sys
 from typing import List
 
-from app.infrastructure.core.config import Config
+from app.infra.core.config import Config
 
 
 def validate_config(config: Config) -> List[str]:

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.domain.entities import RoleEntity
-from app.infrastructure.db.orm import RoleORM
+from app.infra.db.orm import RoleORM
 from app.interface.mappers import RoleMapper
 from app.interface.repository.role_repository_interface import IRoleRepository
 

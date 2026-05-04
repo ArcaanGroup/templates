@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.domain.entities import RefreshTokenEntity
-from app.infrastructure.db.orm import RefreshTokenORM
+from app.infra.db.orm import RefreshTokenORM
 from app.interface.mappers import RefreshTokenMapper
 from app.interface.repository.refresh_token_repository_interface import (
     IRefreshTokenRepository,

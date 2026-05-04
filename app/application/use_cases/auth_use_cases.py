@@ -5,9 +5,9 @@ from app.domain.error.exceptions import (
     CredentialsValidationException,
     InactiveUserException,
 )
-from app.infrastructure.core import config
-from app.infrastructure.utils import verify_password
-from app.infrastructure.utils.auth import generate_access_token, generate_refresh_token
+from app.infra.core import config
+from app.infra.utils import verify_password
+from app.infra.utils.auth import generate_access_token, generate_refresh_token
 from app.interface.dto import Token, UserLogin
 from app.interface.mappers import UserMapper
 from app.interface.repository.refresh_token_repository_interface import (

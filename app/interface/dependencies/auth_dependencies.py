@@ -16,8 +16,8 @@ from app.domain.error.exceptions import (
     InactiveUserException,
     UnauthorizedException,
 )
-from app.infrastructure.core.config import config
-from app.infrastructure.utils.auth.permission import Permission
+from app.infra.core.config import config
+from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.policy_dependencies import (
     get_policy_engine_service,
 )

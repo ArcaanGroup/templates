@@ -255,7 +255,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.infrastructure.db.orm import Base
+from app.infra.db.orm import Base
 
 
 class {resource_pascal}Entity(Base):
@@ -330,7 +330,7 @@ No Direct conversions from Entity to DTO or DTO to Entity
 from app.domain.entities import {resource_pascal}Entity
 from app.interface.dto import {resource_pascal} as {resource_pascal}DTO
 from app.interface.dto import {resource_pascal}Create, {resource_pascal}Update
-from app.infrastructure.db.orm import {resource_pascal}Entity
+from app.infra.db.orm import {resource_pascal}Entity
 
 
 class {resource_pascal}Mapper:
@@ -468,7 +468,7 @@ from sqlalchemy.future import select
 from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.repository.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.domain.entities import {resource_pascal}Entity
-from app.infrastructure.db.orm import {resource_pascal}Entity
+from app.infra.db.orm import {resource_pascal}Entity
 from app.interface.mappers  import {resource_pascal}Mapper
 
 
@@ -662,9 +662,9 @@ def create_controller_dependencies(resource_snake, resource_pascal, dependencies
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infrastructure.core.database import get_db_session
+from app.infra.core.database import get_db_session
 from app.interface.repository.{resource_snake}_repository_interface import I{resource_pascal}Repository
-from app.infrastructure.repositories.{resource_snake}_repository import {resource_pascal}Repository
+from app.infra.repositories.{resource_snake}_repository import {resource_pascal}Repository
 from app.service.{resource_snake}_service import {resource_pascal}Service
 
 

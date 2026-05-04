@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
 from app.domain.error.exceptions import ValidationException
-from app.infrastructure.utils import hash_password
+from app.infra.utils import hash_password
 
 if TYPE_CHECKING:
     from app.domain.entities import RoleEntity

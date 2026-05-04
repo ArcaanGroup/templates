@@ -7,7 +7,7 @@ from typing import Optional
 
 from jose import JWTError, jwt
 
-from app.infrastructure.core.config import config
+from app.infra.core.config import config
 from app.interface.dto import TokenPayload
 
 # Export constants for backward compatibility

@@ -1,5 +1,5 @@
 """
-Package containing all infrastructure implementations like database configuration.
+Package containing all infra implementations like database configuration.
 """
 
 from .config import config

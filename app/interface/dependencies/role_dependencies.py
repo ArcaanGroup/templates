@@ -6,8 +6,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.role_use_cases import RoleUseCase
-from app.infrastructure.core.database import get_db_session
-from app.infrastructure.repositories.role_repository import RoleRepository
+from app.infra.core.database import get_db_session
+from app.infra.repositories.role_repository import RoleRepository
 from app.interface.dependencies.permission_dependencies import (
     get_permission_repository,
 )

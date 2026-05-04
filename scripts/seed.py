@@ -19,12 +19,12 @@ sys.path.insert(0, os.path.abspath("."))
 from fastapi_pagination import Params
 
 from app.domain.entities import RoleEntity, UserEntity
-from app.infrastructure.core.database import get_db_session
-from app.infrastructure.repositories.permission_repository import (
+from app.infra.core.database import get_db_session
+from app.infra.repositories.permission_repository import (
     JSONPermissionRepository,
 )
-from app.infrastructure.repositories.role_repository import RoleRepository
-from app.infrastructure.repositories.user_repository import UserRepository
+from app.infra.repositories.role_repository import RoleRepository
+from app.infra.repositories.user_repository import UserRepository
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
 

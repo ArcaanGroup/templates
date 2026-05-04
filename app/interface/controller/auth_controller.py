@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, Request, Response
 from app.application.use_cases.auth_use_cases import AuthUseCase
 from app.application.use_cases.permission_use_cases import PermissionUseCase
 from app.domain.error.exceptions import CredentialsValidationException
-from app.infrastructure.core.config import config
-from app.infrastructure.utils.auth.permission import Permission
+from app.infra.core.config import config
+from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.auth_dependencies import (
     get_auth_service,
     get_authorized_user,

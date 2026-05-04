@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
 
 from app.application.use_cases.role_use_cases import RoleUseCase
-from app.infrastructure.utils.auth.permission import Permission
+from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.auth_dependencies import get_authorized_user
 from app.interface.dependencies.role_dependencies import get_role_service
 from app.interface.dto import Role, RoleCreate, RoleUpdate

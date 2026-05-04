@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi_pagination import Params
 
-from app.infrastructure.core.config import config
+from app.infra.core.config import config
 
 
 def extract_limit_skip_from_params(params: Optional[Params]) -> tuple[int, int]:

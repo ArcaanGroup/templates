@@ -5,8 +5,8 @@ Refresh token-related dependencies and dependency injection logic.
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infrastructure.core.database import get_db_session
-from app.infrastructure.repositories.refresh_token_repository import (
+from app.infra.core.database import get_db_session
+from app.infra.repositories.refresh_token_repository import (
     RefreshTokenRepository,
 )
 from app.interface.repository.refresh_token_repository_interface import (

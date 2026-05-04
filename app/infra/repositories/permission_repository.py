@@ -7,7 +7,7 @@ import json
 from typing import List, Optional
 
 from app.domain.entities import PermissionEntity
-from app.infrastructure.core.config import config
+from app.infra.core.config import config
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
