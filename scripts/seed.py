@@ -11,10 +11,10 @@ import os
 import sys
 from typing import List
 
-from app.application.use_cases.role_use_cases import RoleUseCase
-
-# Add the project root to the path
+# Add the project root to the path BEFORE importing from app
 sys.path.insert(0, os.path.abspath("."))
+
+from app.application.use_cases.role_use_cases import RoleUseCase
 
 from fastapi_pagination import Params
 

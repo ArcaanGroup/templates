@@ -10,7 +10,7 @@ from app.domain.error.exceptions import CredentialsValidationException
 from app.infra.core.config import config
 from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.auth_dependencies import (
-    get_auth_service,
+    get_auth_usecase,
     get_authorized_user,
     get_refresh_token_from_cookie,
 )
@@ -30,10 +30,10 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 async def login(
     response: Response,
     user_login: UserLogin,
-    auth_service: AuthUseCase = Depends(get_auth_service),
+    auth_usecase: AuthUseCase = Depends(get_auth_usecase),
 ):
     """Authenticate user and return JWT token."""
-    (access_token, refresh_token) = await auth_service.login(user_login)
+    (access_token, refresh_token) = await auth_usecase.login(user_login)
 
     response.set_cookie(
         key=refresh_token.title,
@@ -50,7 +50,7 @@ async def login(
 
 @auth_router.post("/refresh", response_model=StandardResponse[Token])
 async def refresh_tokens(
-    auth_service: AuthUseCase = Depends(get_auth_service),
+    auth_service: AuthUseCase = Depends(get_auth_usecase),
     refresh_token: str = Depends(get_refresh_token_from_cookie),
 ):
     """Refresh the access token using the refresh token from HTTP-only cookie."""
@@ -64,7 +64,7 @@ async def refresh_tokens(
 async def logout(
     request: Request,
     response: Response,
-    auth_service: AuthUseCase = Depends(get_auth_service),
+    auth_service: AuthUseCase = Depends(get_auth_usecase),
 ):
     """Logout the user by blacklisting the refresh token."""
     # Get the refresh token from the cookie

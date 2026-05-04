@@ -37,10 +37,10 @@ class UserORM(Base):
 
     # Relationship with refresh tokens
     refresh_tokens: Mapped[list["RefreshTokenORM"]] = relationship(
-        "RefreshTokenEntity", back_populates="user", cascade="all, delete-orphan"
+        "RefreshTokenORM", back_populates="user", cascade="all, delete-orphan"
     )
 
     # Relationship with roles (many-to-many)
     roles: Mapped[list["RoleORM"]] = relationship(
-        "RoleEntity", secondary="user_roles", back_populates="users"
+        "RoleORM", secondary="user_roles", back_populates="users"
     )

@@ -38,5 +38,5 @@ class RoleORM(Base):
 
     # Relationship with users (many-to-many)
     users: Mapped[list["UserORM"]] = relationship(
-        "UserEntity", secondary="user_roles", back_populates="roles"
+        "UserORM", secondary="user_roles", back_populates="roles"
     )

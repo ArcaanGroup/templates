@@ -182,7 +182,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
     return authorize_dependency
 
 
-async def get_auth_service(
+async def get_auth_usecase(
     user_repository: IUserRepository = Depends(get_user_repository),
     refresh_token_repository=Depends(get_refresh_token_repository),
 ) -> AuthUseCase:

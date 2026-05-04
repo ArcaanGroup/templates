@@ -34,12 +34,12 @@ class Config(BaseSettings):
     # Static files paths
     permissions_path: str = Field(
         default=str(
-            Path(__file__).parent.parent.parent / "statics" / "permissions.json"
+            Path(__file__).parent.parent.parent.parent / "statics" / "permissions.json"
         ),
         alias="PERMISSIONS_PATH",
     )
     policies_path: str = Field(
-        default=str(Path(__file__).parent.parent.parent / "statics" / "policies.json"),
+        default=str(Path(__file__).parent.parent.parent.parent / "statics" / "policies.json"),
         alias="POLICIES_PATH",
     )
 

@@ -30,6 +30,4 @@ class RefreshTokenORM(Base):
     blacklisted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Relationship
-    user: Mapped["UserORM"] = relationship(
-        "UserEntity", back_populates="refresh_tokens"
-    )
+    user: Mapped["UserORM"] = relationship("UserORM", back_populates="refresh_tokens")
