@@ -14,10 +14,9 @@ from typing import List
 # Add the project root to the path BEFORE importing from app
 sys.path.insert(0, os.path.abspath("."))
 
-from app.application.use_cases.role_use_cases import RoleUseCase
-
 from fastapi_pagination import Params
 
+from app.application.use_cases.role_use_cases import RoleUseCase
 from app.domain.entities import RoleEntity, UserEntity
 from app.infra.core.database import get_db_session
 from app.infra.repositories.permission_repository import (
@@ -56,8 +55,8 @@ async def create_roles(role_repository: IRoleRepository):
                 super_user_permission = await permission_repo.get_by_title("super:user")
                 if super_user_permission:
                     # Create role service to assign permission
-                    role_service = RoleUseCase(role_repository, permission_repo)
-                    await role_service.assign_permission_to_role(
+                    role_usecase = RoleUseCase(role_repository, permission_repo)
+                    await role_usecase.assign_permission_to_role(
                         role.id, super_user_permission.id
                     )
                     print(f"Assigned permission 'super:user' to role: {role.name}")

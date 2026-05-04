@@ -79,11 +79,6 @@ auth: ## Run the authorization manager CLI
 	@echo "Starting Authorization Manager..."
 	$(PDM) run python scripts/auth_manager.py
 
-.PHONY: resource
-resource: ## Create a new resource with all 4 layers (models, service, repository, controller)
-	@echo "Creating a new resource..."
-	$(PDM) run python scripts/create_resource.py
-
 .PHONY: migrate
 migrate: ## Create a new auto-generated migration
 	@echo "Creating a new auto-generated migration..."

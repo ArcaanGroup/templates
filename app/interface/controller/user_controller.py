@@ -4,7 +4,7 @@ from fastapi_pagination import Page, Params
 from app.application.use_cases.user_use_cases import UserUseCase
 from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.auth_dependencies import get_authorized_user
-from app.interface.dependencies.user_dependencies import get_user_service
+from app.interface.dependencies.user_dependencies import get_user_usecase
 from app.interface.dto import User, UserCreate, UserUpdate
 from app.interface.dto.responses import StandardResponse, success
 
@@ -14,7 +14,7 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 
 @user_router.get("/", response_model=StandardResponse[Page[User]])
 async def get_users(
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     params: Params = Depends(),
     _=Depends(get_authorized_user([Permission.Users_Read])),
 ):
@@ -30,7 +30,7 @@ async def get_users(
 @user_router.post("/", response_model=StandardResponse[User])
 async def create_user(
     user_create: UserCreate,
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_Create])),
 ):
     """Create a new user"""
@@ -42,7 +42,7 @@ async def create_user(
 @user_router.get("/{user_id}", response_model=StandardResponse[User])
 async def get_user(
     user_id: str,
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_Read])),
 ):
     """Get a specific user by ID"""
@@ -55,7 +55,7 @@ async def get_user(
 async def update_user(
     user_id: str,
     user_update: UserUpdate,
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_Update])),
 ):
     """Update a specific user by ID"""
@@ -68,7 +68,7 @@ async def update_user(
 async def delete_user(
     user_id: str,
     service: UserUseCase = Depends(
-        get_user_service,
+        get_user_usecase,
     ),
     _=Depends(get_authorized_user([Permission.Users_Delete])),
 ):
@@ -82,7 +82,7 @@ async def delete_user(
 async def assign_role_to_user(
     user_id: str,
     role_id: str,
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_AssignRole])),
 ):
     """Assign a role to a user"""
@@ -95,7 +95,7 @@ async def assign_role_to_user(
 async def remove_role_from_user(
     user_id: str,
     role_id: str,
-    service: UserUseCase = Depends(get_user_service),
+    service: UserUseCase = Depends(get_user_usecase),
     _=Depends(get_authorized_user([Permission.Users_UnassignRole])),
 ):
     """Remove a role from a user"""

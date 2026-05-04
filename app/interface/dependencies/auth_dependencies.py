@@ -19,7 +19,7 @@ from app.domain.error.exceptions import (
 from app.infra.core.config import config
 from app.infra.utils.auth.permission import Permission
 from app.interface.dependencies.policy_dependencies import (
-    get_policy_engine_service,
+    get_policy_engine_usecase,
 )
 from app.interface.dependencies.refresh_token_dependencies import (
     get_refresh_token_repository,
@@ -83,7 +83,7 @@ async def authorize(
     access_token: HTTPAuthorizationCredentials = Depends(security),
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
-    policy_engine_service: PolicyEngineUseCase = Depends(get_policy_engine_service),
+    policy_engine_usecase: PolicyEngineUseCase = Depends(get_policy_engine_usecase),
 ) -> Optional[User]:
     """
     Get the current user from the token in the request and check required permissions.
@@ -166,7 +166,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
         access_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
         user_repository: IUserRepository = Depends(get_user_repository),
         role_repository: IRoleRepository = Depends(get_role_repository),
-        policy_engine_service: PolicyEngineUseCase = Depends(get_policy_engine_service),
+        policy_engine_usecase: PolicyEngineUseCase = Depends(get_policy_engine_usecase),
     ) -> Optional[User]:
         if access_token is None:
             raise CredentialsValidationException()
@@ -176,7 +176,7 @@ def get_authorized_user(required_permissions: List[Permission] = []):
             required_permissions=required_permissions,
             user_repository=user_repository,
             role_repository=role_repository,
-            policy_engine_service=policy_engine_service,
+            policy_engine_usecase=policy_engine_usecase,
         )
 
     return authorize_dependency

@@ -20,7 +20,7 @@ async def get_user_repository(
     return UserRepository(db_session=db_session)
 
 
-async def get_user_service(
+async def get_user_usecase(
     user_repository: IUserRepository = Depends(get_user_repository),
     role_repository: IRoleRepository = Depends(get_role_repository),
 ) -> UserUseCase:

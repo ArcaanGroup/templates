@@ -15,7 +15,7 @@ from app.interface.dependencies.auth_dependencies import (
     get_refresh_token_from_cookie,
 )
 from app.interface.dependencies.permission_dependencies import (
-    get_permission_service,
+    get_permission_usecase,
 )
 from app.interface.dto import Permission as PermissionDTO
 from app.interface.dto import Token, User, UserLogin
@@ -50,12 +50,12 @@ async def login(
 
 @auth_router.post("/refresh", response_model=StandardResponse[Token])
 async def refresh_tokens(
-    auth_service: AuthUseCase = Depends(get_auth_usecase),
+    auth_usecase: AuthUseCase = Depends(get_auth_usecase),
     refresh_token: str = Depends(get_refresh_token_from_cookie),
 ):
     """Refresh the access token using the refresh token from HTTP-only cookie."""
     # Use the auth service to refresh the access token
-    new_token = await auth_service.refresh_access_token(refresh_token)
+    new_token = await auth_usecase.refresh_access_token(refresh_token)
 
     return success(message="Token refreshed successfully", payload=new_token)
 
@@ -64,7 +64,7 @@ async def refresh_tokens(
 async def logout(
     request: Request,
     response: Response,
-    auth_service: AuthUseCase = Depends(get_auth_usecase),
+    auth_usecase: AuthUseCase = Depends(get_auth_usecase),
 ):
     """Logout the user by blacklisting the refresh token."""
     # Get the refresh token from the cookie
@@ -72,7 +72,7 @@ async def logout(
 
     if refresh_token:
         # Blacklist the refresh token in the database
-        await auth_service.logout(refresh_token)
+        await auth_usecase.logout(refresh_token)
 
         # Clear the refresh token cookie
         response.delete_cookie(key="refresh_token", path="/")
@@ -85,13 +85,13 @@ async def logout(
 
 @auth_router.get("/permissions", response_model=StandardResponse[list[PermissionDTO]])
 async def get_permissions(
-    permission_service: PermissionUseCase = Depends(get_permission_service),
+    permission_usecase: PermissionUseCase = Depends(get_permission_usecase),
     _=Depends(get_authorized_user([Permission.Permissions_Read])),
 ):
     """Return all permissions with their associated policy objects from the JSON files."""
     try:
         # Get permissions from the service (which uses the JSON file)
-        permissions_domain = await permission_service.get_all_permissions()
+        permissions_domain = await permission_usecase.get_all_permissions()
 
         permissions = [
             PermissionMapper.to_dto(permission).model_dump()

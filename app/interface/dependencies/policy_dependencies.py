@@ -15,14 +15,14 @@ async def get_policy_repository() -> IPolicyRepository:
     return JSONPolicyRepository()
 
 
-async def get_policy_service(
+async def get_policy_usecase(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
 ) -> PolicyUseCase:
     """Dependency to provide PolicyUseCase instance."""
     return PolicyUseCase(policy_repository)
 
 
-async def get_policy_engine_service(
+async def get_policy_engine_usecase(
     policy_repository: IPolicyRepository = Depends(get_policy_repository),
 ) -> PolicyEngineUseCase:
     """Dependency to provide PolicyEngineUseCase instance."""

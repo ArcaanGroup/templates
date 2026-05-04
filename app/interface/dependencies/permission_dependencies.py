@@ -18,7 +18,7 @@ async def get_permission_repository() -> IPermissionRepository:
     return JSONPermissionRepository()
 
 
-async def get_permission_service(
+async def get_permission_usecase(
     permission_repository: IPermissionRepository = Depends(get_permission_repository),
 ) -> PermissionUseCase:
     """Dependency to provide PermissionUseCase instance."""

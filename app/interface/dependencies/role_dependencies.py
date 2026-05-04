@@ -24,7 +24,7 @@ async def get_role_repository(
     return RoleRepository(db_session=db_session)
 
 
-async def get_role_service(
+async def get_role_usecase(
     role_repository: IRoleRepository = Depends(get_role_repository),
     permission_repository: IPermissionRepository = Depends(get_permission_repository),
 ) -> RoleUseCase:
