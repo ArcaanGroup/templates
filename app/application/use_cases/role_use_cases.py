@@ -6,10 +6,10 @@ from app.domain.entities import RoleEntity
 from app.infrastructure.error.exceptions import ResourceNotFoundException
 from app.infrastructure.mappers import RoleMapper
 from app.interface.dto import Role, RoleCreate, RoleUpdate
-from app.interface.repositories.permission_repository_interface import (
+from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
-from app.interface.repositories.role_repository_interface import IRoleRepository
+from app.interface.repository.role_repository_interface import IRoleRepository
 
 
 class RoleUseCase:

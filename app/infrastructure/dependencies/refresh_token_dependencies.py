@@ -6,10 +6,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.core.database import get_db_session
-from app.infrastructure.repository.refresh_token_repository import (
+from app.infrastructure.repositories.refresh_token_repository import (
     RefreshTokenRepository,
 )
-from app.interface.repositories.refresh_token_repository_interface import (
+from app.interface.repository.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 

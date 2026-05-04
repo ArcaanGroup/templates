@@ -1,9 +1,9 @@
 from typing import List
 
-from app.interface.repositories.permission_repository_interface import (
+from app.domain.entities import PermissionEntity
+from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
-from app.domain.entities import PermissionEntity
 
 
 class PermissionUseCase:
@@ -27,5 +27,7 @@ class PermissionUseCase:
             raise ValueError(f"Permission with title {title} not found")
         return permission
 
-    async def search_permissions_by_title(self, title_query: str) -> List[PermissionEntity]:
+    async def search_permissions_by_title(
+        self, title_query: str
+    ) -> List[PermissionEntity]:
         return await self.permission_repository.search_by_title(title_query)

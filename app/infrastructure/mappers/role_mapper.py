@@ -9,7 +9,7 @@ No Direct conversions from Entity to DTO or DTO to Entity
 from datetime import datetime
 
 from app.domain.entities import RoleEntity
-from app.infrastructure.orm import RoleORM
+from app.infrastructure.db.orm import RoleORM
 from app.interface.dto import Role as RoleDTO
 from app.interface.dto import RoleCreate, RoleUpdate
 

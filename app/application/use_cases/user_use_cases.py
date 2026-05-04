@@ -8,8 +8,8 @@ from app.infrastructure.error.exceptions import (
 )
 from app.infrastructure.mappers import UserMapper
 from app.interface.dto import User, UserCreate, UserUpdate
-from app.interface.repositories.role_repository_interface import IRoleRepository
-from app.interface.repositories.user_repository_interface import IUserRepository
+from app.interface.repository.role_repository_interface import IRoleRepository
+from app.interface.repository.user_repository_interface import IUserRepository
 
 
 class UserUseCase:

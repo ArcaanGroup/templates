@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import JSON, Boolean, DateTime, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infrastructure.orm import Base
+from app.infrastructure.db.orm import Base
 
 if TYPE_CHECKING:
-    from app.infrastructure.orm import UserORM
+    from app.infrastructure.db.orm import UserORM
 
 
 class RoleORM(Base):

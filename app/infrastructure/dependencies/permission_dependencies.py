@@ -5,8 +5,10 @@ Permission-related dependencies and dependency injection logic.
 from fastapi import Depends
 
 from app.application.use_cases.permission_use_cases import PermissionUseCase
-from app.infrastructure.repository.permission_repository import JSONPermissionRepository
-from app.interface.repositories.permission_repository_interface import (
+from app.infrastructure.repositories.permission_repository import (
+    JSONPermissionRepository,
+)
+from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
 

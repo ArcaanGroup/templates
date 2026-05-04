@@ -10,11 +10,11 @@ from app.infrastructure.core.database import get_db_session
 from app.infrastructure.dependencies.permission_dependencies import (
     get_permission_repository,
 )
-from app.infrastructure.repository.role_repository import RoleRepository
-from app.interface.repositories.permission_repository_interface import (
+from app.infrastructure.repositories.role_repository import RoleRepository
+from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
-from app.interface.repositories.role_repository_interface import IRoleRepository
+from app.interface.repository.role_repository_interface import IRoleRepository
 
 
 async def get_role_repository(

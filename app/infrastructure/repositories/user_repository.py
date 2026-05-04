@@ -15,13 +15,13 @@ from app.domain.entities import UserEntity
 from app.infrastructure.db.association import (
     UsersRolesAssociation,
 )
+from app.infrastructure.db.orm import RoleORM, UserORM
 from app.infrastructure.error.exceptions import (
     ConflictException,
     ResourceNotFoundException,
 )
 from app.infrastructure.mappers import UserMapper
-from app.infrastructure.orm import RoleORM, UserORM
-from app.interface.repositories.user_repository_interface import IUserRepository
+from app.interface.repository.user_repository_interface import IUserRepository
 
 
 class UserRepository(IUserRepository):

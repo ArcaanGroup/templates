@@ -21,11 +21,13 @@ from fastapi_pagination import Params
 
 from app.domain.entities import RoleEntity, UserEntity
 from app.infrastructure.core.database import get_db_session
-from app.infrastructure.repository.permission_repository import JSONPermissionRepository
-from app.infrastructure.repository.role_repository import RoleRepository
-from app.infrastructure.repository.user_repository import UserRepository
-from app.interface.repositories.role_repository_interface import IRoleRepository
-from app.interface.repositories.user_repository_interface import IUserRepository
+from app.infrastructure.repositories.permission_repository import (
+    JSONPermissionRepository,
+)
+from app.infrastructure.repositories.role_repository import RoleRepository
+from app.infrastructure.repositories.user_repository import UserRepository
+from app.interface.repository.role_repository_interface import IRoleRepository
+from app.interface.repository.user_repository_interface import IUserRepository
 
 
 async def create_roles(role_repository: IRoleRepository):

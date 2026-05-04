@@ -8,7 +8,7 @@ from typing import List, Optional
 
 from app.domain.entities import PolicyEntity
 from app.infrastructure.core.config import config
-from app.interface.repositories.policy_repository_interface import (
+from app.interface.repository.policy_repository_interface import (
     IPolicyRepository,
 )
 

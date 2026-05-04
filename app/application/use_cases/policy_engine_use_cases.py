@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from app.domain.entities import PolicyEntity
 from app.infrastructure.error.exceptions import UnauthorizedException
-from app.interface.repositories.policy_repository_interface import IPolicyRepository
+from app.interface.repository.policy_repository_interface import IPolicyRepository
 
 
 class PolicyEngineUseCase:

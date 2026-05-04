@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.use_cases.user_use_cases import UserUseCase
 from app.infrastructure.core.database import get_db_session
 from app.infrastructure.dependencies.role_dependencies import get_role_repository
-from app.infrastructure.repository.user_repository import UserRepository
-from app.interface.repositories.role_repository_interface import IRoleRepository
-from app.interface.repositories.user_repository_interface import IUserRepository
+from app.infrastructure.repositories.user_repository import UserRepository
+from app.interface.repository.role_repository_interface import IRoleRepository
+from app.interface.repository.user_repository_interface import IUserRepository
 
 
 async def get_user_repository(
