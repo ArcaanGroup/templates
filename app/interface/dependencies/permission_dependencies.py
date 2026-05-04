@@ -4,7 +4,7 @@ Permission-related dependencies and dependency injection logic.
 
 from fastapi import Depends
 
-from app.application.use_cases.permission_use_cases import (
+from app.application.use_cases.permission import (
     GetAllPermissionsUseCase,
     GetPermissionByIdUseCase,
     GetPermissionByTitleUseCase,

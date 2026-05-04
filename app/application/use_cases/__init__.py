@@ -4,7 +4,7 @@ All use cases are independent of frameworks and external concerns.
 """
 
 # User use cases
-from .user_use_cases import (
+from .user import (
     AssignRoleRequest,
     AssignRoleResponse,
     AssignRoleToUserUseCase,
@@ -29,7 +29,7 @@ from .user_use_cases import (
 )
 
 # Auth use cases
-from .auth_use_cases import (
+from .auth import (
     AuthenticateUserUseCase,
     ITokenService,
     IPasswordService,
@@ -46,7 +46,7 @@ from .auth_use_cases import (
 )
 
 # Role use cases
-from .role_use_cases import (
+from .role import (
     AssignPermissionRequest,
     AssignPermissionResponse,
     AssignPermissionToRoleUseCase,
@@ -71,7 +71,7 @@ from .role_use_cases import (
 )
 
 # Permission use cases
-from .permission_use_cases import (
+from .permission import (
     GetAllPermissionsRequest,
     GetAllPermissionsResponse,
     GetAllPermissionsUseCase,
@@ -87,7 +87,7 @@ from .permission_use_cases import (
 )
 
 # Policy use cases
-from .policy_use_cases import (
+from .policy import (
     GetAllPoliciesRequest,
     GetAllPoliciesResponse,
     GetAllPoliciesUseCase,
@@ -103,7 +103,7 @@ from .policy_use_cases import (
 )
 
 # Policy engine use cases
-from .policy_engine_use_cases import (
+from .policy_engine import (
     EvaluatePoliciesRequest,
     EvaluatePoliciesResponse,
     EvaluatePoliciesUseCase,

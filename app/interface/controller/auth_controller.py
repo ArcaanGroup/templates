@@ -10,13 +10,13 @@ from app.application.use_cases import (
     LogoutUseCase,
     RefreshAccessTokenUseCase,
 )
-from app.application.use_cases.auth_use_cases import (
+from app.application.use_cases.auth import (
     LoginRequest,
     LogoutRequest,
     RefreshTokenRequest,
     TokenResponse,
 )
-from app.application.use_cases.permission_use_cases import GetAllPermissionsUseCase
+from app.application.use_cases.permission import GetAllPermissionsUseCase
 from app.domain.error.exceptions import CredentialsValidationException
 from app.infra.core.config import config
 from app.infra.utils.auth.permission import Permission

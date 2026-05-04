@@ -1,6 +1,6 @@
 """
-True Clean Architecture Use Cases for Policy Engine operations.
-Use cases contain business logic and are independent of frameworks and external concerns.
+True Clean Architecture Use Case for evaluating policies.
+Use case contains business logic and is independent of frameworks and external concerns.
 """
 
 from dataclasses import dataclass

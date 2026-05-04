@@ -2,14 +2,14 @@
 
 from fastapi import Depends
 
-from app.application.use_cases.policy_engine_use_cases import (
-    EvaluatePoliciesUseCase,
-)
-from app.application.use_cases.policy_use_cases import (
+from app.application.use_cases.policy import (
     GetAllPoliciesUseCase,
     GetPolicyByIdUseCase,
     GetPolicyByTitleUseCase,
     SearchPoliciesUseCase,
+)
+from app.application.use_cases.policy_engine import (
+    EvaluatePoliciesUseCase,
 )
 from app.infra.repositories.policy_repository import JSONPolicyRepository
 from app.interface.repository.policy_repository_interface import (

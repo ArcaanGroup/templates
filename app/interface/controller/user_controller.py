@@ -10,7 +10,7 @@ from app.application.use_cases import (
     RemoveRoleFromUserUseCase,
     UpdateUserUseCase,
 )
-from app.application.use_cases.user_use_cases import (
+from app.application.use_cases.user import (
     AssignRoleRequest,
     CreateUserRequest,
     DeleteUserRequest,

@@ -8,7 +8,7 @@ from fastapi import Cookie, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
-from app.application.use_cases.auth_use_cases import (
+from app.application.use_cases.auth import (
     AuthenticateUserUseCase,
     LoginUseCase,
     LogoutUseCase,

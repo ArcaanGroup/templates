@@ -10,7 +10,7 @@ from app.application.use_cases import (
     RemovePermissionFromRoleUseCase,
     UpdateRoleUseCase,
 )
-from app.application.use_cases.role_use_cases import (
+from app.application.use_cases.role import (
     AssignPermissionRequest,
     CreateRoleRequest,
     DeleteRoleRequest,

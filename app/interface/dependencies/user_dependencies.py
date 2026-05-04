@@ -5,7 +5,7 @@ User-related dependencies and dependency injection logic.
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.user_use_cases import (
+from app.application.use_cases.user import (
     AssignRoleToUserUseCase,
     CreateUserUseCase,
     DeleteUserUseCase,

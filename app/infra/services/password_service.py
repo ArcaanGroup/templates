@@ -3,7 +3,7 @@ Password service implementation - Infrastructure layer.
 Implements IPasswordService from the application layer.
 """
 
-from app.application.use_cases.auth_use_cases import IPasswordService
+from app.application.use_cases.auth.interfaces import IPasswordService
 from app.infra.utils.password import hash_password, verify_password
 
 

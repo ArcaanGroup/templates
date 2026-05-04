@@ -3,9 +3,7 @@ Token service implementation - Infrastructure layer.
 Implements ITokenService from the application layer.
 """
 
-from datetime import timedelta
-
-from app.application.use_cases.auth_use_cases import ITokenService
+from app.application.use_cases.auth.interfaces import ITokenService
 from app.domain.entities import RefreshTokenEntity
 from app.infra.core.config import config
 from app.infra.utils.auth.jwt import generate_access_token
