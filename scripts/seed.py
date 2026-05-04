@@ -11,15 +11,21 @@ import os
 import sys
 from typing import List
 
+from fastapi_pagination import Params
+
 # Add the project root to the path BEFORE importing from app
 sys.path.insert(0, os.path.abspath("."))
 
-from app.application.use_cases.role_use_cases import (
+from app.application.use_cases.role import (
+    AssignPermissionRequest,
     AssignPermissionToRoleUseCase,
+    CreateRoleRequest,
     CreateRoleUseCase,
 )
-from app.application.use_cases.user_use_cases import (
+from app.application.use_cases.user import (
+    AssignRoleRequest,
     AssignRoleToUserUseCase,
+    CreateUserRequest,
     CreateUserUseCase,
 )
 from app.domain.entities import RoleEntity, UserEntity
@@ -46,7 +52,7 @@ async def create_roles(
     for role_data in roles_data:
         try:
             # Check if role already exists
-            existing_roles = await role_repository.get_all()
+            existing_roles = await role_repository.get_all(Params(page=1, size=100))
             existing_role_names = [r.name for r in existing_roles]
 
             if role_data["name"] not in existing_role_names:
@@ -125,7 +131,7 @@ async def create_users(
                 print(f"Created user: {user.username}")
 
                 # Find the Admin role and assign it to the user
-                existing_roles = await role_repository.get_all()
+                existing_roles = await role_repository.get_all(Params(page=1, size=100))
                 admin_role = next(
                     (r for r in existing_roles if r.name == "Admin"), None
                 )
@@ -136,9 +142,7 @@ async def create_users(
                         user_repository, role_repository
                     )
                     await assign_role_usecase.execute(
-                        AssignRoleRequest(
-                            user_id=user.id, role_id=admin_role.id
-                        )
+                        AssignRoleRequest(user_id=user.id, role_id=admin_role.id)
                     )
                     print(f"Assigned admin role to user: {user.username}")
 
