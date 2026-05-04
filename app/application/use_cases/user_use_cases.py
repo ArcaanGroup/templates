@@ -1,12 +1,10 @@
-from typing import Optional
-
 from fastapi_pagination import Page, Params
 
-from app.infrastructure.error.exceptions import (
+from app.application.mappers import UserMapper
+from app.domain.error.exceptions import (
     ConflictException,
     ResourceNotFoundException,
 )
-from app.infrastructure.mappers import UserMapper
 from app.interface.dto import User, UserCreate, UserUpdate
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository

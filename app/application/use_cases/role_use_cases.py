@@ -1,10 +1,10 @@
-from typing import List, Optional
+from typing import List
 
 from fastapi_pagination import Page, Params
 
+from app.application.mappers import RoleMapper
 from app.domain.entities import RoleEntity
-from app.infrastructure.error.exceptions import ResourceNotFoundException
-from app.infrastructure.mappers import RoleMapper
+from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.dto import Role, RoleCreate, RoleUpdate
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,

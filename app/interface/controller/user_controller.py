@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
 
+from app.application.dependencies.auth_dependencies import get_authorized_user
+from app.application.dependencies.user_dependencies import get_user_service
 from app.application.use_cases.user_use_cases import UserUseCase
-from app.infrastructure.dependencies.auth_dependencies import get_authorized_user
-from app.infrastructure.dependencies.user_dependencies import get_user_service
 from app.infrastructure.utils.auth.permission import Permission
 from app.interface.dto import User, UserCreate, UserUpdate
 from app.interface.dto.responses import StandardResponse, success

@@ -5,11 +5,11 @@ role-related dependencies and dependency injection logic.
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.role_use_cases import RoleUseCase
-from app.infrastructure.core.database import get_db_session
-from app.infrastructure.dependencies.permission_dependencies import (
+from app.application.dependencies.permission_dependencies import (
     get_permission_repository,
 )
+from app.application.use_cases.role_use_cases import RoleUseCase
+from app.infrastructure.core.database import get_db_session
 from app.infrastructure.repositories.role_repository import RoleRepository
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,

@@ -4,19 +4,19 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from app.application.use_cases.auth_use_cases import AuthUseCase
-from app.application.use_cases.permission_use_cases import PermissionUseCase
-from app.infrastructure.core.config import config
-from app.infrastructure.dependencies.auth_dependencies import (
+from app.application.dependencies.auth_dependencies import (
     get_auth_service,
     get_authorized_user,
     get_refresh_token_from_cookie,
 )
-from app.infrastructure.dependencies.permission_dependencies import (
+from app.application.dependencies.permission_dependencies import (
     get_permission_service,
 )
-from app.infrastructure.error.exceptions import CredentialsValidationException
-from app.infrastructure.mappers import PermissionMapper
+from app.application.mappers import PermissionMapper
+from app.application.use_cases.auth_use_cases import AuthUseCase
+from app.application.use_cases.permission_use_cases import PermissionUseCase
+from app.domain.error.exceptions import CredentialsValidationException
+from app.infrastructure.core.config import config
 from app.infrastructure.utils.auth.permission import Permission
 from app.interface.dto import Permission as PermissionDTO
 from app.interface.dto import Token, User, UserLogin

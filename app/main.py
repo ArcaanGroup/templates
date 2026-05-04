@@ -2,9 +2,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
+from app.domain.error.exception_handlers import register_all_exception_handlers
 from app.infrastructure.core.add_middlewares import add_middlewares
 from app.infrastructure.core.logging import register_logger
-from app.infrastructure.error.exception_handlers import register_all_exception_handlers
 from app.interface.controller import api_router
 
 app = FastAPI(title="FastAPI Server", version="1.0.0")

@@ -173,7 +173,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from app.infrastructure.error.exceptions import ValidationException
+from app.domain.error.exceptions import ValidationException
 
 
 @dataclass
@@ -465,11 +465,11 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.infrastructure.error.exceptions import ResourceNotFoundException
+from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.repository.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.domain.entities import {resource_pascal}Entity
 from app.infrastructure.db.orm import {resource_pascal}Entity
-from app.infrastructure.mappers  import {resource_pascal}Mapper
+from app.application.mappers  import {resource_pascal}Mapper
 
 
 class {resource_pascal}Repository(I{resource_pascal}Repository):
@@ -560,10 +560,10 @@ def create_service(resource_snake, resource_pascal, service_dir):
 
     service_content = f'''from fastapi_pagination import Page, Params
 
-from app.infrastructure.error.exceptions import ResourceNotFoundException
+from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.repository.{resource_snake}_repository_interface import I{resource_pascal}Repository
 from app.interface.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
-from app.infrastructure.mappers  import {resource_pascal}Mapper
+from app.application.mappers  import {resource_pascal}Mapper
 
 
 class {resource_pascal}Service:
@@ -689,7 +689,7 @@ def create_controller(resource_snake, resource_pascal, controller_dir):
     controller_content = f'''from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
 
-from app.infrastructure.dependencies.{resource_snake}_dependencies import get_{resource_snake}_service
+from app.application.dependencies.{resource_snake}_dependencies import get_{resource_snake}_service
 from app.interface.dto.responses import StandardResponse, success
 from app.interface.dto import {resource_pascal}, {resource_pascal}Create, {resource_pascal}Update
 from app.service.{resource_snake}_service import {resource_pascal}Service

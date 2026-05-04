@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
-from app.infrastructure.error.exceptions import ValidationException
+from app.domain.error.exceptions import ValidationException
 from app.infrastructure.utils import hash_password
 
 if TYPE_CHECKING:
