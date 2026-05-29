@@ -939,6 +939,17 @@ func New{{.Entity}}Handler(
 	}
 }
 
+// GetByID returns a single {{.EntityVar}} by ID.
+// @Summary     Get {{.EntityVar}} by ID
+// @Description Get a {{.EntityVar}} by their unique identifier
+// @Tags        {{.Path}}
+// @Accept      json
+// @Produce     json
+// @Param       id   path     string  true  "{{.Entity}} ID"
+// @Success     200  {object} dto.{{.Entity}}Response
+// @Failure     404  {object} map[string]string
+// @Failure     500  {object} map[string]string
+// @Router      /{{.Path}}/{id} [get]
 func (h *{{.Entity}}Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	result, err := h.getByID.Execute(r.Context(), &{{.Package}}usecase.Get{{.Entity}}Input{ID: id})
@@ -949,6 +960,17 @@ func (h *{{.Entity}}Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, to{{.Entity}}Response(result.{{.Entity}}))
 }
 
+// GetAll returns all {{.EntityVar}}s.
+// @Summary     List {{.Entities}}
+// @Description Get a paginated list of all {{.Entities}}
+// @Tags        {{.Path}}
+// @Accept      json
+// @Produce     json
+// @Param       page      query  int  false  "Page number"    default(1)
+// @Param       page_size query  int  false  "Items per page" default(20)
+// @Success     200  {object} dto.Paginated{{.Entity}}Response
+// @Failure     500  {object} map[string]string
+// @Router      /{{.Path}} [get]
 func (h *{{.Entity}}Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	p := parsePagination(r)
 	result, err := h.getAll.Execute(r.Context(), &{{.Package}}usecase.List{{.Entities}}Input{Page: p.Page, PageSize: p.PageSize})
@@ -963,6 +985,18 @@ func (h *{{.Entity}}Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, dto.NewPaginatedResponse(dtos, result.Total, result.Page, result.PageSize))
 }
 
+// Create creates a new {{.EntityVar}}.
+// @Summary     Create {{.EntityVar}}
+// @Description Create a new {{.EntityVar}} with the given payload
+// @Tags        {{.Path}}
+// @Accept      json
+// @Produce     json
+// @Param       body  body      dto.Create{{.Entity}}Request  true  "{{.Entity}} payload"
+// @Success     201   {object}  dto.{{.Entity}}Response
+// @Failure     400   {object}  map[string]string
+// @Failure     409   {object}  map[string]string
+// @Failure     500   {object}  map[string]string
+// @Router      /{{.Path}} [post]
 func (h *{{.Entity}}Handler) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var reqDTO dto.Create{{.Entity}}Request
@@ -981,6 +1015,20 @@ func (h *{{.Entity}}Handler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, to{{.Entity}}Response(result.{{.Entity}}))
 }
 
+// Update updates an existing {{.EntityVar}} by ID.
+// @Summary     Update {{.EntityVar}}
+// @Description Update an existing {{.EntityVar}} by their unique identifier
+// @Tags        {{.Path}}
+// @Accept      json
+// @Produce     json
+// @Param       id    path    string                    true  "{{.Entity}} ID"
+// @Param       body  body    dto.Update{{.Entity}}Request     true  "Updated {{.EntityVar}} payload"
+// @Success     200   {object}  dto.{{.Entity}}Response
+// @Failure     400   {object}  map[string]string
+// @Failure     404   {object}  map[string]string
+// @Failure     409   {object}  map[string]string
+// @Failure     500   {object}  map[string]string
+// @Router      /{{.Path}}/{id} [put]
 func (h *{{.Entity}}Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	defer r.Body.Close()
@@ -1000,6 +1048,17 @@ func (h *{{.Entity}}Handler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, to{{.Entity}}Response(result.{{.Entity}}))
 }
 
+// Delete deletes a {{.EntityVar}} by ID.
+// @Summary     Delete {{.EntityVar}}
+// @Description Delete a {{.EntityVar}} by their unique identifier
+// @Tags        {{.Path}}
+// @Accept      json
+// @Produce     json
+// @Param       id   path     string  true  "{{.Entity}} ID"
+// @Success     204  "No Content"
+// @Failure     404  {object} map[string]string
+// @Failure     500  {object} map[string]string
+// @Router      /{{.Path}}/{id} [delete]
 func (h *{{.Entity}}Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if err := h.delete.Execute(r.Context(), &{{.Package}}usecase.Delete{{.Entity}}Input{ID: id}); err != nil {
