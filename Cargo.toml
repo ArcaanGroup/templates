@@ -1,5 +1,5 @@
 [package]
-name = "go-clean-template"
+name = "rust-clean-template"
 version = "0.1.0"
 edition = "2021"
 

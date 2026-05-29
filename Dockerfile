@@ -10,6 +10,6 @@ RUN cargo build --release
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=builder /app/target/release/go-clean-template .
+COPY --from=builder /app/target/release/rust-clean-template .
 EXPOSE 8080
-CMD ["./go-clean-template"]
+CMD ["./rust-clean-template"]

@@ -8,6 +8,7 @@ pub enum AppError {
     NotFound,
     AlreadyExists,
     InvalidInput(String),
+    #[allow(dead_code)]
     Internal(anyhow::Error),
 }
 

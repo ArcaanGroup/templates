@@ -2,8 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use go_clean_template::application::usecase::user::{DeleteUserInput, DeleteUserUseCase, DeleteUserUseCaseImpl, UserRepository};
-use go_clean_template::domain;
+use rust_clean_template::application::usecase::user::{
+    DeleteUserInput, DeleteUserUseCase, DeleteUserUseCaseImpl, UserRepository,
+};
+use rust_clean_template::domain;
 
 struct MockUserRepo {
     find_by_id: Arc<std::sync::Mutex<Option<Result<domain::User, domain::Error>>>>,
@@ -22,14 +24,28 @@ impl MockUserRepo {
 #[async_trait]
 impl UserRepository for MockUserRepo {
     async fn find_by_id(&self, _id: &str) -> Result<domain::User, domain::Error> {
-        self.find_by_id.lock().unwrap().clone().unwrap_or(Err(domain::Error::NotFound))
+        self.find_by_id
+            .lock()
+            .unwrap()
+            .clone()
+            .unwrap_or(Err(domain::Error::NotFound))
     }
-    async fn find_all(&self, _offset: usize, _limit: usize) -> Result<(Vec<domain::User>, i64), domain::Error> {
+    async fn find_all(
+        &self,
+        _offset: usize,
+        _limit: usize,
+    ) -> Result<(Vec<domain::User>, i64), domain::Error> {
         Ok((vec![], 0))
     }
-    async fn find_by_email(&self, _email: &str) -> Result<domain::User, domain::Error> { Err(domain::Error::NotFound) }
-    async fn create(&self, _user: &domain::User) -> Result<(), domain::Error> { Ok(()) }
-    async fn update(&self, _user: &domain::User) -> Result<(), domain::Error> { Ok(()) }
+    async fn find_by_email(&self, _email: &str) -> Result<domain::User, domain::Error> {
+        Err(domain::Error::NotFound)
+    }
+    async fn create(&self, _user: &domain::User) -> Result<(), domain::Error> {
+        Ok(())
+    }
+    async fn update(&self, _user: &domain::User) -> Result<(), domain::Error> {
+        Ok(())
+    }
     async fn delete(&self, _id: &str) -> Result<(), domain::Error> {
         self.delete.lock().unwrap().clone().unwrap_or(Ok(()))
     }

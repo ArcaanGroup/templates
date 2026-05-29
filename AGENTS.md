@@ -1,4 +1,4 @@
-# go-clean-template — Rust version
+# rust-clean-template — Rust version
 
 ## Architecture
 

@@ -1,15 +1,15 @@
 use std::sync::Arc;
 
+use async_trait::async_trait;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use async_trait::async_trait;
 
-use go_clean_template::application::usecase::role::*;
-use go_clean_template::application::error::AppError;
-use go_clean_template::domain;
-use go_clean_template::interface::dto::CreateRoleRequest;
-use go_clean_template::interface::handler::role::RoleHandler;
+use rust_clean_template::application::error::AppError;
+use rust_clean_template::application::usecase::role::*;
+use rust_clean_template::domain;
+use rust_clean_template::interface::dto::CreateRoleRequest;
+use rust_clean_template::interface::handler::role::RoleHandler;
 
 struct MockCreateRoleUC;
 #[async_trait]
@@ -36,14 +36,23 @@ struct MockListRolesUC;
 #[async_trait]
 impl ListRolesUseCase for MockListRolesUC {
     async fn execute(&self, _input: ListRolesInput) -> Result<ListRolesOutput, AppError> {
-        Ok(ListRolesOutput { roles: vec![], total: 0, page: 1, page_size: 20, total_pages: 1 })
+        Ok(ListRolesOutput {
+            roles: vec![],
+            total: 0,
+            page: 1,
+            page_size: 20,
+        })
     }
 }
 
 struct MockUpdateRoleUC;
 #[async_trait]
 impl UpdateRoleUseCase for MockUpdateRoleUC {
-    async fn execute(&self, _id: &str, _input: UpdateRoleInput) -> Result<UpdateRoleOutput, AppError> {
+    async fn execute(
+        &self,
+        _id: &str,
+        _input: UpdateRoleInput,
+    ) -> Result<UpdateRoleOutput, AppError> {
         let role = domain::Role::new("admin".into(), "Admin".into()).unwrap();
         Ok(UpdateRoleOutput { role })
     }
@@ -52,7 +61,9 @@ impl UpdateRoleUseCase for MockUpdateRoleUC {
 struct MockDeleteRoleUC;
 #[async_trait]
 impl DeleteRoleUseCase for MockDeleteRoleUC {
-    async fn execute(&self, _input: DeleteRoleInput) -> Result<(), AppError> { Ok(()) }
+    async fn execute(&self, _input: DeleteRoleInput) -> Result<(), AppError> {
+        Ok(())
+    }
 }
 
 fn test_role_handler() -> RoleHandler {
@@ -68,20 +79,18 @@ fn test_role_handler() -> RoleHandler {
 #[tokio::test]
 async fn test_role_get_by_id_success() {
     let handler = Arc::new(test_role_handler());
-    let response = RoleHandler::get_by_id(
-        State(handler),
-        Path("1".into()),
-    ).await.into_response();
+    let response = RoleHandler::get_by_id(State(handler), Path("1".into()))
+        .await
+        .into_response();
     assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
 async fn test_role_get_by_id_not_found() {
     let handler = Arc::new(test_role_handler());
-    let response = RoleHandler::get_by_id(
-        State(handler),
-        Path("999".into()),
-    ).await.into_response();
+    let response = RoleHandler::get_by_id(State(handler), Path("999".into()))
+        .await
+        .into_response();
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
@@ -90,17 +99,21 @@ async fn test_role_create_success() {
     let handler = Arc::new(test_role_handler());
     let response = RoleHandler::create(
         State(handler),
-        axum::Json(CreateRoleRequest { name: "admin".into(), description: "Admin role".into() }),
-    ).await.into_response();
+        axum::Json(CreateRoleRequest {
+            name: "admin".into(),
+            description: "Admin role".into(),
+        }),
+    )
+    .await
+    .into_response();
     assert_eq!(response.status(), StatusCode::CREATED);
 }
 
 #[tokio::test]
 async fn test_role_delete_success() {
     let handler = Arc::new(test_role_handler());
-    let response = RoleHandler::delete(
-        State(handler),
-        Path("1".into()),
-    ).await.into_response();
+    let response = RoleHandler::delete(State(handler), Path("1".into()))
+        .await
+        .into_response();
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }

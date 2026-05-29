@@ -9,19 +9,16 @@ pub struct User {
     pub name: String,
     pub email: String,
     pub phone: String,
-    pub national_id: String,
     pub password_hash: String,
     pub email_verified: bool,
     pub phone_verified: bool,
     pub avatar: String,
     pub role_ids: Vec<String>,
     pub order_count: i32,
-    pub total_spent: i64,
     pub wallet_balance: i64,
     pub language: String,
     pub currency: String,
     pub last_login_at: Option<DateTime<Utc>>,
-    pub last_ip: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
@@ -39,19 +36,16 @@ impl User {
             name,
             email,
             phone,
-            national_id: String::new(),
             password_hash: String::new(),
             email_verified: false,
             phone_verified: false,
             avatar: String::new(),
             role_ids,
             order_count: 0,
-            total_spent: 0,
             wallet_balance: 0,
             language: "fa".to_string(),
             currency: "IRR".to_string(),
             last_login_at: None,
-            last_ip: String::new(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
             deleted_at: None,
@@ -85,17 +79,6 @@ impl User {
     pub fn mark_deleted(&mut self) {
         self.deleted_at = Some(Utc::now());
         self.updated_at = Utc::now();
-    }
-
-    pub fn update_wallet(&mut self, delta: i64) -> Result<(), Error> {
-        if self.wallet_balance + delta < 0 {
-            return Err(Error::InvalidInput(
-                "wallet balance cannot be negative".to_string(),
-            ));
-        }
-        self.wallet_balance += delta;
-        self.updated_at = Utc::now();
-        Ok(())
     }
 
     pub fn validate(&self) -> Result<(), Error> {
@@ -144,7 +127,6 @@ mod tests {
         assert_eq!(u.name, "Alice");
         assert_eq!(u.email, "alice@example.com");
         assert_eq!(u.language, "fa");
-        assert_eq!(u.currency, "IRR");
     }
 
     #[test]
@@ -186,31 +168,4 @@ mod tests {
         assert!(u.deleted_at.is_some());
     }
 
-    #[test]
-    fn test_update_wallet_ok() {
-        let mut u = User::new(
-            "Alice".into(),
-            "alice@example.com".into(),
-            "123".into(),
-            vec![],
-        )
-        .unwrap();
-        u.wallet_balance = 1000;
-        assert!(u.update_wallet(-500).is_ok());
-        assert_eq!(u.wallet_balance, 500);
-    }
-
-    #[test]
-    fn test_update_wallet_negative() {
-        let mut u = User::new(
-            "Alice".into(),
-            "alice@example.com".into(),
-            "123".into(),
-            vec![],
-        )
-        .unwrap();
-        u.wallet_balance = 100;
-        let result = u.update_wallet(-200);
-        assert!(result.is_err());
-    }
 }

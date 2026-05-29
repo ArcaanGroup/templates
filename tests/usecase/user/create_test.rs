@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use go_clean_template::application::usecase::user::{
+use rust_clean_template::application::usecase::user::{
     CreateUserInput, CreateUserUseCase, CreateUserUseCaseImpl, RoleRepository, UserRepository,
 };
-use go_clean_template::domain;
+use rust_clean_template::domain;
 
 struct MockUserRepo {
     find_by_email: Arc<std::sync::Mutex<Option<Result<domain::User, domain::Error>>>>,
@@ -26,7 +26,11 @@ impl UserRepository for MockUserRepo {
     async fn find_by_id(&self, _id: &str) -> Result<domain::User, domain::Error> {
         Err(domain::Error::NotFound)
     }
-    async fn find_all(&self, _offset: usize, _limit: usize) -> Result<(Vec<domain::User>, i64), domain::Error> {
+    async fn find_all(
+        &self,
+        _offset: usize,
+        _limit: usize,
+    ) -> Result<(Vec<domain::User>, i64), domain::Error> {
         Ok((vec![], 0))
     }
     async fn find_by_email(&self, _email: &str) -> Result<domain::User, domain::Error> {
@@ -52,7 +56,11 @@ impl RoleRepository for MockRoleRepo {
     async fn find_by_id(&self, _id: &str) -> Result<domain::Role, domain::Error> {
         Err(domain::Error::NotFound)
     }
-    async fn find_all(&self, _offset: usize, _limit: usize) -> Result<(Vec<domain::Role>, i64), domain::Error> {
+    async fn find_all(
+        &self,
+        _offset: usize,
+        _limit: usize,
+    ) -> Result<(Vec<domain::Role>, i64), domain::Error> {
         Ok((vec![], 0))
     }
     async fn find_by_name(&self, _name: &str) -> Result<domain::Role, domain::Error> {
@@ -75,10 +83,7 @@ async fn test_create_user_success() {
     *user_repo.find_by_email.lock().unwrap() = Some(Err(domain::Error::NotFound));
     *user_repo.create.lock().unwrap() = Some(Ok(()));
 
-    let uc = CreateUserUseCaseImpl::new(
-        Arc::new(user_repo),
-        Arc::new(MockRoleRepo),
-    );
+    let uc = CreateUserUseCaseImpl::new(Arc::new(user_repo), Arc::new(MockRoleRepo));
 
     let input = CreateUserInput {
         name: "Alice".into(),

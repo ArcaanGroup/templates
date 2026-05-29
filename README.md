@@ -1,4 +1,4 @@
-# go-clean-template (Rust)
+# rust-clean-template (Rust)
 
 A production-grade **Clean Architecture** template for Rust applications, emphasizing separation of concerns, testability, and maintainability.
 

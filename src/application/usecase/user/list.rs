@@ -16,7 +16,6 @@ pub struct ListUsersOutput {
     pub total: i64,
     pub page: i32,
     pub page_size: i32,
-    pub total_pages: i32,
 }
 
 #[async_trait]
@@ -49,15 +48,11 @@ impl ListUsersUseCase for ListUsersUseCaseImpl {
         let offset = ((page - 1) * page_size) as usize;
         let (users, total) = self.user_repo.find_all(offset, page_size as usize).await?;
 
-        let total_pages = (total as f64 / page_size as f64).ceil() as i32;
-        let total_pages = if total_pages < 1 { 1 } else { total_pages };
-
         Ok(ListUsersOutput {
             users,
             total,
             page,
             page_size,
-            total_pages,
         })
     }
 }

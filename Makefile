@@ -1,6 +1,6 @@
 .PHONY: build run test lint clean docker-build docker-up docker-down help
 
-APP_NAME := go-clean-template
+APP_NAME := rust-clean-template
 
 build: ## Build the binary
 	cargo build --release
