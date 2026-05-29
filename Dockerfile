@@ -1,14 +1,15 @@
-FROM golang:1.25-alpine AS builder
+FROM rust:1.83-slim-bookworm AS builder
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo build --release 2>/dev/null || true
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/bin/server ./cmd/main.go
+RUN cargo build --release
 
-FROM alpine:3.20
-RUN apk --no-cache add ca-certificates tzdata
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=builder /app/bin/server .
+COPY --from=builder /app/target/release/go-clean-template .
 EXPOSE 8080
-CMD ["./server"]
+CMD ["./go-clean-template"]
