@@ -3,19 +3,15 @@ Refresh token-related dependencies and dependency injection logic.
 """
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infra.core.database import get_db_session
-from app.infra.repositories.refresh_token_repository import (
-    RefreshTokenRepository,
+from app.infra.repositories.in_memory.registry import (
+    refresh_token_repository as _in_memory_refresh_token_repository,
 )
 from app.interface.repository.refresh_token_repository_interface import (
     IRefreshTokenRepository,
 )
 
 
-async def get_refresh_token_repository(
-    db_session: AsyncSession = Depends(get_db_session),
-) -> IRefreshTokenRepository:
+async def get_refresh_token_repository() -> IRefreshTokenRepository:
     """Dependency to get refresh token repository instance."""
-    return RefreshTokenRepository(db_session)
+    return _in_memory_refresh_token_repository

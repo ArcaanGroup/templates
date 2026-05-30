@@ -90,10 +90,30 @@ upgrade: ## Upgrade the database to the latest version
 	@echo "Upgrading the database to the latest version..."
 	$(PDM) run alembic upgrade head
 
-.PHONY: seed
-seed: ## Seed the database with initial data
+.PHONY: seed-db
+seed-db: ## Seed the database with initial data (requires DB)
 	@echo "Seeding the database with initial data..."
 	$(PDM) run python scripts/seed.py
+
+.PHONY: seed-mem
+seed-mem: ## Seed in-memory repositories with initial data
+	@echo "Seeding in-memory repositories..."
+	$(PDM) run python scripts/seed_in_memory.py
+
+.PHONY: seed
+seed: ## Prompt to choose between database and in-memory seeding
+	@echo "Pick a seeding option:"
+	@echo "  1) Database  (requires PostgreSQL)"
+	@echo "  2) In-memory (no database needed)"
+	@read -p "Enter choice [1 or 2]: " choice; \
+	if [ "$$choice" = "1" ]; then \
+		$(MAKE) seed-db; \
+	elif [ "$$choice" = "2" ]; then \
+		$(MAKE) seed-mem; \
+	else \
+		echo "Invalid choice. Please run 'make seed-db' or 'make seed-mem' directly."; \
+		exit 1; \
+	fi
 
 .PHONY: init-db
 init-db: ## Initialize database with custom credentials (Create, Upgrade, Seed). Prompts user for DB_USER (default: postgres), DB_PASSWORD (default: secret), and DB_NAME (required).

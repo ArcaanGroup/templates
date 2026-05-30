@@ -29,12 +29,11 @@ from app.application.use_cases.user import (
     CreateUserUseCase,
 )
 from app.domain.entities import RoleEntity, UserEntity
-from app.infra.core.database import get_db_session
-from app.infra.repositories.permission_repository import (
+from app.infra.repositories.json.permission_repository import (
     JSONPermissionRepository,
 )
-from app.infra.repositories.role_repository import RoleRepository
-from app.infra.repositories.user_repository import UserRepository
+from app.infra.repositories.in_memory.role_repository import InMemoryRoleRepository
+from app.infra.repositories.in_memory.user_repository import InMemoryUserRepository
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
 
@@ -166,21 +165,18 @@ async def main():
     print("Starting database seeding...")
 
     try:
-        # Get database session
-        async for session in get_db_session():
-            # Initialize repositories
-            user_repo: IUserRepository = UserRepository(session)
-            role_repo: IRoleRepository = RoleRepository(session)
-            perm_repo: JSONPermissionRepository = JSONPermissionRepository()
+        # Initialize repositories
+        user_repo: IUserRepository = InMemoryUserRepository()
+        role_repo: IRoleRepository = InMemoryRoleRepository()
+        perm_repo: JSONPermissionRepository = JSONPermissionRepository()
 
-            # Create roles
-            await create_roles(role_repo, perm_repo)
+        # Create roles
+        await create_roles(role_repo, perm_repo)
 
-            # Create users
-            await create_users(user_repo, role_repo)
+        # Create users
+        await create_users(user_repo, role_repo)
 
-            print("Database seeding completed successfully!")
-            break
+        print("Database seeding completed successfully!")
 
     except Exception as e:
         print(f"Error during seeding: {e}")

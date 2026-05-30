@@ -3,7 +3,6 @@ User-related dependencies and dependency injection logic.
 """
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.user import (
     AssignRoleToUserUseCase,
@@ -14,25 +13,24 @@ from app.application.use_cases.user import (
     RemoveRoleFromUserUseCase,
     UpdateUserUseCase,
 )
-from app.infra.core.database import get_db_session
-from app.infra.repositories.role_repository import RoleRepository
-from app.infra.repositories.user_repository import UserRepository
+from app.infra.repositories.in_memory.registry import (
+    role_repository as _in_memory_role_repository,
+)
+from app.infra.repositories.in_memory.registry import (
+    user_repository as _in_memory_user_repository,
+)
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
 
 
-async def get_user_repository(
-    db_session: AsyncSession = Depends(get_db_session),
-) -> IUserRepository:
-    """Dependency to provide UserRepository instance with database session."""
-    return UserRepository(db_session=db_session)
+async def get_user_repository() -> IUserRepository:
+    """Dependency to provide UserRepository instance."""
+    return _in_memory_user_repository
 
 
-async def get_role_repository(
-    db_session: AsyncSession = Depends(get_db_session),
-) -> IRoleRepository:
-    """Dependency to provide RoleRepository instance with database session."""
-    return RoleRepository(db_session=db_session)
+async def get_role_repository() -> IRoleRepository:
+    """Dependency to provide RoleRepository instance."""
+    return _in_memory_role_repository
 
 
 async def get_get_all_users_usecase(

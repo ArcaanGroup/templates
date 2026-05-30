@@ -3,7 +3,6 @@ Role-related dependencies and dependency injection logic.
 """
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.role import (
     AssignPermissionToRoleUseCase,
@@ -14,25 +13,26 @@ from app.application.use_cases.role import (
     RemovePermissionFromRoleUseCase,
     UpdateRoleUseCase,
 )
-from app.infra.core.database import get_db_session
-from app.infra.repositories.permission_repository import JSONPermissionRepository
-from app.infra.repositories.role_repository import RoleRepository
+from app.infra.repositories.in_memory.registry import (
+    role_repository as _in_memory_role_repository,
+)
+from app.infra.repositories.in_memory.registry import (
+    permission_repository as _in_memory_permission_repository,
+)
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
 from app.interface.repository.role_repository_interface import IRoleRepository
 
 
-async def get_role_repository(
-    db_session: AsyncSession = Depends(get_db_session),
-) -> IRoleRepository:
-    """Dependency to provide RoleRepository instance with database session."""
-    return RoleRepository(db_session=db_session)
+async def get_role_repository() -> IRoleRepository:
+    """Dependency to provide RoleRepository instance."""
+    return _in_memory_role_repository
 
 
 async def get_permission_repository() -> IPermissionRepository:
-    """Dependency to provide PermissionRepository instance with database session."""
-    return JSONPermissionRepository()
+    """Dependency to provide PermissionRepository instance."""
+    return _in_memory_permission_repository
 
 
 async def get_get_all_roles_usecase(
