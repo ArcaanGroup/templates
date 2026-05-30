@@ -1,16 +1,9 @@
-"""
-Basic tests for the main application
-"""
-
 import pytest
 
 
-def test_root_endpoint(test_client):
-    """Test the root endpoint"""
-    response = test_client.get("/api")
+def test_ping_endpoint(test_client):
+    response = test_client.get("/api/ping")
     assert response.status_code == 200
-    assert "message" in response.json()
-
-
-if __name__ == "__main__":
-    pytest.main()
+    data = response.json()
+    assert data["success"] is True
+    assert data["message"] == "pong"

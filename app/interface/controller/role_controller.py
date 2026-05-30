@@ -50,9 +50,16 @@ async def get_roles(
     from app.interface.mappers import RoleMapper
 
     roles_dto = [RoleMapper.to_dto(role) for role in result.roles]
+    pages = (result.total + result.size - 1) // result.size if result.total else 1
     return success(
         message="Roles retrieved successfully",
-        payload=roles_dto,
+        payload=Page(
+            items=roles_dto,
+            total=result.total,
+            page=result.page,
+            size=result.size,
+            pages=pages,
+        ),
     )
 
 

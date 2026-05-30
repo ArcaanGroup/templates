@@ -48,13 +48,19 @@ async def get_users(
         GetAllUsersRequest(page=params.page, size=params.size)
     )
 
-    # Convert domain entities to DTOs
     from app.interface.mappers import UserMapper
 
     users_dto = [UserMapper.to_dto(user) for user in result.users]
+    pages = (result.total + result.size - 1) // result.size if result.total else 1
     return success(
         message="Users retrieved successfully",
-        payload=users_dto,
+        payload=Page(
+            items=users_dto,
+            total=result.total,
+            page=result.page,
+            size=result.size,
+            pages=pages,
+        ),
     )
 
 

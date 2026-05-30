@@ -37,12 +37,12 @@ class GetAllUsersUseCase:
 
     async def execute(self, request: GetAllUsersRequest) -> GetAllUsersResponse:
         """Execute the use case to get all users."""
-        users = await self._user_repo.get_all(
+        page = await self._user_repo.get_all(
             Params(page=request.page, size=request.size)
         )
         return GetAllUsersResponse(
-            users=users,
-            total=len(users),
+            users=page.items,
+            total=page.total,
             page=request.page,
             size=request.size,
         )

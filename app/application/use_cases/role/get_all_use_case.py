@@ -6,6 +6,8 @@ Use case contains business logic and is independent of frameworks and external c
 from dataclasses import dataclass
 from typing import List
 
+from fastapi_pagination import Params
+
 from app.domain.entities import RoleEntity
 from app.interface.repository.role_repository_interface import IRoleRepository
 
@@ -34,10 +36,12 @@ class GetAllRolesUseCase:
 
     async def execute(self, request: GetAllRolesRequest) -> GetAllRolesResponse:
         """Execute the use case to get all roles."""
-        roles = await self._role_repo.get_all()
+        page = await self._role_repo.get_all(
+            Params(page=request.page, size=request.size)
+        )
         return GetAllRolesResponse(
-            roles=roles,
-            total=len(roles),
+            roles=page.items,
+            total=page.total,
             page=request.page,
             size=request.size,
         )

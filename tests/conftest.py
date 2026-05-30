@@ -1,39 +1,30 @@
-"""
-Pytest configuration file
-"""
-
+import warnings
 import sys
 from pathlib import Path
 
 import pytest
 
-# Add the app directory to the path so we can import modules
 sys.path.insert(0, str(Path(__file__).parent.parent / "app"))
+
+warnings.filterwarnings("ignore", message="I/O operation on closed file")
 
 
 @pytest.fixture(scope="session")
 def test_client():
-    """
-    Create a test client for API requests
-    """
     from fastapi.testclient import TestClient
 
     from app.main import app
 
-    return TestClient(app)
+    with TestClient(app) as client:
+        yield client
 
 
-@pytest.fixture(scope="function")
-def db_session():
-    """
-    Create a database session for tests
-    """
-    from unittest.mock import MagicMock
-
-    from app.infra.core.database import get_db_session
-    from app.main import app
-
-    session = MagicMock()
-    app.dependency_overrides[get_db_session] = lambda: session
-    yield session
-    app.dependency_overrides.clear()
+@pytest.fixture(scope="session")
+def admin_token(test_client):
+    response = test_client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": "Secret123"},
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    return data["payload"]["token"]
