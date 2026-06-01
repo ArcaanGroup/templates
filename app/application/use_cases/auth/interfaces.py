@@ -12,6 +12,10 @@ class IPasswordService:
         """Verify a password against its hash."""
         raise NotImplementedError
 
+    def hash(self, password: str) -> str:
+        """Hash a plain text password."""
+        raise NotImplementedError
+
 
 class ITokenService:
     """Interface for token operations."""

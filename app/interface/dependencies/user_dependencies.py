@@ -4,6 +4,7 @@ User-related dependencies and dependency injection logic.
 
 from fastapi import Depends
 
+from app.application.use_cases.auth.interfaces import IPasswordService
 from app.application.use_cases.user import (
     AssignRoleToUserUseCase,
     CreateUserUseCase,
@@ -21,6 +22,12 @@ from app.infra.repositories.in_memory.registry import (
 )
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
+
+
+def get_password_service() -> IPasswordService:
+    """Dependency to provide password service instance."""
+    from app.infra.services import BcryptPasswordService
+    return BcryptPasswordService()
 
 
 async def get_user_repository() -> IUserRepository:
@@ -49,9 +56,10 @@ async def get_get_user_by_id_usecase(
 
 async def get_create_user_usecase(
     user_repository: IUserRepository = Depends(get_user_repository),
+    password_service: IPasswordService = Depends(get_password_service),
 ) -> CreateUserUseCase:
     """Dependency to provide CreateUserUseCase instance."""
-    return CreateUserUseCase(user_repository)
+    return CreateUserUseCase(user_repository, password_service)
 
 
 async def get_update_user_usecase(

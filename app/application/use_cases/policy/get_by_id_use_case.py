@@ -6,6 +6,7 @@ Use case contains business logic and is independent of frameworks and external c
 from dataclasses import dataclass
 
 from app.domain.entities import PolicyEntity
+from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.repository.policy_repository_interface import IPolicyRepository
 
 
@@ -33,5 +34,7 @@ class GetPolicyByIdUseCase:
         """Execute the use case to get a policy by ID."""
         policy = await self._policy_repo.get_by_id(request.policy_id)
         if policy is None:
-            raise ValueError(f"Policy with ID {request.policy_id} not found")
+            raise ResourceNotFoundException(
+                resource_type="Policy", identifier=request.policy_id
+            )
         return GetPolicyByIdResponse(policy=policy)

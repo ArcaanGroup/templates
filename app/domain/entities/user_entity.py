@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
 from app.domain.error.exceptions import ValidationException
-from app.infra.utils import hash_password
 
 if TYPE_CHECKING:
     from app.domain.entities import RoleEntity
@@ -36,7 +35,7 @@ class UserEntity:
         last_name: str,
         email: str,
         username: str,
-        password: str,
+        hashed_password: str,
         user_id: Optional[str] = None,
         roles: Optional[List["RoleEntity"]] = None,
     ) -> "UserEntity":
@@ -44,7 +43,6 @@ class UserEntity:
         # Validate inputs
         cls._validate_email(email)
         cls._validate_username(username)
-        cls._validate_password(password)
 
         user_id = user_id or str(uuid4())
         now = datetime.now(UTC)
@@ -56,7 +54,7 @@ class UserEntity:
             last_name=last_name,
             email=email,
             username=username,
-            hashed_password=hash_password(password),
+            hashed_password=hashed_password,
             created_at=now,
             updated_at=now,
             is_active=False,
@@ -98,10 +96,9 @@ class UserEntity:
         self.is_active = True
         self.updated_at = datetime.now(UTC)
 
-    def change_password(self, new_password: str) -> None:
+    def change_password(self, new_hashed_password: str) -> None:
         """Change the user's password after validation."""
-        self._validate_password(new_password)
-        self.hashed_password = hash_password(new_password)
+        self.hashed_password = new_hashed_password
         self.updated_at = datetime.now(UTC)
 
     @staticmethod

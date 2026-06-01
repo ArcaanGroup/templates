@@ -14,14 +14,6 @@ class RoleMapper:
     """Mapper class to handle conversions between Role representations."""
 
     @staticmethod
-    def from_dto(dto: RoleCreate) -> RoleEntity:
-        """Convert DTO Role to domain."""
-        return RoleEntity.create(
-            name=dto.name,
-            permission_ids=dto.permission_ids,
-        )
-
-    @staticmethod
     def to_dto(domain_role: RoleEntity) -> RoleDTO:
         """Convert domain Role to DTO."""
         return RoleDTO(

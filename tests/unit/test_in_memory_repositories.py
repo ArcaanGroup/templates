@@ -10,6 +10,10 @@ from app.infra.repositories.in_memory.refresh_token_repository import (
 )
 from app.infra.repositories.in_memory.role_repository import InMemoryRoleRepository
 from app.infra.repositories.in_memory.user_repository import InMemoryUserRepository
+from app.infra.utils import hash_password
+
+
+HASHED_PASSWORD = hash_password("password123")
 
 
 @pytest.fixture
@@ -34,7 +38,7 @@ def sample_user():
         last_name="Doe",
         email="john@example.com",
         username="johndoe",
-        password="password123",
+        hashed_password=HASHED_PASSWORD,
     )
 
 
@@ -110,7 +114,7 @@ class TestUserRepository:
                 last_name="Test",
                 email=f"user{i}@example.com",
                 username=f"user{i}",
-                password="password123",
+                hashed_password=HASHED_PASSWORD,
             )
             await user_repo.create(user)
         page = await user_repo.get_all(Params(page=1, size=2))

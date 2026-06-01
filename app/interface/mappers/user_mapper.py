@@ -13,17 +13,6 @@ class UserMapper:
     """Mapper class to handle conversions between user representations."""
 
     @staticmethod
-    def from_dto(dto: UserCreate) -> UserEntity:
-        """Convert DTO user to domain."""
-        return UserEntity.create(
-            first_name=dto.first_name,
-            last_name=dto.last_name,
-            email=dto.email,
-            username=dto.username,
-            password=dto.password,
-        )
-
-    @staticmethod
     def to_dto(domain_user: UserEntity) -> UserDTO:
         """Convert domain user to DTO."""
         roles_dto = []

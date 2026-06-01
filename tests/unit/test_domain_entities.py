@@ -4,7 +4,10 @@ from uuid import uuid4
 
 from app.domain.entities import PermissionEntity, PolicyEntity, RefreshTokenEntity, RoleEntity, UserEntity
 from app.domain.error.exceptions import ValidationException
+from app.infra.utils import hash_password
 
+
+HASHED_PASSWORD = hash_password("password123")
 
 class TestUserEntity:
     def test_create_valid_user(self):
@@ -13,7 +16,7 @@ class TestUserEntity:
             last_name="Doe",
             email="john@example.com",
             username="johndoe",
-            password="password123",
+            hashed_password=HASHED_PASSWORD,
         )
         assert user.first_name == "John"
         assert user.last_name == "Doe"
@@ -30,7 +33,7 @@ class TestUserEntity:
                 last_name="Doe",
                 email="invalid",
                 username="johndoe",
-                password="password123",
+                hashed_password=HASHED_PASSWORD,
             )
 
     def test_create_short_username(self):
@@ -40,24 +43,14 @@ class TestUserEntity:
                 last_name="Doe",
                 email="john@example.com",
                 username="jo",
-                password="password123",
-            )
-
-    def test_create_short_password(self):
-        with pytest.raises(ValidationException):
-            UserEntity.create(
-                first_name="John",
-                last_name="Doe",
-                email="john@example.com",
-                username="johndoe",
-                password="short",
+                hashed_password=HASHED_PASSWORD,
             )
 
     def test_activate(self):
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123",
+            hashed_password=HASHED_PASSWORD,
         )
         assert user.is_active is False
         user.activate()
@@ -67,7 +60,7 @@ class TestUserEntity:
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123",
+            hashed_password=HASHED_PASSWORD,
         )
         user.activate()
         user.deactivate()
@@ -77,17 +70,19 @@ class TestUserEntity:
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123",
+            hashed_password=HASHED_PASSWORD,
         )
         old_hash = user.hashed_password
-        user.change_password("newpassword123")
+        new_hashed = hash_password("newpassword123")
+        user.change_password(new_hashed)
         assert user.hashed_password != old_hash
+        assert user.hashed_password == new_hashed
 
     def test_update_info(self):
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123",
+            hashed_password=HASHED_PASSWORD,
         )
         user.update_info(first_name="Jane", email="jane@example.com")
         assert user.first_name == "Jane"
@@ -99,7 +94,7 @@ class TestUserEntity:
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123", user_id=custom_id,
+            hashed_password=HASHED_PASSWORD, user_id=custom_id,
         )
         assert user.id == custom_id
 
@@ -108,9 +103,13 @@ class TestUserEntity:
         user = UserEntity.create(
             first_name="John", last_name="Doe",
             email="john@example.com", username="johndoe",
-            password="password123", roles=[role],
+            hashed_password=HASHED_PASSWORD, roles=[role],
         )
         assert user.roles == [role]
+
+    def test_validate_password_short(self):
+        with pytest.raises(ValidationException):
+            UserEntity._validate_password("short")
 
 
 class TestRoleEntity:

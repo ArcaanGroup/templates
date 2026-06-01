@@ -5,6 +5,7 @@ from app.infra.repositories.in_memory.registry import (
     role_repository,
     user_repository,
 )
+from app.infra.services.password_service import BcryptPasswordService
 
 
 async def seed():
@@ -38,7 +39,8 @@ async def seed():
             AssignPermissionRequest(role_id=role.id, permission_id=perm.id)
         )
 
-    create_user_uc = CreateUserUseCase(user_repository)
+    password_service = BcryptPasswordService()
+    create_user_uc = CreateUserUseCase(user_repository, password_service)
     result = await create_user_uc.execute(
         CreateUserRequest(
             first_name="Admin",

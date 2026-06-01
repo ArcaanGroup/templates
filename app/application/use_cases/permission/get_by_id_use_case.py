@@ -6,6 +6,7 @@ Use case contains business logic and is independent of frameworks and external c
 from dataclasses import dataclass
 
 from app.domain.entities import PermissionEntity
+from app.domain.error.exceptions import ResourceNotFoundException
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
@@ -35,5 +36,7 @@ class GetPermissionByIdUseCase:
         """Execute the use case to get a permission by ID."""
         permission = await self._permission_repo.get_by_id(request.permission_id)
         if permission is None:
-            raise ValueError(f"Permission with ID {request.permission_id} not found")
+            raise ResourceNotFoundException(
+                resource_type="Permission", identifier=request.permission_id
+            )
         return GetPermissionByIdResponse(permission=permission)
