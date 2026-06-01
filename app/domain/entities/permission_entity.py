@@ -3,7 +3,7 @@ Domain Entity for Permission - contains business logic and behavior
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional
 from uuid import uuid4
 
@@ -27,7 +27,7 @@ class PermissionEntity:
     ) -> "PermissionEntity":
         """Create a new PermissionEntity entity."""
         permission_id = permission_id or str(uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         return cls(
             id=permission_id,

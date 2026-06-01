@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 from fastapi_pagination import Params
 
@@ -209,7 +209,7 @@ class TestRefreshTokenRepository:
     async def test_create_and_get_by_token(self, refresh_token_repo):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
         )
         created = await refresh_token_repo.create_refresh_token(token)
         assert created.id == token.id
@@ -225,7 +225,7 @@ class TestRefreshTokenRepository:
     async def test_revoke_token(self, refresh_token_repo):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
         )
         await refresh_token_repo.create_refresh_token(token)
         assert await refresh_token_repo.revoke_refresh_token(token.id) is True

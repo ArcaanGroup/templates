@@ -9,15 +9,11 @@ dependencies = [
     "fastapi==0.115.6",
     "uvicorn[standard]>=0.38.0",
     "passlib[bcrypt]>=1.7.4",
-    "sqlalchemy[asyncio]>=2.0.0",
-    "asyncpg>=0.29.0",
-    "alembic>=1.13.0",
-    "psycopg2-binary>=2.9.0",
     "pydantic-settings>=2.0.0",
-    "aiosqlite>=0.19.0",
     "python-jose[cryptography]>=3.3.0",
     "loguru>=0.7.3",
-    "fastapi-pagination>=0.15.3"
+    "fastapi-pagination>=0.15.3",
+    "bcrypt>=4.0.0",
 ]
 
 requires-python = "==3.12.*"

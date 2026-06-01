@@ -3,7 +3,7 @@ Domain Entity for User - contains business logic and behavior
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
@@ -47,7 +47,7 @@ class UserEntity:
         cls._validate_password(password)
 
         user_id = user_id or str(uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         roles = roles or []
 
         return cls(
@@ -86,23 +86,23 @@ class UserEntity:
             self._validate_username(username)
             self.username = username
 
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def deactivate(self) -> None:
         """Deactivate the user account."""
         self.is_active = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def activate(self) -> None:
         """Activate the user account."""
         self.is_active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def change_password(self, new_password: str) -> None:
         """Change the user's password after validation."""
         self._validate_password(new_password)
         self.hashed_password = hash_password(new_password)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     @staticmethod
     def _validate_email(email: str) -> None:

@@ -13,8 +13,3 @@ class BcryptPasswordService(IPasswordService):
     def verify(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
         return verify_password(plain_password, hashed_password)
-
-    @staticmethod
-    def hash(self, password: str) -> str:
-        """Hash a plain text password."""
-        return hash_password(password)

@@ -3,7 +3,7 @@ Domain Entity for Policy - contains business logic and behavior
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional
 from uuid import uuid4
 
@@ -27,7 +27,7 @@ class PolicyEntity:
     ) -> "PolicyEntity":
         """Create a new PolicyDomain entity."""
         policy_id = policy_id or str(uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         return cls(
             id=policy_id,

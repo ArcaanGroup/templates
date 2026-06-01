@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from app.domain.entities import PermissionEntity, PolicyEntity, RefreshTokenEntity, RoleEntity, UserEntity
@@ -145,7 +145,7 @@ class TestRoleEntity:
 class TestRefreshTokenEntity:
     def test_create_token(self):
         user_id = str(uuid4())
-        expires_at = datetime.utcnow() + timedelta(days=7)
+        expires_at = datetime.now(UTC) + timedelta(days=7)
         token = RefreshTokenEntity.create(user_id=user_id, expires_at=expires_at)
         assert token.user_id == user_id
         assert token.expires_at == expires_at
@@ -157,14 +157,37 @@ class TestRefreshTokenEntity:
     def test_is_valid(self):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
         )
         assert token.is_valid() is True
 
     def test_is_expired(self):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() - timedelta(days=1),
+            expires_at=datetime.now(UTC) - timedelta(days=1),
+        )
+        assert token.is_valid() is False
+
+    def test_revoke(self):
+        token = RefreshTokenEntity.create(
+            user_id=str(uuid4()),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
+        )
+        token.revoke()
+        assert token.revoked is True
+        assert token.is_valid() is False
+
+    def test_blacklist(self):
+        token = RefreshTokenEntity.create(
+            user_id=str(uuid4()),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
+        )
+        assert token.is_valid() is True
+
+    def test_is_expired(self):
+        token = RefreshTokenEntity.create(
+            user_id=str(uuid4()),
+            expires_at=datetime.now(UTC) - timedelta(days=1),
         )
         assert token.is_valid() is False
 

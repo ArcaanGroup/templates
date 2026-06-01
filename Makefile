@@ -66,92 +66,10 @@ check: ## Check the status of the project
 shell: ## Open Python shell with project environment
 	@$(PDM) run python
 
-.PHONY: create-db
-create-db: ## Create the database if it doesn't exist
-	@echo "Creating the database if it doesn't exist..."
-	$(PDM) run python scripts/create_db.py
-
 .PHONY: serve
 serve: dev ## Alias for dev (run development server)
 
-.PHONY: auth
-auth: ## Run the authorization manager CLI
-	@echo "Starting Authorization Manager..."
-	$(PDM) run python scripts/auth_manager.py
-
-.PHONY: migrate
-migrate: ## Create a new auto-generated migration
-	@echo "Creating a new auto-generated migration..."
-	@read -p "Enter migration message: " msg; \
-	$(PDM) run alembic revision --autogenerate -m "$$msg"
-
-.PHONY: upgrade
-upgrade: ## Upgrade the database to the latest version
-	@echo "Upgrading the database to the latest version..."
-	$(PDM) run alembic upgrade head
-
-.PHONY: seed-db
-seed-db: ## Seed the database with initial data (requires DB)
-	@echo "Seeding the database with initial data..."
-	$(PDM) run python scripts/seed.py
-
-.PHONY: seed-mem
-seed-mem: ## Seed in-memory repositories with initial data
+.PHONY: seed
+seed: ## Seed in-memory repositories with initial data
 	@echo "Seeding in-memory repositories..."
 	$(PDM) run python scripts/seed_in_memory.py
-
-.PHONY: seed
-seed: ## Prompt to choose between database and in-memory seeding
-	@echo "Pick a seeding option:"
-	@echo "  1) Database  (requires PostgreSQL)"
-	@echo "  2) In-memory (no database needed)"
-	@read -p "Enter choice [1 or 2]: " choice; \
-	if [ "$$choice" = "1" ]; then \
-		$(MAKE) seed-db; \
-	elif [ "$$choice" = "2" ]; then \
-		$(MAKE) seed-mem; \
-	else \
-		echo "Invalid choice. Please run 'make seed-db' or 'make seed-mem' directly."; \
-		exit 1; \
-	fi
-
-.PHONY: init-db
-init-db: ## Initialize database with custom credentials (Create, Upgrade, Seed). Prompts user for DB_USER (default: postgres), DB_PASSWORD (default: secret), and DB_NAME (required).
-	@echo "Initializing database with custom parameters..."
-	@read -p "Enter database user (DB_USER) [postgres]: " DB_USER_IN; \
-	DB_USER=$${DB_USER_IN:-postgres}; \
-	\
-	echo "Enter database password (DB_PASSWORD) [secret] (input will be visible):"; \
-	read -r DB_PASSWORD_IN; \
-	DB_PASSWORD=$${DB_PASSWORD_IN:-secret}; \
-	\
-	read -p "Enter database name (DB_NAME) (required): " DB_NAME; \
-	\
-	if [ -z "$$DB_NAME" ]; then \
-		echo ""; \
-		echo "Error: Database name (DB_NAME) is required."; \
-		exit 1; \
-	fi; \
-	\
-	echo "Setting up database configuration with user: $$DB_USER, database: $$DB_NAME"; \
-	\
-	echo "Step 1: Creating .env file from .env.example with provided credentials..."; \
-	sed -e "s/DB_USER=.*/DB_USER=$$DB_USER/" \
-	    -e "s/DB_PASSWORD=.*/DB_PASSWORD=$$DB_PASSWORD/" \
-	    -e "s/DB_NAME=.*/DB_NAME=$$DB_NAME/" \
-	    .env.example > .env; \
-	\
-	echo "Step 2: Updating sqlalchemy.url in alembic.ini..."; \
-	sed -i.bak -e "s|sqlalchemy\.url =.*|sqlalchemy.url = postgresql://$$DB_USER:$$DB_PASSWORD@localhost/$$DB_NAME|" alembic.ini; \
-	rm alembic.ini.bak; \
-	\
-	echo "Step 3: Creating the database if it doesn't exist..."; \
-	$(MAKE) create-db; \
-	\
-	echo "Step 4: Upgrading the database to the latest version..."; \
-	$(MAKE) upgrade; \
-	\
-	echo "Step 5: Seeding the database with initial data..."; \
-	$(MAKE) seed; \
-	\
-	echo "Database initialization completed with custom configuration!"

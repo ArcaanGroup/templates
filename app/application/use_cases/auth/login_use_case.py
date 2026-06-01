@@ -3,7 +3,7 @@ True Clean Architecture Use Case for User Login.
 Use case contains business logic and is independent of frameworks and external concerns.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from app.interface.repository.refresh_token_repository_interface import (
     IRefreshTokenRepository,
@@ -37,7 +37,7 @@ class LoginUseCase:
         access_token_str = self._token_service.generate_access_token(
             data={"sub": user.id, "username": user.username},
         )
-        access_expires_at = datetime.utcnow() + timedelta(
+        access_expires_at = datetime.now(UTC) + timedelta(
             minutes=self._token_service.access_token_expire_minutes
         )
         access_token = TokenResponse(

@@ -2,7 +2,7 @@
 Refresh token utilities for authentication.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from app.domain.entities import RefreshTokenEntity
 from app.infra.core.config import config
@@ -18,6 +18,6 @@ def generate_refresh_token(user_id: str) -> RefreshTokenEntity:
     Returns:
         RefreshTokenEntity object with the generated token
     """
-    expires_at = datetime.utcnow() + timedelta(days=config.refresh_token_expire_days)
+    expires_at = datetime.now(UTC) + timedelta(days=config.refresh_token_expire_days)
 
     return RefreshTokenEntity.create(user_id=user_id, expires_at=expires_at)

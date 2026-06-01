@@ -3,7 +3,7 @@ Domain Entity for Role - contains business logic and behavior
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import List, Optional
 from uuid import uuid4
 
@@ -35,7 +35,7 @@ class RoleEntity:
         cls._validate_name(name)
 
         resource_id = resource_id or str(uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         return cls(
             id=resource_id,
@@ -63,17 +63,17 @@ class RoleEntity:
         if permission_ids is not None:
             self.permission_ids = permission_ids
 
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def deactivate(self) -> None:
         """Deactivate the Role."""
         self.is_active = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def activate(self) -> None:
         """Activate the Role."""
         self.is_active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     @staticmethod
     def _validate_name(name: str) -> None:

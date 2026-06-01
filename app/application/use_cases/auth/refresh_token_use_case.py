@@ -3,6 +3,8 @@ True Clean Architecture Use Case for Refreshing Access Token.
 Use case contains business logic and is independent of frameworks and external concerns.
 """
 
+from datetime import UTC, datetime, timedelta
+
 from app.domain.error.exceptions import CredentialsValidationException, InactiveUserException
 from app.interface.repository.refresh_token_repository_interface import (
     IRefreshTokenRepository,
@@ -28,8 +30,6 @@ class RefreshAccessTokenUseCase:
 
     async def execute(self, request: RefreshTokenRequest) -> RefreshTokenResponse:
         """Execute the use case to refresh an access token."""
-        from datetime import timedelta
-
         from app.domain.entities import RefreshTokenEntity
 
         refresh_token_entity = await self._refresh_token_repo.get_refresh_token_by_token(
@@ -51,9 +51,7 @@ class RefreshAccessTokenUseCase:
         access_token_str = self._token_service.generate_access_token(
             data={"sub": user.id, "username": user.username},
         )
-        from datetime import datetime
-
-        access_expires_at = datetime.utcnow() + timedelta(
+        access_expires_at = datetime.now(UTC) + timedelta(
             minutes=self._token_service.access_token_expire_minutes
         )
         access_token = TokenResponse(

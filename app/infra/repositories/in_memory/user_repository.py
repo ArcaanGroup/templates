@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import List, Optional
 
 from fastapi_pagination import Page, Params
@@ -93,7 +93,7 @@ class InMemoryUserRepository(IUserRepository):
 
     def _build_role_entities(self, user_id: str) -> List[RoleEntity]:
         role_ids = self._user_role_ids.get(user_id, [])
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         return [
             RoleEntity(
                 id=rid,

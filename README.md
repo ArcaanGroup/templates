@@ -1,6 +1,6 @@
 # FastAPI Server
 
-An e-commerce for Datasets.
+A FastAPI server following Clean Architecture with in-memory persistence.
 
 ## Features
 
@@ -11,50 +11,33 @@ An e-commerce for Datasets.
 - Standardized response format
 - Dependency injection
 - Proper exception handling
+- JWT-based authentication with refresh tokens
+- RBAC (Role-Based Access Control) with permissions and policies
 
-## Clean Architecture with PostgreSQL + SQLAlchemy + Alembic
+## Architecture
 
-The project follows clean architecture principles with clear separation of concerns:
-
-### Architecture
-- **Entities / Domain**: `app/models/**/domain.py` contains rich domain entities with business rules
-- **DTOs**: `app/models/**/dto.py` contains request and response payload models
-- **Mappers**: `app/models/**/mapper.py` converts between entities, domain models, and DTOs
-- **Use Cases**: `app/use_cases/` contains application business logic interactors
-- **Repository Interfaces**: `app/interface/repositories/` defines persistence contracts
-- **Framework Adapters**: `app/repository/` contains SQLAlchemy and JSON persistence implementations
-- **Delivery / Controllers**: `app/controller/` contains FastAPI route adapters
-- **Dependency Wiring**: `app/dependencies/` connects the framework layer to use case and repository boundaries
-- **Migrations**: `alembic/` contains database migration scripts
-
-### Configuration
-
-The application uses [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) for configuration management with the following hierarchy:
-1. Environment variables (highest priority)
-2. `.env` file values
-3. Default values from .env.example (lowest priority)
-
-Required configuration is validated at startup.
-
-### Running with PostgreSQL
-
-1. Create your `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-# Edit .env to add your database credentials
+```
+app/
+  domain/entities/         # business models (no framework deps)
+  domain/error/            # domain exceptions
+  application/use_cases/   # business logic, orchestrates repositories
+  interface/dto/           # request/response DTOs
+  interface/mappers/       # DTO <-> entity conversion
+  interface/repository/    # repository interfaces (abstract)
+  interface/controller/    # FastAPI routes
+  interface/dependencies/  # DI wiring (resolves repos -> use cases -> controllers)
+  infra/repositories/      # concrete implementations
+    json/                  # JSON-file-backed (permissions, policies)
+    in_memory/             # dict-backed (users, roles, refresh tokens)
+  infra/core/              # config, logging, middleware, seed
+  infra/services/          # password hashing, JWT tokens
 ```
 
-2. Run the application:
+## Quick Start
+
 ```bash
-pdm run uvicorn app.main:app --reload
+pdm install
+make dev
 ```
 
-### Running Migrations
-```bash
-# Apply all migrations
-pdm run alembic upgrade head
-
-# Create new migration after model changes
-export ALEMBIC_CMD=revision
-pdm run alembic revision --autogenerate -m "Description of changes"
-```
+The server runs on `http://localhost:8000` (or port 8004, see `app/main.py`).

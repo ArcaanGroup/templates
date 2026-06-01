@@ -7,7 +7,7 @@ from app.domain.error.exceptions import (
     CredentialsValidationException,
     InactiveUserException,
 )
-from app.infra.services.password_service import IPasswordService
+from app.application.use_cases.auth.interfaces import IPasswordService
 from app.interface.repository.user_repository_interface import IUserRepository
 
 

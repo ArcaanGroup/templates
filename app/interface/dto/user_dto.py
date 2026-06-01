@@ -1,5 +1,4 @@
 from datetime import datetime
-from sys import is_stack_trampoline_active
 from typing import List, Optional
 
 from pydantic import BaseModel

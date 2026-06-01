@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime
+from datetime import UTC, datetime
 
 
 class RefreshTokenEntity:
@@ -43,7 +43,7 @@ class RefreshTokenEntity:
             token=token,
             user_id=user_id,
             expires_at=expires_at,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             revoked=False,
             blacklisted=False,
         )
@@ -53,7 +53,7 @@ class RefreshTokenEntity:
         return (
             not self.revoked
             and not self.blacklisted
-            and datetime.utcnow() < self.expires_at
+            and datetime.now(UTC) < self.expires_at
         )
 
     def revoke(self) -> None:

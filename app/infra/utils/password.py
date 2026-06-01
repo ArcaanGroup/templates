@@ -16,11 +16,13 @@ def hash_password(password: str) -> str:
         Hashed password string
     """
     # bcrypt has a 72-byte password length limit
-    # Truncate if necessary to avoid ValueError
-    if len(password.encode('utf-8')) > 72:
-        password = password[:72]
+    # Truncate to 72 bytes to avoid ValueError, preserving whole characters
+    password_bytes = password.encode('utf-8')[:72]
+    try:
+        password = password_bytes.decode('utf-8')
+    except UnicodeDecodeError:
+        password = password_bytes.decode('utf-8', errors='ignore')
 
-    # Use bcrypt directly to avoid the context validation issues
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed.decode('utf-8')

@@ -10,18 +10,16 @@ pdm run pytest -v                        # verbose
 pdm run pytest tests/unit/               # unit tests only
 pdm run pytest tests/integration/        # integration tests only
 pdm run pytest -k "test_login"           # filter by test name
-pdm run alembic upgrade head             # apply migrations
-pdm run alembic revision --autogenerate -m "msg"  # create migration
 ```
 
-Makefile shortcuts: `make init-db`, `make dev`, `make test`, `make seed`, `make upgrade`, `make seed-mem`, `make seed-db`
+Makefile shortcuts: `make dev`, `make test`, `make seed`
 
 ## Stack
 
 - **Package manager**: PDM (prefix all commands with `pdm run`)
 - **Python**: 3.12 (exact, see pyproject.toml)
 - **Framework**: FastAPI with clean architecture
-- **Persistence**: In-memory (default, no DB required) or PostgreSQL + SQLAlchemy + Alembic
+- **Persistence**: In-memory (dict-backed for users/roles/tokens; JSON-file-backed for permissions/policies)
 - **Config**: pydantic-settings reads `.env` (see `.env.example` for template)
 
 ## Architecture
@@ -50,7 +48,7 @@ app/
 | `application/use_cases` | `domain/entities`, `interface/repository` | Orchestration, request/response DTOs |
 | `interface/controller` | `application/use_cases`, `interface/dto` | HTTP (FastAPI decorators, Depends) |
 | `interface/dependencies` | `infra/repositories`, `application/use_cases` | Wiring (which impl to inject) |
-| `infra/repositories` | `interface/repository` | Storage (JSON, dict, SQLAlchemy, etc.) |
+| `infra/repositories` | `interface/repository` | Storage (JSON, dict) |
 
 ## Testing
 
@@ -98,24 +96,13 @@ def test_create_role(test_client, admin_token):
 
 - **Loguru I/O warning on exit** — harmless, filtered in conftest.py
 - **Seed data is shared** — the lifespan seeds 1 admin user + 1 admin role. Tests should create additional data rather than mutate the seed
-- **`datetime.utcnow()` deprecation** — pre-existing in the codebase, `datetime.now(datetime.UTC)` is the Python 3.12+ replacement
-
-## Gotchas
-
-- **alembic.ini sqlalchemy.url** must match `.env` database config (no auto-sync)
 - **Permissions** stored in `statics/permissions.json` (not database-backed)
 - **asyncio_mode = "auto"** in pytest config (no manual event loop handling)
 - **No lint/typecheck** configured (Makefile `lint` target is just py_compile)
-- **Seed scripts** both create admin/admin@example.com/Secret123 with "Admin" role + super:user permission
+- **Seed** creates admin/admin@example.com/Secret123 with "Admin" role + super:user permission
 - **In-memory repos** are process-scoped singletons — seeding and serving must happen in the same process (auto-seeded via FastAPI lifespan)
-
-## DB Setup Sequence
-
-Requires PostgreSQL running: `make init-db` (or manually: create-db → upgrade → seed)
 
 ## Seeding
 
-- `make seed` — prompts to choose database or in-memory
-- `make seed-db` — seeds into PostgreSQL (requires DB setup)
-- `make seed-mem` — seeds into in-memory repos (no DB needed)
+- `make seed` — seeds into in-memory repos
 - In-memory seeding happens **automatically on `make dev`** via FastAPI lifespan event

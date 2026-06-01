@@ -25,7 +25,8 @@ class InMemoryRefreshTokenRepository(IRefreshTokenRepository):
         return None
 
     async def revoke_refresh_token(self, token_id: str) -> bool:
-        if token_id in self._tokens:
-            del self._tokens[token_id]
+        token = self._tokens.get(token_id)
+        if token:
+            token.revoke()
             return True
         return False
