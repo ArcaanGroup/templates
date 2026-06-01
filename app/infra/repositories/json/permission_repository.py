@@ -66,7 +66,7 @@ class JSONPermissionRepository(IPermissionRepository):
         """Create a PermissionEntity from JSON data."""
         from datetime import datetime
 
-        # Parse datetime strings
+        # Parse datetime strings (handle 'Z' suffix for UTC)
         created_at = datetime.fromisoformat(
             perm_data["created_at"].replace("Z", "+00:00")
         )

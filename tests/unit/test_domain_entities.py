@@ -194,7 +194,7 @@ class TestRefreshTokenEntity:
     def test_revoke(self):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
         )
         token.revoke()
         assert token.revoked is True
@@ -203,7 +203,7 @@ class TestRefreshTokenEntity:
     def test_blacklist(self):
         token = RefreshTokenEntity.create(
             user_id=str(uuid4()),
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            expires_at=datetime.now(UTC) + timedelta(days=1),
         )
         token.blacklist()
         assert token.blacklisted is True

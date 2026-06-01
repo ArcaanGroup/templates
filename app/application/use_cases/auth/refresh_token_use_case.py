@@ -30,8 +30,6 @@ class RefreshAccessTokenUseCase:
 
     async def execute(self, request: RefreshTokenRequest) -> RefreshTokenResponse:
         """Execute the use case to refresh an access token."""
-        from app.domain.entities import RefreshTokenEntity
-
         refresh_token_entity = await self._refresh_token_repo.get_refresh_token_by_token(
             request.refresh_token
         )

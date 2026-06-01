@@ -63,9 +63,13 @@ class JSONPolicyRepository(IPolicyRepository):
     def _create_policy_entity(self, policy_data: dict) -> PolicyEntity:
         """Create a PolicyEntity from JSON data."""
 
-        # Parse datetime strings
-        created_at = datetime.fromisoformat(policy_data["created_at"])
-        updated_at = datetime.fromisoformat(policy_data["updated_at"])
+        # Parse datetime strings (handle 'Z' suffix for UTC)
+        created_at = datetime.fromisoformat(
+            policy_data["created_at"].replace("Z", "+00:00")
+        )
+        updated_at = datetime.fromisoformat(
+            policy_data["updated_at"].replace("Z", "+00:00")
+        )
 
         return PolicyEntity(
             id=policy_data["id"],

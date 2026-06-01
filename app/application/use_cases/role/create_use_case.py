@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from app.domain.entities import RoleEntity
-from app.domain.error.exceptions import ResourceNotFoundException
+from app.domain.error.exceptions import ConflictException, ResourceNotFoundException
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
@@ -40,6 +40,11 @@ class CreateRoleUseCase:
 
     async def execute(self, request: CreateRoleRequest) -> CreateRoleResponse:
         """Execute the use case to create a new role."""
+        # Check for existing role by name
+        existing = await self._role_repo.get_by_name(request.name)
+        if existing:
+            raise ConflictException(f"Role with name '{request.name}' already exists")
+
         # Validate permission IDs if provided
         if request.permission_ids:
             await self._validate_permission_ids(request.permission_ids)

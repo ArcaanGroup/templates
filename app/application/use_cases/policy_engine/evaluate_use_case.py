@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from app.domain.entities import PolicyEntity
-from app.domain.error.exceptions import UnauthorizedException
+from app.domain.error.exceptions import ForbiddenException
 from app.interface.repository.policy_repository_interface import IPolicyRepository
 
 
@@ -46,7 +46,7 @@ class EvaluatePoliciesUseCase:
                 policies.append(policy)
 
         if invalid_policy_ids:
-            raise UnauthorizedException(
+            raise ForbiddenException(
                 message=f"Invalid or missing policies: {', '.join(invalid_policy_ids)}",
                 details={"invalid_policy_ids": invalid_policy_ids},
             )

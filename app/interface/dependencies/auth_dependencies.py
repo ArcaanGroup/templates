@@ -6,7 +6,6 @@ from typing import List, Optional
 
 from fastapi import Cookie, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
 
 from app.application.use_cases.auth import (
     AuthenticateUserUseCase,
@@ -17,28 +16,22 @@ from app.application.use_cases.auth import (
 from app.domain.entities import RoleEntity
 from app.domain.error.exceptions import (
     CredentialsValidationException,
+    ForbiddenException,
     InactiveUserException,
-    UnauthorizedException,
 )
-from app.infra.core.config import config
 from app.infra.services import BcryptPasswordService, JoseTokenService
+from app.infra.utils.auth.jwt import verify_token
 from app.infra.utils.auth.permission import Permission
-from app.interface.dependencies.policy_dependencies import (
-    get_policy_engine_usecase,
-)
 from app.interface.dependencies.refresh_token_dependencies import (
     get_refresh_token_repository,
 )
 from app.interface.dependencies.role_dependencies import get_role_repository
-from app.interface.dto import TokenData, User
+from app.interface.dto import User
 from app.interface.mappers import UserMapper
 from app.interface.repository.role_repository_interface import IRoleRepository
 from app.interface.repository.user_repository_interface import IUserRepository
 
 from .user_dependencies import get_user_repository
-
-SECRET_KEY = config.secret_key
-ALGORITHM = config.algorithm
 
 
 security = HTTPBearer(auto_error=False)
@@ -61,36 +54,6 @@ def get_password_service() -> BcryptPasswordService:
 def get_token_service() -> JoseTokenService:
     """Dependency to provide JoseTokenService instance."""
     return JoseTokenService()
-
-
-def verify_token(token: str) -> Optional[TokenData]:
-    """
-    Verify and decode a JWT token.
-
-    Args:
-        token: JWT token string to verify
-
-    Returns:
-        TokenData if valid, None if invalid
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-        # Validate that required fields exist
-        sub = payload.get("sub")
-        username = payload.get("username")
-
-        if sub is None or username is None:
-            return None
-
-        token_data = TokenData(
-            sub=sub,
-            username=username,
-        )
-
-        return token_data
-    except JWTError:
-        return None
 
 
 async def authorize(
@@ -159,7 +122,7 @@ async def authorize(
             required_permission_ids = [perm.value for perm in required_permissions]
             for perm_id in required_permission_ids:
                 if perm_id not in all_user_permission_ids:
-                    raise UnauthorizedException()
+                    raise ForbiddenException()
     # -------------------- Authorization
 
     return user_dto

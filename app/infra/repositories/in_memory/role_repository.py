@@ -27,6 +27,12 @@ class InMemoryRoleRepository(IRoleRepository):
     async def get_by_id(self, role_id: str) -> Optional[RoleEntity]:
         return self._roles.get(role_id)
 
+    async def get_by_name(self, name: str) -> Optional[RoleEntity]:
+        for role in self._roles.values():
+            if role.name == name:
+                return role
+        return None
+
     async def create(self, created_domain: RoleEntity) -> RoleEntity:
         self._roles[created_domain.id] = created_domain
         return created_domain

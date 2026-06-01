@@ -26,6 +26,11 @@ class IRoleRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_name(self, name: str) -> Optional[RoleEntity]:
+        """Get a role by name from the repository."""
+        pass
+
+    @abstractmethod
     async def create(self, created_domain: RoleEntity) -> RoleEntity:
         """Create a new role in the repository."""
         pass

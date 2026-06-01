@@ -1,5 +1,5 @@
 [project]
-name = "fastapi"
+name = "fastapi-clean-architecture-template"
 version = "0.1.0"
 description = "Default template for PDM package"
 authors = [

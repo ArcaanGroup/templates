@@ -48,8 +48,6 @@ class LoginUseCase:
         )
 
         # Generate refresh token
-        from app.domain.entities import RefreshTokenEntity
-
         refresh_token_entity = self._token_service.generate_refresh_token(user.id)
         refresh_token_dto = await self._refresh_token_repo.create_refresh_token(
             refresh_token_entity

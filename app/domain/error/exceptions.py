@@ -79,21 +79,21 @@ class ResourceNotFoundException(DomainException):
 
 class UnauthorizedException(DomainException):
     """
-    Exception raised when a user is not authorized to perform an action.
+    Exception raised when a user is not authenticated.
     """
 
-    def __init__(self, message: str = "Forbidden access", **kwargs):
+    def __init__(self, message: str = "Not authenticated", **kwargs):
         super().__init__(
             message=message,
-            error_code="FORBIDDEN",
+            error_code="UNAUTHORIZED",
             details=kwargs,
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
 
 class ForbiddenException(DomainException):
     """
-    Exception raised when access is forbidden.
+    Exception raised when a user is authenticated but lacks permission.
     """
 
     def __init__(self, message: str = "Access forbidden", **kwargs):

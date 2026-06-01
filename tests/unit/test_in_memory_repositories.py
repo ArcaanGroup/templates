@@ -229,7 +229,9 @@ class TestRefreshTokenRepository:
         )
         await refresh_token_repo.create_refresh_token(token)
         assert await refresh_token_repo.revoke_refresh_token(token.id) is True
-        assert await refresh_token_repo.get_refresh_token_by_token(token.token) is None
+        fetched = await refresh_token_repo.get_refresh_token_by_token(token.token)
+        assert fetched is not None
+        assert fetched.revoked is True
 
     @pytest.mark.asyncio
     async def test_revoke_not_found(self, refresh_token_repo):

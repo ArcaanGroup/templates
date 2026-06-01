@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from app.domain.entities import RoleEntity
-from app.domain.error.exceptions import ResourceNotFoundException
+from app.domain.error.exceptions import ConflictException, ResourceNotFoundException
 from app.interface.repository.permission_repository_interface import (
     IPermissionRepository,
 )
@@ -47,6 +47,14 @@ class UpdateRoleUseCase:
             raise ResourceNotFoundException(
                 resource_type="Role", identifier=request.role_id
             )
+
+        # Check role name uniqueness if changing
+        if request.name is not None and request.name != role.name:
+            existing = await self._role_repo.get_by_name(request.name)
+            if existing:
+                raise ConflictException(
+                    f"Role with name '{request.name}' already exists"
+                )
 
         # Validate permission IDs if provided
         if request.permission_ids is not None:
